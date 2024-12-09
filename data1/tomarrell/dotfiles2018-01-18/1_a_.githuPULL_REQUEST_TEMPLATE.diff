@@ -1,0 +1,8 @@
+diff --git a/.github/PULL_REQUEST_TEMPLATE b/.github/PULL_REQUEST_TEMPLATE
+new file mode 120000
+index 0000000..800a578
+--- /dev/null
+++ b/.github/PULL_REQUEST_TEMPLATE
+@@ -0,0 +1 @@
+../Documentation/PULL_REQUEST_TEMPLATE
+\ No newline at end of file

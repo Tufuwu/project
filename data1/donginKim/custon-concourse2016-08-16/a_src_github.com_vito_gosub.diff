@@ -1,0 +1,7 @@
+diff --git a/src/github.com/vito/gosub b/src/github.com/vito/gosub
+index 2aa7c2bcf..84ac9df6e 160000
+--- a/src/github.com/vito/gosub
+++ b/src/github.com/vito/gosub
+@@ -1 +1 @@
+-Subproject commit 2aa7c2bcf84483331d2d3a8e85513382c09e08f7
+Subproject commit 84ac9df6e1c049bc6e9515fb3be985e1f9589ba7

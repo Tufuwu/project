@@ -1,0 +1,4 @@
+diff --git a/example/templates/db/.gitignore b/aqueduct/templates/db/.gitignore
+similarity index 100%
+rename from example/templates/db/.gitignore
+rename to aqueduct/templates/db/.gitignore

@@ -1,0 +1,7 @@
+diff --git a/src/github.com/elazarl/go-bindata-assetfs b/src/github.com/elazarl/go-bindata-assetfs
+index 8731e8bf2..e1a2a7ec6 160000
+--- a/src/github.com/elazarl/go-bindata-assetfs
+++ b/src/github.com/elazarl/go-bindata-assetfs
+@@ -1 +1 @@
+-Subproject commit 8731e8bf23ba6063372c2362eaa9d8a4a2ca7e41
+Subproject commit e1a2a7ec64b07d04ac9ebb072404fe8b7b60de1b

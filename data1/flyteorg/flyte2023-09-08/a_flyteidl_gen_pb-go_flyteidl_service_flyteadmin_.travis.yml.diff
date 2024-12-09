@@ -1,0 +1,14 @@
+diff --git a/flyteidl/gen/pb-go/flyteidl/service/flyteadmin/.travis.yml b/flyteidl/gen/pb-go/flyteidl/service/flyteadmin/.travis.yml
+new file mode 100644
+index 0000000000..f5cb2ce9a5
+-- /dev/null
++++ b/flyteidl/gen/pb-go/flyteidl/service/flyteadmin/.travis.yml
+@@ -0,0 +1,8 @@
++language: go
++
++install:
++  - go get -d -v .
++
++script:
++  - go build -v ./
++

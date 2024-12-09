@@ -1,0 +1,15 @@
+diff --git a/.gitignore b/.gitignore
+index edb6293..ae9f65f 100644
+--- a/.gitignore
+++ b/.gitignore
+@@ -1,6 +1,10 @@
+ !.editorconfig
+ *.obj
+# Ignore all hidden files everywhere.
+# Use `git add -f` to add hidden files.
+ .*
+__pycache__
+*.pyc
+ /doc/tags
+ /init.vim
+ /test/ale-info-test-file

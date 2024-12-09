@@ -1,0 +1,19 @@
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..fd14cc3
+--- /dev/null
+++ b/.gitignore
+@@ -0,0 +1,13 @@
+.*~
+*~
+*.swp
+.repo-index
+*.log
+build.log.round*
+*.tar.*
+*.tgz
+!*.tar.*.*
+*.zip
+commitmsg
+results/
+rpms/

@@ -1,0 +1,9 @@
+diff --git a/.gitignore b/.gitignore
+index fd14cc3..edbcfda 100644
+--- a/.gitignore
+++ b/.gitignore
+@@ -11,3 +11,4 @@ build.log.round*
+ commitmsg
+ results/
+ rpms/
+for-review.txt

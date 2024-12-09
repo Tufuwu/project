@@ -1,0 +1,7 @@
+diff --git a/src/github.com/shiena/ansicolor b/src/github.com/shiena/ansicolor
+index d445752f6..a422bbe96 160000
+--- a/src/github.com/shiena/ansicolor
+++ b/src/github.com/shiena/ansicolor
+@@ -1 +1 @@
+-Subproject commit d445752f6f66f9cd987722f109149f6799cdf1de
+Subproject commit a422bbe96644373c5753384a59d678f7d261ff10

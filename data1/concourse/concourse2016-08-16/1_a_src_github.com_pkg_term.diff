@@ -1,0 +1,7 @@
+diff --git a/src/github.com/pkg/term b/src/github.com/pkg/term
+index d7ef5fb23c9..b1f72af2d63 160000
+--- a/src/github.com/pkg/term
+++ b/src/github.com/pkg/term
+@@ -1 +1 @@
+-Subproject commit d7ef5fb23c9838dfaf4731b1dd94aacaedd89181
+Subproject commit b1f72af2d63057363398bec5873d16a98b453312

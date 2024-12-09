@@ -1,0 +1,11 @@
+diff --git a/.github/ISSUE_TEMPLATE/suggest-an-improvement.md b/.github/ISSUE_TEMPLATE/suggest-an-improvement.md
+index 855a649..d39d0ac 100644
+--- a/.github/ISSUE_TEMPLATE/suggest-an-improvement.md
+++ b/.github/ISSUE_TEMPLATE/suggest-an-improvement.md
+@@ -1,5 +1,6 @@
+ ---
+ name: Suggest an improvement
+labels: enhancement
+ about: Suggest some way to improve ALE, or add a new feature.
+ 
+ ---

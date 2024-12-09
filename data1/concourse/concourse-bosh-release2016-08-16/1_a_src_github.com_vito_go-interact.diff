@@ -1,0 +1,7 @@
+diff --git a/src/github.com/vito/go-interact b/src/github.com/vito/go-interact
+index 0eb390344..965b78fd2 160000
+--- a/src/github.com/vito/go-interact
+++ b/src/github.com/vito/go-interact
+@@ -1 +1 @@
+-Subproject commit 0eb390344c5c183069c844093f1bb2ab968eae7b
+Subproject commit 965b78fd2ce125500bf67529de7a88c0be18ac0c

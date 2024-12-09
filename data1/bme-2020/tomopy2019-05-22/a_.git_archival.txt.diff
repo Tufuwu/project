@@ -1,0 +1,7 @@
+diff --git a/.git_archival.txt b/.git_archival.txt
+new file mode 100644
+index 00000000..95cb3eea
+--- /dev/null
+++ b/.git_archival.txt
+@@ -0,0 +1 @@
+ref-names: $Format:%D$

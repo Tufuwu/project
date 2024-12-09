@@ -1,0 +1,146 @@
+diff --git a/.travis.yml b/.travis.yml
+index 12a1e60..833367a 100644
+-- a/.travis.yml
++++ b/.travis.yml
+@@ -1,12 +1,18 @@
+ language: cpp
+ 
+dist: trusty
++dist: bionic
+ sudo: true
+ 
+ branches:
+   only:
+     - master
+ 
++arch:
++  - amd64
++  - ppc64le
++  - s390x
++  - arm64
++
+ matrix:
+   include:
+   # Linux clang builds
+@@ -19,7 +25,7 @@ matrix:
+     addons:
+       apt:
+         sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-trusty-4.0']
+        packages: [ 'cmake', 'clang-4.0', 'llvm-4.0-tools', 'libstdc++-6-dev', 'libssl-dev', 'libcurl4-openssl-dev', 'gdb', 'lcov', 'cppcheck' ]
++        packages: [ 'apport', 'cmake', 'clang-4.0', 'llvm-4.0-tools', 'libstdc++-6-dev', 'libssl-dev', 'libcurl4-openssl-dev', 'gdb', 'lcov', 'cppcheck' ]
+ 
+   - os: linux
+     compiler: clang
+@@ -30,7 +36,7 @@ matrix:
+     addons:
+       apt:
+         sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-trusty-5.0']
+        packages: [ 'cmake', 'clang-5.0', 'llvm-5.0-tools', 'libstdc++-6-dev', 'libssl-dev', 'libcurl4-openssl-dev', 'gdb', 'lcov', 'cppcheck' ]
++        packages: [ 'apport', 'cmake', 'clang-5.0', 'llvm-5.0-tools', 'libstdc++-6-dev', 'libssl-dev', 'libcurl4-openssl-dev', 'gdb', 'lcov', 'cppcheck' ]
+ 
+   - os: linux
+     compiler: clang
+@@ -41,42 +47,9 @@ matrix:
+     addons:
+       apt:
+         sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-trusty-6.0']
+        packages: [ 'cmake', 'clang-6.0', 'llvm-6.0-tools', 'libstdc++-6-dev', 'libssl-dev', 'libcurl4-openssl-dev', 'gdb', 'lcov', 'cppcheck' ]
++        packages: [ 'apport', 'cmake', 'clang-6.0', 'llvm-6.0-tools', 'libstdc++-6-dev', 'libssl-dev', 'libcurl4-openssl-dev', 'gdb', 'lcov', 'cppcheck' ]
+ 
+   # Linux GCC builds
+  - os: linux
+    compiler: gcc
+    env:
+      - COMPILER=g++-4.9
+      - COV_TOOL=gcov-4.9
+      - COV_TOOL_ARGS=
+    addons:
+      apt:
+        sources: ['ubuntu-toolchain-r-test']
+        packages: ['g++-4.9', 'libssl-dev', 'libcurl4-openssl-dev', 'gdb', 'lcov', 'cppcheck']
+
+  - os: linux
+    compiler: gcc
+    env:
+      - COMPILER=g++-5
+      - COV_TOOL=gcov-5
+      - COV_TOOL_ARGS=
+    addons:
+      apt:
+        sources: ['ubuntu-toolchain-r-test']
+        packages: ['g++-5', 'libssl-dev', 'libcurl4-openssl-dev', 'gdb', 'lcov', 'cppcheck']
+
+  - os: linux
+    compiler: gcc
+    env:
+      - COMPILER=g++-6
+      - COV_TOOL=gcov-6
+      - COV_TOOL_ARGS=
+    addons:
+      apt:
+        sources: ['ubuntu-toolchain-r-test']
+        packages: ['g++-6', 'libssl-dev', 'libcurl4-openssl-dev', 'gdb', 'lcov', 'cppcheck']
+
+   - os: linux
+     compiler: gcc
+     env:
+@@ -86,7 +59,7 @@ matrix:
+     addons:
+       apt:
+         sources: ['ubuntu-toolchain-r-test']
+        packages: ['g++-7', 'libssl-dev', 'libcurl4-openssl-dev', 'gdb', 'lcov', 'cppcheck']
++        packages: ['apport', 'g++-7', 'libssl-dev', 'libcurl4-openssl-dev', 'gdb', 'lcov', 'cppcheck']
+ 
+   - os: linux
+     compiler: gcc
+@@ -97,7 +70,7 @@ matrix:
+     addons:
+       apt:
+         sources: ['ubuntu-toolchain-r-test']
+        packages: ['g++-8', 'libssl-dev', 'libcurl4-openssl-dev', 'gdb', 'lcov', 'cppcheck']
++        packages: ['apport', 'g++-8', 'libssl-dev', 'libcurl4-openssl-dev', 'gdb', 'lcov', 'cppcheck']
+ 
+ install:
+   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
+@@ -114,7 +87,7 @@ before_script:
+ 
+   # Print debug system information
+   - cat /proc/sys/kernel/core_pattern
+  - cat /etc/default/apport
++  - cat /etc/default/apport || true
+   - service --status-all || true
+   - initctl list || true
+ 
+@@ -126,6 +99,14 @@ before_script:
+     -DPISTACHE_BUILD_TESTS=true
+     -DPISTACHE_USE_SSL=true
+ 
++  # Debug build, no SSL
++  - cmake -H.
++    -BBuild-Debug-nossl
++    -DCMAKE_BUILD_TYPE=Debug
++    -DPISTACHE_BUILD_EXAMPLES=true
++    -DPISTACHE_BUILD_TESTS=true
++    -DPISTACHE_USE_SSL=false
++
+   # Release build
+   - cmake -H.
+     -BBuild-Release
+@@ -133,10 +114,17 @@ before_script:
+     -DPISTACHE_USE_SSL=true
+ 
+ script:
++  # Set the ulimit
++  - ulimit -c unlimited -S
++
+   # Debug build
+   - cd Build-Debug
+   - make -j 2 all test ARGS="-V"
+ 
++  # Debug build, no SSL
++  - cd ../Build-Debug-nossl
++  - make -j 2 all test ARGS="-V"
++
+   # Release build
+   - cd ../Build-Release
+   - make -j 2

@@ -1,0 +1,13 @@
+diff --git a/.travis.yml b/.travis.yml
+index 3d068ef..f4ca1b2 100644
+-- a/.travis.yml
++++ b/.travis.yml
+@@ -6,7 +6,7 @@ branches:
+   only:
+     - master
+     - develop
+    - //^rel-v.+$//
++    - /^rel-v(\d+.){0,2}\d+$/
+ install:
+   - pip install flake8
+ before_script:

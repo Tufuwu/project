@@ -1,0 +1,7 @@
+diff --git a/src/github.com/mattn/go-isatty b/src/github.com/mattn/go-isatty
+index 7fcbc72f8..66b8e73f3 160000
+--- a/src/github.com/mattn/go-isatty
+++ b/src/github.com/mattn/go-isatty
+@@ -1 +1 @@
+-Subproject commit 7fcbc72f853b92b5720db4a6b8482be612daef24
+Subproject commit 66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8

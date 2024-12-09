@@ -1,0 +1,26 @@
+diff --git a/benchmarking/.gitignore b/benchmarking/.gitignore
+new file mode 100644
+index 00000000..381c74a2
+--- /dev/null
+++ b/benchmarking/.gitignore
+@@ -0,0 +1,20 @@
+##
+##  Ignore everything...
+##
+
+*
+
+##
+##  Except these files...
+##
+
+!.gitignore
+!__init__.py
+!__main__.py
+!phantom.py
+!rec.py
+!util.py
+!*.sh
+!README.md
+!profile.sh
+!setup.py

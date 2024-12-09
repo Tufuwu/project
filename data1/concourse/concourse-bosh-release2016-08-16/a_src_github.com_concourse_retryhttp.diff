@@ -1,0 +1,7 @@
+diff --git a/src/github.com/concourse/retryhttp b/src/github.com/concourse/retryhttp
+index 3248b7b30..c1bda6971 160000
+--- a/src/github.com/concourse/retryhttp
+++ b/src/github.com/concourse/retryhttp
+@@ -1 +1 @@
+-Subproject commit 3248b7b306c926bc1fc2ac759dfb306ba7b52480
+Subproject commit c1bda6971351cdc2fbc09631178097bf398a433b

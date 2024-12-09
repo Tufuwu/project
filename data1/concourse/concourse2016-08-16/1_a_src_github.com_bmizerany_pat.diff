@@ -1,0 +1,7 @@
+diff --git a/src/github.com/bmizerany/pat b/src/github.com/bmizerany/pat
+index b8a35001b77..c068ca2f0aa 160000
+--- a/src/github.com/bmizerany/pat
+++ b/src/github.com/bmizerany/pat
+@@ -1 +1 @@
+-Subproject commit b8a35001b773c267eb260a691f4e5499a3531600
+Subproject commit c068ca2f0aacee5ac3681d68e4d0a003b7d1fd2c

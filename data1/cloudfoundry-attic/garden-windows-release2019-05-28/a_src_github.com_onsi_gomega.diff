@@ -1,0 +1,7 @@
+diff --git a/src/github.com/onsi/gomega b/src/github.com/onsi/gomega
+index 0df7b7f..90e2898 160000
+--- a/src/github.com/onsi/gomega
+++ b/src/github.com/onsi/gomega
+@@ -1 +1 @@
+-Subproject commit 0df7b7fdb38123c12a1f569f0affb2c2a7bd72cf
+Subproject commit 90e289841c1ed79b7a598a7cd9959750cb5e89e2

@@ -1,0 +1,8 @@
+diff --git a/flyteidl/.gitattributes b/flyteidl/.gitattributes
+new file mode 100644
+index 0000000000..a2236d5f13
+--- /dev/null
+++ b/flyteidl/.gitattributes
+@@ -0,0 +1,2 @@
+gen/** linguist-generated=true
+protos/**/*.rst linguist-generated=true

@@ -1,0 +1,7 @@
+diff --git a/site-lisp/magit b/site-lisp/magit
+index 3d5373f..a83f930 160000
+--- a/site-lisp/magit
+++ b/site-lisp/magit
+@@ -1 +1 @@
+-Subproject commit 3d5373fd273f120d5d074bfadcd11d66701392ae
+Subproject commit a83f9303be806dd2e793cd7207926f0fc8dd8146

@@ -1,0 +1,4 @@
+diff --git a/example/templates/default/.travis.yml b/aqueduct/templates/default/.travis.yml
+similarity index 100%
+rename from example/templates/default/.travis.yml
+rename to aqueduct/templates/default/.travis.yml

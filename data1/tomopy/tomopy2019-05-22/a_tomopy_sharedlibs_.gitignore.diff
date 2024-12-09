@@ -1,0 +1,4 @@
+diff --git a/tomopy/sharedlibs/.gitignore b/source/tomopy/sharedlibs/.gitignore
+similarity index 100%
+rename from tomopy/sharedlibs/.gitignore
+rename to source/tomopy/sharedlibs/.gitignore

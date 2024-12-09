@@ -1,0 +1,7 @@
+diff --git a/src/github.com/papertrail/remote_syslog2 b/src/github.com/papertrail/remote_syslog2
+index d121b66d163..523d577b498 160000
+--- a/src/github.com/papertrail/remote_syslog2
+++ b/src/github.com/papertrail/remote_syslog2
+@@ -1 +1 @@
+-Subproject commit d121b66d163aa804fa4c2fcc438b019b448e9fbb
+Subproject commit 523d577b4986087b35651a31dbeaa1d922943213

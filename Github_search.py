@@ -67,7 +67,7 @@ if __name__ == "__main__":
     date_year = parser.parse("2017-12-31")
     search_repo(start_date=date_year.date(),
                 out_file='repos-min-5-forks-.csv',
-                api_token='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',
+                api_token='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',
                 stars=4,
-                lang='Java',
+                lang='Python',
                 verbose=True)

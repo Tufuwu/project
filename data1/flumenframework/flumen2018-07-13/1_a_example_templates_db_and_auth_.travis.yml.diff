@@ -1,0 +1,4 @@
+diff --git a/example/templates/db_and_auth/.travis.yml b/aqueduct/templates/db_and_auth/.travis.yml
+similarity index 100%
+rename from example/templates/db_and_auth/.travis.yml
+rename to aqueduct/templates/db_and_auth/.travis.yml

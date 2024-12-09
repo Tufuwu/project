@@ -1,0 +1,7 @@
+diff --git a/src/github.com/google/go-github b/src/github.com/google/go-github
+index 9420d0f48..b96981646 160000
+--- a/src/github.com/google/go-github
+++ b/src/github.com/google/go-github
+@@ -1 +1 @@
+-Subproject commit 9420d0f48acb838ccf8a7f8dde9eaee19af71132
+Subproject commit b9698164669e386680621e2006cab02271257611

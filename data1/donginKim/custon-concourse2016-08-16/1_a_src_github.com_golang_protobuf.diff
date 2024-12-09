@@ -1,0 +1,7 @@
+diff --git a/src/github.com/golang/protobuf b/src/github.com/golang/protobuf
+index deb4a5e3b..7390af9dc 160000
+--- a/src/github.com/golang/protobuf
+++ b/src/github.com/golang/protobuf
+@@ -1 +1 @@
+-Subproject commit deb4a5e3b15dea23f340a311eea995421845c356
+Subproject commit 7390af9dcd3c33042ebaf2474a1724a83cf1a7e6

@@ -1,0 +1,7 @@
+diff --git a/src/github.com/hpcloud/tail b/src/github.com/hpcloud/tail
+index 05d326f71..a30252cb6 160000
+--- a/src/github.com/hpcloud/tail
+++ b/src/github.com/hpcloud/tail
+@@ -1 +1 @@
+-Subproject commit 05d326f7170255d4f0c2a57dd00268b9beeb6e59
+Subproject commit a30252cb686a21eb2d0b98132633053ec2f7f1e5

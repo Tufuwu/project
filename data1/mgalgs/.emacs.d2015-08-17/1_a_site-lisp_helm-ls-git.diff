@@ -1,0 +1,7 @@
+diff --git a/site-lisp/helm-ls-git b/site-lisp/helm-ls-git
+index f0f0fce..ee13949 160000
+--- a/site-lisp/helm-ls-git
+++ b/site-lisp/helm-ls-git
+@@ -1 +1 @@
+-Subproject commit f0f0fce8bb11ed70104616b4330ddd7957778da4
+Subproject commit ee1394928a70964dc08c4667423ca6db03e76e28

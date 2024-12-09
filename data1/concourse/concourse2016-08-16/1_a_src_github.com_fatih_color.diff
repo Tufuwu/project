@@ -1,0 +1,7 @@
+diff --git a/src/github.com/fatih/color b/src/github.com/fatih/color
+index 76d423163af..87d4004f2ab 160000
+--- a/src/github.com/fatih/color
+++ b/src/github.com/fatih/color
+@@ -1 +1 @@
+-Subproject commit 76d423163af754ff6423d2d9be0057fbf03c57c2
+Subproject commit 87d4004f2ab62d0d255e0a38f1680aa534549fe3

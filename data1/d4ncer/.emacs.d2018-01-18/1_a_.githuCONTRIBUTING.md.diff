@@ -1,0 +1,8 @@
+diff --git a/.github/CONTRIBUTING.md b/.github/CONTRIBUTING.md
+new file mode 120000
+index 00000000..92c688c2
+--- /dev/null
+++ b/.github/CONTRIBUTING.md
+@@ -0,0 +1 @@
+../Documentation/CONTRIBUTING.md
+\ No newline at end of file

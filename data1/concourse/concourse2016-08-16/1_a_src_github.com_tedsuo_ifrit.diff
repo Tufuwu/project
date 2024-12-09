@@ -1,0 +1,7 @@
+diff --git a/src/github.com/tedsuo/ifrit b/src/github.com/tedsuo/ifrit
+index 3a41de6efdb..6711154296c 160000
+--- a/src/github.com/tedsuo/ifrit
+++ b/src/github.com/tedsuo/ifrit
+@@ -1 +1 @@
+-Subproject commit 3a41de6efdb78719e66467a1b170f2b7f1e1014d
+Subproject commit 6711154296c2b3fc5cd1932f0638c8ca0ce8a8a7
