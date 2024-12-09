@@ -1,4 +1,0 @@
-diff --git a/example/templates/default/.gitignore b/aqueduct/templates/default/.gitignore
-similarity index 100%
-rename from example/templates/default/.gitignore
-rename to aqueduct/templates/default/.gitignore

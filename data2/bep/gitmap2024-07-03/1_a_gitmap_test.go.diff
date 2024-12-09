@@ -1,0 +1,21 @@
+diff --git a/gitmap_test.go b/gitmap_test.go
+index 19426db..298ae0d 100644
+--- a/gitmap_test.go
+++ b/gitmap_test.go
+@@ -171,7 +171,6 @@ func assertMessage(
+ 	if gi.Body != expectedBody {
+ 		t.Error("Incorrect commit body. Got", gi.Body)
+ 	}
+-
+ }
+ 
+ func TestActiveRevision(t *testing.T) {
+@@ -201,7 +200,7 @@ func TestGitExecutableNotFound(t *testing.T) {
+ 	gitExec = "thisShouldHopefullyNotExistOnPath"
+ 	gi, err := Map(repository, revision)
+ 
+-	if err != GitNotFound || gi != nil {
+	if err != ErrGitNotFound || gi != nil {
+ 		t.Fatal("Invalid error handling")
+ 	}
+ }

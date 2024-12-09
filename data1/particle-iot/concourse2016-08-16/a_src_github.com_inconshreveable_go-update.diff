@@ -1,7 +1,0 @@
-diff --git a/src/github.com/inconshreveable/go-update b/src/github.com/inconshreveable/go-update
-index 8455de157e..8152e7eb6c 160000
---- a/src/github.com/inconshreveable/go-update
-++ b/src/github.com/inconshreveable/go-update
-@@ -1 +1 @@
--Subproject commit 8455de157e5e3eee5d680febf627fc4c03b59332
-Subproject commit 8152e7eb6ccf8679a64582a66b78519688d156ad

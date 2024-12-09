@@ -1,7 +1,0 @@
-diff --git a/.gitattributes b/.gitattributes
-new file mode 100644
-index 00000000..00a7b00c
---- /dev/null
-++ b/.gitattributes
-@@ -0,0 +1 @@
-.git_archival.txt  export-subst

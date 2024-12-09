@@ -1,7 +1,0 @@
-diff --git a/src/github.com/lib/pq b/src/github.com/lib/pq
-index ffe986aba..80f815004 160000
---- a/src/github.com/lib/pq
-++ b/src/github.com/lib/pq
-@@ -1 +1 @@
--Subproject commit ffe986aba3e6cfcded8b06615965941408891ef0
-Subproject commit 80f8150043c80fb52dee6bc863a709cdac7ec8f8

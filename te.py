@@ -6,9 +6,9 @@ import os
 
 # 配置你的 GitHub Token 和搜索关键字
 GITHUB_TOKEN = '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'  # 用你自己的 GitHub Personal Access Token 替换
-QUERY = 'replace Travis GitHub in:message'
+QUERY = 'replace+Travis+GitHub'
 REPO = 'username/repo'  # 用你自己的仓库名替换
-parent_dir = 'D:/mytxt/project/data1'
+parent_dir = 'D:/mytxt/project/data2'
 
 # GitHub API URL
 API_URL = f"https://api.github.com/search/commits?q={QUERY}"

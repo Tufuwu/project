@@ -69,8 +69,8 @@ before_script:
 
 
 script:
-  - ./gradlew clean demo:assembleDebug cameraview:testDebugUnitTest cameraview:connectedCheck cameraview:mergedCoverageReport cameraview:javadoc
-
+  - ./gradlew clean demo:assembleDebug cameraview:testDebugUnitTest  cameraview:mergedCoverageReport cameraview:javadoc
+cameraview:connectedCheck
 after_success:
   - bash <(curl -s https://codecov.io/bash) -s "*/build/reports/mergedCoverageReport/"
 
@@ -86,4 +86,4 @@ deploy:
   on:
     branch: master
     tags: true
-\ No newline at end of file
+

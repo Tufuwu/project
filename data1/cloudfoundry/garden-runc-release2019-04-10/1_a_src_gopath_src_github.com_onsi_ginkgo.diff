@@ -1,7 +1,0 @@
-diff --git a/src/gopath/src/github.com/onsi/ginkgo b/src/gopath/src/github.com/onsi/ginkgo
-index 059cec02d..eea6ad008 160000
---- a/src/gopath/src/github.com/onsi/ginkgo
-++ b/src/gopath/src/github.com/onsi/ginkgo
-@@ -1 +1 @@
--Subproject commit 059cec02d342bab423425a99b191186a03255e9e
-Subproject commit eea6ad008b96acdaa524f5b409513bf062b500ad

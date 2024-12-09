@@ -1,0 +1,23 @@
+language: generic
+
+services:
+  - docker
+
+before_install:
+  - docker build -t pzijlmans/docker-react -f Dockerfile.dev .
+
+script:
+  - docker run -e CI=true pzijlmans/docker-react npm run test
+
+deploy:
+  provider: elasticbeanstalk
+  region: "us-east-1"
+  app: "frontend"
+  env: "Frontend-env"
+  bucket_name: "elasticbeanstalk-us-east-1-058264559513"
+  bucket_path: "frontend"
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
+\ No newline at end of file

@@ -1,7 +1,0 @@
-diff --git a/src/github.com/gorilla/websocket b/src/github.com/gorilla/websocket
-index 5c91b59efa..a69d25be2f 160000
---- a/src/github.com/gorilla/websocket
-++ b/src/github.com/gorilla/websocket
-@@ -1 +1 @@
--Subproject commit 5c91b59efa232fa9a87b705d54101832c498a172
-Subproject commit a69d25be2fe2923a97c2af6849b2f52426f68fc0

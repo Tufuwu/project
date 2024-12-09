@@ -1,0 +1,12 @@
+diff --git a/.gitignore b/.gitignore
+index 2dc6d1b..1bd3e48 100644
+--- a/.gitignore
+++ b/.gitignore
+@@ -1,5 +1,6 @@
+ # macOS
+-**/.DS_Store
+.DS_Store
+._*
+ 
+ # Gradle
+ .gradle/

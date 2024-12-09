@@ -1,0 +1,16 @@
+diff --git a/.github/workflows/deploy-storybook.yml b/.github/workflows/deploy-storybook.yml
+index 4edaf5b..75edef3 100644
+--- a/.github/workflows/deploy-storybook.yml
+++ b/.github/workflows/deploy-storybook.yml
+@@ -25,9 +25,9 @@ jobs:
+       - name: Checkout
+         uses: actions/checkout@v4
+       - name: Use Node.js
+-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
+         with:
+-          node-version: 20.x
+          node-version-file: '.nvmrc'
+       - run: npm ci
+       - run: npm run verify
+       - run: npm run build-storybook -- --base=/declarative-canvas/

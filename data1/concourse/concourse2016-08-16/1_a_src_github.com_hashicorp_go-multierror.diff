@@ -1,7 +1,0 @@
-diff --git a/src/github.com/hashicorp/go-multierror b/src/github.com/hashicorp/go-multierror
-index d30f09973e1..8c5f0ad9360 160000
---- a/src/github.com/hashicorp/go-multierror
-++ b/src/github.com/hashicorp/go-multierror
-@@ -1 +1 @@
--Subproject commit d30f09973e19c1dfcd120b2d9c4f168e68d6b5d5
-Subproject commit 8c5f0ad9360406a3807ce7de6bc73269a91a6e51

@@ -1,9 +1,0 @@
-diff --git a/.gitignore b/.gitignore
-index 513fe66a..2ac35b14 100644
---- a/.gitignore
-++ b/.gitignore
-@@ -16,3 +16,4 @@ schema.graphql
- subgraph.yaml
- build/
- *.scss.d.ts
-*.css.d.ts

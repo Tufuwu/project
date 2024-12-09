@@ -1,0 +1,8 @@
+diff --git a/.github/FUNDING.yml b/.github/FUNDING.yml
+new file mode 100644
+index 0000000..82f3f17
+--- /dev/null
+++ b/.github/FUNDING.yml
+@@ -0,0 +1 @@
+github: [bep]
+\ No newline at end of file

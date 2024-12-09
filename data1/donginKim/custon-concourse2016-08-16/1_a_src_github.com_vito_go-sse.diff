@@ -1,7 +1,0 @@
-diff --git a/src/github.com/vito/go-sse b/src/github.com/vito/go-sse
-index bfb56c559..fd69d275c 160000
---- a/src/github.com/vito/go-sse
-++ b/src/github.com/vito/go-sse
-@@ -1 +1 @@
--Subproject commit bfb56c5590376a59535cd0edb3f5aa3447dbbe65
-Subproject commit fd69d275caac5d78d793e77ddbe9bd2001d9b88d

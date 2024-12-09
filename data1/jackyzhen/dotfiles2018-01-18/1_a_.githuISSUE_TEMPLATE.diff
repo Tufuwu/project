@@ -1,8 +1,0 @@
-diff --git a/.github/ISSUE_TEMPLATE b/.github/ISSUE_TEMPLATE
-new file mode 120000
-index 0000000..a38479e
---- /dev/null
-++ b/.github/ISSUE_TEMPLATE
-@@ -0,0 +1 @@
-../Documentation/ISSUE_TEMPLATE
-\ No newline at end of file

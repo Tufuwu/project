@@ -1,0 +1,24 @@
+name: CI
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  java:
+    runs-on: ubuntu-latest
+      strategy:
+      matrix:
+        java: [ '1.8', '11'8]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK ${{ matrix.java }}
+      uses: actions/setup-java@v1
+      with:
+        java-version: ${{ matrix.java }}
+    - name: Test
+      run: |
+        cd h2
+        echo $JAVA_OPTS
+        export JAVA_OPTS=-Xmx512m
+        ./build.sh jar testCI

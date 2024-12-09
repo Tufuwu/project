@@ -1,0 +1,8 @@
+language: c
+ 
+addons:
+  apt:
+    packages:
+    - pandoc
+ 
+script: curl -s https://raw.githubusercontent.com/BigWigsMods/packager/master/release.sh | bash

@@ -1,7 +1,0 @@
-diff --git a/src/github.com/google/go-querystring b/src/github.com/google/go-querystring
-index 547ef5ac97..9235644dd9 160000
---- a/src/github.com/google/go-querystring
-++ b/src/github.com/google/go-querystring
-@@ -1 +1 @@
--Subproject commit 547ef5ac979778feb2f760cdb5f4eae1a2207b86
-Subproject commit 9235644dd9e52eeae6fa48efd539fdc351a0af53

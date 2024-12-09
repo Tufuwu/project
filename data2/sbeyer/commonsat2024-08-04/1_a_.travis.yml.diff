@@ -1,0 +1,22 @@
+language: cpp
+
+os: linux
+sudo: required
+dist: trusty
+
+compiler:
+  - gcc
+
+addons:
+  apt:
+    packages:
+      - doxygen
+      - graphviz
+
+git:
+  depth: 3
+  submodules: false
+
+script:
+  - util/quickstart.sh
+  - util/check-doxygen-errors.sh

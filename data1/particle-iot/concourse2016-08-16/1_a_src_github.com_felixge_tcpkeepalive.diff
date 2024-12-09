@@ -1,7 +1,0 @@
-diff --git a/src/github.com/felixge/tcpkeepalive b/src/github.com/felixge/tcpkeepalive
-index c7641b57e8..5bb0b2dea9 160000
---- a/src/github.com/felixge/tcpkeepalive
-++ b/src/github.com/felixge/tcpkeepalive
-@@ -1 +1 @@
--Subproject commit c7641b57e8ed2e6100440f198116fd86924dba04
-Subproject commit 5bb0b2dea91e0de550022159b9571aafc72c08ba

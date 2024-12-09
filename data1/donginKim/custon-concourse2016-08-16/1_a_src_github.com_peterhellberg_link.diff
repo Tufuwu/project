@@ -1,7 +1,0 @@
-diff --git a/src/github.com/peterhellberg/link b/src/github.com/peterhellberg/link
-index 1082c67c1..d1cebc7ea 160000
---- a/src/github.com/peterhellberg/link
-++ b/src/github.com/peterhellberg/link
-@@ -1 +1 @@
--Subproject commit 1082c67c1c8ca8ed0baafd222ac7b17c6e78c35f
-Subproject commit d1cebc7ea14a5fc0de7cb4a45acae773161642c6

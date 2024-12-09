@@ -1,7 +1,0 @@
-diff --git a/src/github.com/kr/pty b/src/github.com/kr/pty
-index f7ee69f31..ce7fa4592 160000
---- a/src/github.com/kr/pty
-++ b/src/github.com/kr/pty
-@@ -1 +1 @@
--Subproject commit f7ee69f31298ecbe5d2b349c711e2547a617d398
-Subproject commit ce7fa45920dc37a92de8377972e52bc55ffa8d57

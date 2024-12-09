@@ -1,7 +1,0 @@
-diff --git a/src/github.com/sclevine/agouti b/src/github.com/sclevine/agouti
-index ce6246482..e5378e70d 160000
---- a/src/github.com/sclevine/agouti
-++ b/src/github.com/sclevine/agouti
-@@ -1 +1 @@
--Subproject commit ce62464824d19ff6a7aaec92bdfc802ce0cbec00
-Subproject commit e5378e70dca437a9e16cc6d71a85aa0045dd94c7
