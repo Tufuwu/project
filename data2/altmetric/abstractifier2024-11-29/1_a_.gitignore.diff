@@ -1,7 +1,0 @@
-diff --git a/.gitignore b/.gitignore
-new file mode 100644
-index 0000000..b844b14
---- /dev/null
-++ b/.gitignore
-@@ -0,0 +1 @@
-Gemfile.lock
