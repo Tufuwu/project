@@ -7,4 +7,4 @@ script:
   - "cargo fmt -- --check"
   - "cargo test --release -- --nocapture"
   - "export RUST_TEST_THREADS=1; cargo test --release -- --ignored --nocapture"
-\ No newline at end of file
+
