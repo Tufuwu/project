@@ -1,0 +1,22 @@
+diff --git a/.github/dependabot.yml b/.github/dependabot.yml
+index 0b1d040..166832b 100644
+--- a/.github/dependabot.yml
+++ b/.github/dependabot.yml
+@@ -4,8 +4,14 @@
+ # https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+ 
+ version: 2
+
+ updates:
+-  - package-ecosystem: "bundler" # See documentation for possible values
+-    directory: "/" # Location of package manifests
+  - package-ecosystem: 'bundler'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+     schedule:
+-      interval: "weekly"
+      interval: 'weekly'

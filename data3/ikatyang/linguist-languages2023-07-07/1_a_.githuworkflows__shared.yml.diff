@@ -1,0 +1,24 @@
+diff --git a/.github/workflows/_shared.yml b/.github/workflows/_shared.yml
+new file mode 100644
+index 00000000..67b6f61a
+--- /dev/null
+++ b/.github/workflows/_shared.yml
+@@ -0,0 +1,18 @@
+on:
+  workflow_call:
+    inputs:
+      command:
+        type: string
+        required: true
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '10'
+          cache: yarn
+      - run: yarn
+      - run: ${{ inputs.command }}

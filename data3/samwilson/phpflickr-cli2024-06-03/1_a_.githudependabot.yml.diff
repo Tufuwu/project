@@ -1,0 +1,14 @@
+diff --git a/.github/dependabot.yml b/.github/dependabot.yml
+new file mode 100644
+index 0000000..846a1bb
+--- /dev/null
+++ b/.github/dependabot.yml
+@@ -0,0 +1,8 @@
+version: 2
+updates:
+- package-ecosystem: composer
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "21:00"
+  open-pull-requests-limit: 10

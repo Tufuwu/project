@@ -1,0 +1,6 @@
+language: python
+python:
+  - "3.8"
+script:
+  - pytest
+\ No newline at end of file

@@ -1,0 +1,12 @@
+diff --git a/.gitignore b/.gitignore
+index bf47d95be..ad7fbc0e0 100644
+--- a/.gitignore
+++ b/.gitignore
+@@ -39,6 +39,7 @@ config/app_environment_variables.rb
+ *.sublime-workspace
+ .idea
+ .env
+.secrets
+ 
+ # ignore vim backup files
+ *~

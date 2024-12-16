@@ -1,0 +1,20 @@
+diff --git a/.github/workflows/main.yml b/.github/workflows/main.yml
+new file mode 100644
+index 0000000..38468e8
+--- /dev/null
+++ b/.github/workflows/main.yml
+@@ -0,0 +1,14 @@
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v3
+    - name: dependencies
+      run: npm install
+    - run: mkdir -p dist
+    - name: build
+      run: npx browserify index.js -o dist/aria.js -s aria
+    - name: test
+      run: npx mocha-headless-chrome -a no-sandbox -f test/index.html

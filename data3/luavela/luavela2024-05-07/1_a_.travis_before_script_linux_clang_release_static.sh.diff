@@ -1,0 +1,13 @@
+diff --git a/.travis/before_script/linux_clang_release_static.sh b/.travis/before_script/linux_clang_release_static.sh
+deleted file mode 100755
+index d9b6acb2..00000000
+-- a/.travis/before_script/linux_clang_release_static.sh
++++ /dev/null
+@@ -1,7 +0,0 @@
+#!/usr/bin/env bash
+
+cmake -H. -B${BUILD_DIR} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain/Clang.cmake \
+    -DUJIT_TEST_LIB_TYPE=static \
+    -DUJIT_TEST_OPTIONS="-O4"

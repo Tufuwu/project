@@ -1,0 +1,12 @@
+diff --git a/.travis/before_script/linux_gcc_debug_static.sh b/.travis/before_script/linux_gcc_debug_static.sh
+deleted file mode 100755
+index 4d6694f3..00000000
+-- a/.travis/before_script/linux_gcc_debug_static.sh
++++ /dev/null
+@@ -1,6 +0,0 @@
+#!/usr/bin/env bash
+
+cmake -H. -B${BUILD_DIR} \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DUJIT_TEST_LIB_TYPE=static \
+    -DUJIT_TEST_OPTIONS="-O4"

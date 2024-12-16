@@ -1,0 +1,24 @@
+diff --git a/.github/workflows/check-build.yml b/.github/workflows/check-build.yml
+index 7bad84fd21..9f4f278138 100644
+--- a/.github/workflows/check-build.yml
+++ b/.github/workflows/check-build.yml
+@@ -25,5 +25,19 @@ jobs:
+     - name: Compile binary programs
+       run: make pgms
+ 
+    - name: Check for carriage returns
+      run: |
+        if grep -IUrl --exclude-dir=.git . -e $'\r'; then
+          echo "Sorry, carriage returns are not allowed in the repo."
+          exit 1
+        fi
+
+    - name: XML validation
+      run: |
+        sudo apt-get install -y libxml2-utils
+        for i in xml/issue*.xml ; do
+          xmllint --noout --nowarning --dtdvalid xml/lwg-issue.dtd $i
+        done
+
+     - name: Generate HTML lists
+       run: make lists

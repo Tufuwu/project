@@ -1,0 +1,17 @@
+diff --git a/.github/workflows/pr-verification.yml b/.github/workflows/pr-verification.yml
+index 573217b..54717aa 100644
+--- a/.github/workflows/pr-verification.yml
+++ b/.github/workflows/pr-verification.yml
+@@ -1,9 +1,9 @@
+ name: Verify the push
+ 
+ on:
+-  pull_request:
+-    branches:
+-      - master
+  push:
+    branches-ignore:
+      - main
+ 
+ jobs:
+   verify:

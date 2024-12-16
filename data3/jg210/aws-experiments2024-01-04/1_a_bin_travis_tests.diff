@@ -1,0 +1,23 @@
+diff --git a/bin/travis_tests b/bin/travis_tests
+deleted file mode 100755
+index adeeb18..0000000
+-- a/bin/travis_tests
++++ /dev/null
+@@ -1,17 +0,0 @@
+#!/bin/bash
+
+. "$(dirname "$0")/.common.sh" 
+##########################################################
+
+# tmpDir="$(mktemp -d)"
+# trap "rm -fR ${tmpDir}" EXIT
+# terraformZip="${tmpDir}/terraform.zip"
+# binDir="${tmpDir}/bin"
+# # TODO cache download.
+# curl https://releases.hashicorp.com/terraform/0.11.13/terraform_0.11.13_linux_amd64.zip > "${terraformZip}"
+# unzip "${terraformZip}" -d "${binDir}"
+# terraform="${binDir}/terraform"
+# "${terraform}" init -backend=false
+# touch ~/.ssh/aws-experiments.pub
+# "${terraform}" validate
+# "${terraform}" graph -draw-cycles | dot -Tsvg > terraform.svg

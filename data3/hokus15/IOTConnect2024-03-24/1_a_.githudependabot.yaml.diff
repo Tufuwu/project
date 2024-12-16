@@ -1,0 +1,26 @@
+diff --git a/.github/dependabot.yaml b/.github/dependabot.yaml
+new file mode 100644
+index 0000000..da65805
+--- /dev/null
+++ b/.github/dependabot.yaml
+@@ -0,0 +1,19 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: daily
+      time: "06:00"
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "daily"
+      time: "06:15"
+    commit-message:
+      prefix: "build"
+      include: "scope"
+    labels:
+      - dependencies
+    open-pull-requests-limit: 10
+    rebase-strategy: auto
+\ No newline at end of file

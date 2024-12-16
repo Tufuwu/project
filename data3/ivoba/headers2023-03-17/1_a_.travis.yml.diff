@@ -1,0 +1,12 @@
+language: php
+
+php:
+  - 7.1
+  - 7.2
+
+before_script:
+  - wget http://getcomposer.org/composer.phar
+  - php composer.phar install --dev
+
+script: vendor/bin/phpunit
+\ No newline at end of file

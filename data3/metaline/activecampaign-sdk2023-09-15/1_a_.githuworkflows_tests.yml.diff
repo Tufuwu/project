@@ -1,0 +1,16 @@
+diff --git a/.github/workflows/tests.yml b/.github/workflows/tests.yml
+index 767bdd4..30102e5 100644
+--- a/.github/workflows/tests.yml
+++ b/.github/workflows/tests.yml
+@@ -17,9 +17,11 @@ jobs:
+     strategy:
+       matrix:
+         php-version:
+          - '7.3'
+           - '7.4'
+           - '8.0'
+           - '8.1'
+          - '8.2'
+ 
+     steps:
+     - uses: actions/checkout@v3

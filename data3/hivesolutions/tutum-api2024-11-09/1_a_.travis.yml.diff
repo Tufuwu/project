@@ -1,0 +1,33 @@
+language: python
+python:
+  - "2.7"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "pypy3"
+matrix:
+  include:
+  - python: 3.8
+    dist: xenial
+  - python: 3.9
+    dist: xenial
+  - python: pypy
+    dist: xenial
+  - python: pypy3
+    dist: xenial
+before_install:
+  - pip install --upgrade pip setuptools
+install:
+  - pip install -r requirements.txt
+  - if [[ $TRAVIS_PYTHON_VERSION != pypy* ]]; then pip install coveralls; fi
+script: if [[ $TRAVIS_PYTHON_VERSION != pypy* ]]; then coverage run --source=tutum setup.py test; else python setup.py test; fi
+after_success: if [[ $TRAVIS_PYTHON_VERSION != pypy* ]]; then coveralls; fi
+deploy:
+  provider: pypi
+  user: joamag
+  password:
+    secure: PVeU5BHaKjmpCEajQYhXZgH0QvHalMezLC2Tj+llKUr4cc+uVIyd7LYj1L5moDUAfY9YTlRqe+CfrNu77V2ik3PL1CRlhw3wP6cbq1qSFxfd8ko9GLVjXGb8KxCuLge3MF+N3Y5fOEciMZ3pHwMbPFa+kW8/okATLtbuCBGbhf3oCPDc1xygbFcavl8TPGXj/vT1KmltYjU6Ue1HhzI0B6EQikaHqH7Dy7+TaWFy0w39XRvLOEiaQzr9tG+hccseC8lt85HSbIVXCa0KL4n2hCQ0EJ+9lHW8udNB7J3RRN+SJZIxtmyzKws7G6f46BnJKMFORIXfDPQ01Rmanih3bWDB5oPioX0uguR2SNiKDlq56gqBIgWalhtfKNwcxUdiiSRC8W/DilBHXW7wf4fm1PKNTndK8upwllzEf28nC+VcQKuDoKSht5jgn9rJnWM+3tVBQbSrmAC+GTL0sm5t6Ml/x0rxgzDHzTeJfpZvslNMRyqBcwBeHYmrqQJLK7qepJQKYBKrMSvjNFoydr3OlkGzZJKnAiY7yvawaxR+S1gdUiK9OZNS1G626JwrB8nWC24RMJYtF07PMTP7NFBiuDbkmNhXSGbkwvkvuECH1RVzO1ISBnpjDrQHQSbE/88Bkr5TxqCTiceP1GygjtifRm9Lekqw9K1/GdQGdFCzaX8=
+  distributions: sdist bdist_wheel
+  on:
+    tags: true
+    python: "2.7"

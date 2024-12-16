@@ -1,0 +1,19 @@
+diff --git a/.github/workflows/workflow.yml b/.github/workflows/workflow.yml
+new file mode 100644
+index 00000000..a8585908
+--- /dev/null
+++ b/.github/workflows/workflow.yml
+@@ -0,0 +1,13 @@
+on:
+  - push
+  - pull_request
+
+jobs:
+  lint:
+    uses: ./.github/workflows/_shared.yml
+    with:
+      command: yarn run lint
+  test:
+    uses: ./.github/workflows/_shared.yml
+    with:
+      command: yarn run test

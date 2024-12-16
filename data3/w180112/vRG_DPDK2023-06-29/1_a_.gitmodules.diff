@@ -1,0 +1,21 @@
+diff --git a/.gitmodules b/.gitmodules
+index 6d04b4d..30101cd 100644
+--- a/.gitmodules
+++ b/.gitmodules
+@@ -1,9 +1,11 @@
+ [submodule "lib/libutil"]
+ 	path = lib/libutil
+ 	url = https://github.com/w180112/libutil.git
+-[submodule "lib/dpdk"]
+-	path = lib/dpdk
+-	url = https://github.com/DPDK/dpdk
+ [submodule "lib/dpdk-kmods"]
+ 	path = lib/dpdk-kmods
+-	url = https://dpdk.org/git/dpdk-kmods
+\ No newline at end of file
+	url = https://dpdk.org/git/dpdk-kmods
+	branch = main
+[submodule "lib/dpdk"]
+	path = lib/dpdk
+	url = https://dpdk.org/git/dpdk-stable
+	branch = 22.11

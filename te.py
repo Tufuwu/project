@@ -2,13 +2,15 @@ import requests
 import json
 from utils import get_commit_diff,split_and_save_diffs
 import os
+import time
+
 
 
 # 配置你的 GitHub Token 和搜索关键字
 GITHUB_TOKEN = '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'  # 用你自己的 GitHub Personal Access Token 替换
 QUERY = 'replace+Travis+GitHub'
 REPO = 'username/repo'  # 用你自己的仓库名替换
-parent_dir = 'D:/mytxt/project/data2'
+parent_dir = 'D:/mytxt/project/data3'
 
 # GitHub API URL
 API_URL = f"https://api.github.com/search/commits?q={QUERY}"
@@ -21,10 +23,11 @@ headers = {
 
 # 定义获取提交记录的函数
 def get_commits(url):
-    page = 1
+    page = 1002
     per_page = 1  # 每次只获取一条记录
     while True:
         print(f"Fetching page {page}...")
+
         response = requests.get(url, headers=headers, params={'page': page, 'per_page': per_page})
         data = response.json()
 

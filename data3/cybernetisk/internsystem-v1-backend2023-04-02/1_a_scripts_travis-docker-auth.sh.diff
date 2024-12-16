@@ -1,0 +1,10 @@
+diff --git a/scripts/travis-docker-auth.sh b/scripts/travis-docker-auth.sh
+deleted file mode 100755
+index 0232d906..00000000
+-- a/scripts/travis-docker-auth.sh
++++ /dev/null
+@@ -1,4 +0,0 @@
+#!/bin/sh
+set -eu
+
+echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin

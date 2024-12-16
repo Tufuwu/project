@@ -1,0 +1,32 @@
+diff --git a/.travis.yml b/.travis.yml
+deleted file mode 100644
+index 18506ca..0000000
+-- a/.travis.yml
++++ /dev/null
+@@ -1,26 +0,0 @@
+addons:
+  apt:
+    packages:
+      - python-pygments
+
+install:
+    - wget https://github.com/gohugoio/hugo/releases/download/v0.63.2/hugo_0.63.2_Linux-64bit.deb
+    - sudo dpkg -i hugo*.deb
+    - rm -rf public 2> /dev/null
+    - rm *.deb
+
+script:
+    - hugo
+    - echo 'toplak.io' > public/CNAME
+    - touch public/.nojekyll
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
+  keep-history: true
+  verbose: true
+  local-dir: public
+  target_branch: gh-pages
+  on:
+    branch: master

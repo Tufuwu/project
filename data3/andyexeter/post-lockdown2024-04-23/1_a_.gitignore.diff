@@ -1,0 +1,9 @@
+diff --git a/.gitignore b/.gitignore
+index d169f4e..84a3c7c 100644
+--- a/.gitignore
+++ b/.gitignore
+@@ -4,3 +4,4 @@
+ /bin/release-secrets
+ /.php_cs.cache
+ /wordpress
+/.php-cs-fixer.cache

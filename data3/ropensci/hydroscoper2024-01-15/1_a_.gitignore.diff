@@ -1,0 +1,9 @@
+diff --git a/.gitignore b/.gitignore
+index 7266d3f..d7dcecb 100644
+--- a/.gitignore
+++ b/.gitignore
+@@ -5,3 +5,4 @@
+ inst/doc
+ .DS_Store
+ CRAN-RELEASE
+docs/

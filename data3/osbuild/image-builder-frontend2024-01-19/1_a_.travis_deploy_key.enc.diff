@@ -1,0 +1,4 @@
+diff --git a/.travis/deploy_key.enc b/.travis/deploy_key.enc
+deleted file mode 100644
+index 4c15ff68d..000000000
+Binary files a/.travis/deploy_key.enc and /dev/null differ

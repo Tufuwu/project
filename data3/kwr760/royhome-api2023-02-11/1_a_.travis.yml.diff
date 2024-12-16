@@ -1,0 +1,30 @@
+language: java
+jdk:
+- openjdk11
+jobs:
+  include:
+  - stage: Test Pull Request
+    script:
+    - "./gradlew test build"
+    if: type = pull_request
+  - stage: Deploy to Production
+    script:
+    - "./gradlew build"
+    - "./.travis/deploy.sh"
+    if: type = push AND branch = main
+before_cache:
+- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
+before_install:
+- chmod +x gradlew
+- chmod +x gradle/wrapper/gradle-wrapper.jar
+addons:
+  ssh_known_hosts:
+  - 45.79.110.249
+env:
+  global:
+    secure: K7Pg/4ogS0stPcLVyV1xyTqlhlWItCUdyAvYbdlDGSrE4fy8AVKV3vNY8ZnjJ/SC33CYxPg0ZyvHHnU5KYneqAmUrhRsbv2itiMqSn8aStv/ldGc/9x9irWYFa4LP53XBv9NKDgtQsAalKsF9xKunJU+Tdx/ucBTbLNziLdlHPIYgwh/ktJgWCruc4jRu4s9m4FK7NTzWA9vaR9h5rK4jt4neWcMMZASzyStu3vPkQ0piPKvY9jp06SUAPbCBhCzQLojVOPtuBSuiopw5J4iSSDeJsOU/4QufYYXiK6FI7wFsP/afcMvZ4/CfOcrG3+HRtX2QvhNiDG+DpWMtGx/EKGNHYXWaG9tTEpTHh3inBD5WtfZimgYU5A/Zt3epzSLRh53SzMLGTWM7UfOJD4zQOgxKWdqZSzHHp6oN17Qm10Fe4TIU6p7+eaqV92CW0UCNsEYdt7qLPNtdJLhSUuOApfHoVnlW8br4MSyFLYZFh+l92OCDHPFIybkE8J4SWsG4S9ML8dSTT8eX0MatMFKLKh3imthehOE56HISA5cbnXE+FmItsbAo+dUs6busOjW+OVgNKFfNV2GpgH7oIKd+vG2KGYXaYACfNsZ4aAwAsuWwcVgc1i4MvFbdae5q3ixQyOa7n1a/XphPxtG4ukK8AYw93Mf/4nnj0cPuQTZs1s=

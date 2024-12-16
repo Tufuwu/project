@@ -1,0 +1,16 @@
+diff --git a/scripts/travis-test-image.sh b/scripts/test-image.sh
+similarity index 96%
+rename from scripts/travis-test-image.sh
+rename to scripts/test-image.sh
+index b58e69ef..af507b86 100755
+-- a/scripts/travis-test-image.sh
++++ b/scripts/test-image.sh
+@@ -18,7 +18,7 @@ container_id=$(
+   docker run \
+     --rm \
+     -d \
+    -e LOCAL_SETTINGS=settings_local_travis \
++    -e LOCAL_SETTINGS=settings_local_ci \
+     --network-alias=service \
+     --network $network_id \
+     "$image_id"

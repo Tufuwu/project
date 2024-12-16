@@ -1,0 +1,12 @@
+diff --git a/.gitignore b/.gitignore
+index d1a41ad..4eb401b 100644
+--- a/.gitignore
+++ b/.gitignore
+@@ -4,7 +4,6 @@ debug.test
+ data/*
+ /vendor
+ coverage.txt
+-.github
+ dist
+ .vscode
+ .idea

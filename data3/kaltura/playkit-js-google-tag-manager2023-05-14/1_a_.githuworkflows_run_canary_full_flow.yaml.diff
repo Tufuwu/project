@@ -1,0 +1,10 @@
+diff --git a/.github/workflows/run_canary_full_flow.yaml b/.github/workflows/run_canary_full_flow.yaml
+index 777c354..221c149 100644
+--- a/.github/workflows/run_canary_full_flow.yaml
+++ b/.github/workflows/run_canary_full_flow.yaml
+@@ -24,4 +24,4 @@ jobs:
+       type: "plugin"
+       stage: "canary"
+       schema-type: "playerV3Versions"
+-      tests-yarn-run-to-execute: 'lint:check types:check test'
+      tests-yarn-run-to-execute: 'build lint:check types:check test'

@@ -1,0 +1,20 @@
+diff --git a/.github/dependabot.yml b/.github/dependabot.yml
+new file mode 100644
+index 0000000..a8042fc
+--- /dev/null
+++ b/.github/dependabot.yml
+@@ -0,0 +1,14 @@
+---
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    allow:
+      - dependency-type: direct
+      - dependency-type: indirect

@@ -1,0 +1,14 @@
+diff --git a/.gitignore b/.gitignore
+index 7d9e551..29cdf9f 100644
+--- a/.gitignore
+++ b/.gitignore
+@@ -1,5 +1,6 @@
+ node_modules/
+ package-lock.json
+yarn.lock
+ 
+ dist/
+-.cache/
+\ No newline at end of file
+.parcel-cache/
+\ No newline at end of file

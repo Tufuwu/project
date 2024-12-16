@@ -1,0 +1,19 @@
+diff --git a/.github/ISSUE_TEMPLATE/software_release.md b/.github/ISSUE_TEMPLATE/software_release.md
+index fe3a5b7..4cd8d07 100644
+--- a/.github/ISSUE_TEMPLATE/software_release.md
+++ b/.github/ISSUE_TEMPLATE/software_release.md
+@@ -14,12 +14,12 @@ assignees: ''
+ - [ ] Update release version to appropriate number (for Python apps, set to final version without any `-pre` or `-dev` tags).
+ - [ ] Update changelog to make sure that all features, changes, bugfixes, etc included in the release are documented.  You may want to review the git revision history to be sure you¡¯ve captured everything.
+ - [ ] Update deploy notes to document any manual steps that need to be done with the deploy (e.g., running any import scripts, configuring site domain in Django admin, etc)
+-- [ ] Update any README badges that are pointing to develop branches to use either main or default branch (travis-ci build, code coverage, etc).
+- [ ] Update any README badges that are pointing to develop branches to use either main or default branch (GitHub Actions workflow status, code coverage, etc).
+ - [ ] Make sure local settings are documented (for django app: sample local settings file includes any new configurations).
+ - [ ] Check python requirements for any internal dependencies that should be released (or at least pinned to a specific git commit)
+ - [ ] Release & publish any internal JS dependencies with updates; specfy the published version number in package.json
+ - [ ] Use npm audit to check and fix vulnerabilities in npm dependencies
+-- [ ] Make sure that unit tests are passing on travis-ci for release branch (fix them if they are not)
+- [ ] Make sure that unit tests and other GitHub Actions workflow checks on are passing on the release branch (fix them if they are not)
+ - [ ] Make sure code coverage is 95% or higher. Review for any important gaps.
+ - [ ] Review code documentation to make sure it is up to date. If the database has changed, generate and include current schema documentation images.
+ - [ ] Run pip freeze, save output as requirements.lock and check in to document known working versions of python dependencies

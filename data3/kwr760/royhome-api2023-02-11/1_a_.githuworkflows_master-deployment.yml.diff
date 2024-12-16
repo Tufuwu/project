@@ -1,0 +1,32 @@
+name: Deploy code
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: deployment
+
+    steps:
+      - name: Configure SSH for ${{ env.USER }}@${{ env.HOST }}
+        run: |
+          mkdir -p ~/.ssh/
+          echo "${{ env.KEY }}" > ~/.ssh/staging.key
+          chmod 600 ~/.ssh/staging.key
+          cat >>~/.ssh/config <<END
+          Host staging
+            HostName ${{ env.HOST }}
+            User ${{ env.USER }}
+            IdentityFile ~/.ssh/staging.key
+            StrictHostKeyChecking no
+          END
+        env:
+          USER: ${{ vars.SSH_USER }}
+          HOST: ${{ vars.SSH_HOST }}
+          KEY: ${{ secrets.SSH_KEY }}
+
+      - name: Stop the server
+        run: ssh staging '/usr/royhome/scripts/deploy/deploy-release.sh api'

@@ -1,0 +1,18 @@
+diff --git a/.github/.kodiak.toml b/.github/.kodiak.toml
+new file mode 100644
+index 0000000..400ad08
+--- /dev/null
+++ b/.github/.kodiak.toml
+@@ -0,0 +1,12 @@
+# .kodiak.toml
+# Minimal config. version is the only required field.
+version = 1
+[merge.automerge_dependencies]
+# only auto merge "minor" and "patch" version upgrades.
+# do not automerge "major" version upgrades.
+versions = ["minor", "patch"]
+usernames = ["dependabot"]
+[merge]
+method = "squash"
+[merge.message]
+include_coauthors = true

@@ -1,0 +1,18 @@
+language: node_js
+node_js:
+- 10
+install:
+- yarn install
+script:
+- yarn build
+deploy:
+  provider: pages
+  github_token: $GITHUB_TOKEN
+  keep_history: true
+  local_dir: public
+  fqdn: yackovlev.ru
+  cleanup: false
+  edge: true
+  on:
+    tags: true
+    repo: aleksandryackovlev/yackovlev.ru

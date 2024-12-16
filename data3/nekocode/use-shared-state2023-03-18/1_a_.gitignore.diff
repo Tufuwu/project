@@ -1,0 +1,13 @@
+diff --git a/.gitignore b/.gitignore
+index bc91e67..31b5c5f 100644
+--- a/.gitignore
+++ b/.gitignore
+@@ -1,5 +1,3 @@
+ /node_modules/
+ /lib/
+-/pkg/
+-yarn.lock
+-yarn-error.lock
+\ No newline at end of file
+/pkg/
+\ No newline at end of file

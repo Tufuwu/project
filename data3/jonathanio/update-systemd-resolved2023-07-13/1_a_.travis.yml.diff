@@ -1,0 +1,17 @@
+diff --git a/.travis.yml b/.travis.yml
+deleted file mode 100644
+index 918c066..0000000
+-- a/.travis.yml
++++ /dev/null
+@@ -1,11 +0,0 @@
+---
+# Don't need sudo access or to install anything
+arch:
+    - amd64
+    - arm64
+    - ppc64le
+sudo: false
+install: true
+
+script:
+  - ./run-tests

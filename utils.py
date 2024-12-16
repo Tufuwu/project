@@ -3,6 +3,7 @@ import requests
 import re
 
 
+
 def prompt_constructor(*args):
     prompt = ""
     for arg in args:

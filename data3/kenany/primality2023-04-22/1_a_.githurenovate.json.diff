@@ -1,0 +1,13 @@
+diff --git a/.github/renovate.json b/.github/renovate.json
+new file mode 100644
+index 0000000..f0259f8
+--- /dev/null
+++ b/.github/renovate.json
+@@ -0,0 +1,7 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "local>kenany/renovate-config",
+    ":assignAndReview(kenany)"
+  ]
+}

@@ -1,0 +1,12 @@
+diff --git a/.gitignore b/.gitignore
+index 01e8942..656f5c4 100644
+--- a/.gitignore
+++ b/.gitignore
+@@ -7,6 +7,7 @@ target/
+ .classpath
+ 
+ .idea
+.bsp
+ *.iml
+ 
+ .metals

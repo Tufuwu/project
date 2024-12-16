@@ -1,0 +1,31 @@
+diff --git a/.github/workflows/common_build.yml b/.github/workflows/common_build.yml
+deleted file mode 100644
+index bba0d85..0000000
+--- a/.github/workflows/common_build.yml
+++ /dev/null
+@@ -1,25 +0,0 @@
+-name: deploy to QA
+-
+-on:
+-  pull_request:
+-    types: 
+-      - closed
+-  pull_request_review:
+-    types: 
+-      - submitted
+-  
+-jobs:
+-   canary_build:
+-    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+-    uses: kaltura/playkit-js-common/.github/workflows/build.yml@master
+-    with:
+-      pluginPath: playkit-kaltura-cuepoints
+-      prefix: canary
+-    secrets: inherit
+-   dev_build:
+-    if: github.event.review.state == 'approved'
+-    uses: kaltura/playkit-js-common/.github/workflows/build.yml@master
+-    with:
+-      pluginPath: playkit-kaltura-cuepoints
+-      prefix: dev
+-    secrets: inherit

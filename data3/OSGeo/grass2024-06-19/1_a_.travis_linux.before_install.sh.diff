@@ -1,0 +1,10 @@
+diff --git a/.travis/linux.before_install.sh b/.travis/linux.before_install.sh
+index 0941d6c17b7..d01f54eff06 100755
+-- a/.travis/linux.before_install.sh
++++ b/.travis/linux.before_install.sh
+@@ -1,4 +1,4 @@
+#!/usr/bin/env sh
++#!/usr/bin/env bash
+ # Author: Ivan Mincik, ivan.mincik@gmail.com
+ 
+ set -e

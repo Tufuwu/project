@@ -1,0 +1,8 @@
+diff --git a/.github/workflows/requirements.txt b/.github/workflows/requirements.txt
+deleted file mode 100644
+index 9273ecbd5..000000000
+--- a/.github/workflows/requirements.txt
+++ /dev/null
+@@ -1 +0,0 @@
+-mkdocs-mermaid2-plugin==0.6.0
+\ No newline at end of file

@@ -1,0 +1,11 @@
+diff --git a/.gitignore b/.gitignore
+index bf0e2e2..48781b6 100644
+--- a/.gitignore
+++ b/.gitignore
+@@ -16,5 +16,5 @@ db/**/*
+ !db/testdb.sqlite
+ !db/README.md
+ 
+-rmdstore.sh
+
+ z_*

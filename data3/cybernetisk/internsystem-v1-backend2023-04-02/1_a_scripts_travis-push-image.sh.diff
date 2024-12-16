@@ -1,0 +1,20 @@
+diff --git a/scripts/travis-push-image.sh b/scripts/push-image.sh
+similarity index 67%
+rename from scripts/travis-push-image.sh
+rename to scripts/push-image.sh
+index a0ae9ee8..e09eae24 100755
+-- a/scripts/travis-push-image.sh
++++ b/scripts/push-image.sh
+@@ -4,10 +4,10 @@ set -eu
+ repo=$(cat .dockerrepo)
+ tag=$(cat .dockertag)
+ 
+echo "Pusing to $repo:$tag"
++echo "Pushing to $repo:$tag"
+ docker push $repo:$tag
+ 
+if [ "${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}" = "master" ]; then
++if [ "$GITHUB_REF_NAME" = "master" ]; then
+   echo "On master - pushing to latest as well"
+   docker tag $repo:$tag $repo:latest
+   docker push $repo:latest

@@ -1,0 +1,11 @@
+diff --git a/.gitattributes b/.gitattributes
+index e99ac07..9565361 100644
+--- a/.gitattributes
+++ b/.gitattributes
+@@ -1,5 +1,5 @@
+ /.gitattributes   export-ignore
+/.github/         export-ignore
+ /.gitignore       export-ignore
+-/.travis.yml      export-ignore
+ /phpunit.xml.dist export-ignore
+ /tests/           export-ignore

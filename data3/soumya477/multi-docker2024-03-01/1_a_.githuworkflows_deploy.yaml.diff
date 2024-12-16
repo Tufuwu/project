@@ -1,0 +1,25 @@
+name: Deploy MultiDocker
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+ build:
+  runs-on: ubuntu-latest
+  steps:
+   - uses: actions/checkout@v3
+   - run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+   - run: docker build -t givepeasachance/react-test -f ./client/Dockerfile.dev ./client
+   - run: docker run -e CI=true givepeasachance/react-test npm test
+
+   - run: docker build -t givepeasachance/multi-client ./client
+   - run: docker build -t givepeasachance/multi-nginx ./nginx
+   - run: docker build -t givepeasachance/multi-server ./server
+   - run: docker build -t givepeasachance/multi-worker ./worker
+
+   - run: docker push givepeasachance/multi-client
+   - run: docker push givepeasachance/multi-nginx
+   - run: docker push givepeasachance/muti-server
+   - run: dokcer push givepeasachance/multi-worker
+\ No newline at end of file

@@ -1,0 +1,10 @@
+diff --git a/.github/workflows/run_canary_full_flow.yaml b/.github/workflows/run_canary_full_flow.yaml
+index 7af959e8..c137d6a5 100644
+--- a/.github/workflows/run_canary_full_flow.yaml
+++ b/.github/workflows/run_canary_full_flow.yaml
+@@ -24,4 +24,4 @@ jobs:
+       type: "dependency"
+       stage: "canary"
+       schema-type: "playerV3Versions"
+-      tests-yarn-run-to-execute: 'eslint flow test'
+      tests-yarn-run-to-execute: 'build eslint flow test'

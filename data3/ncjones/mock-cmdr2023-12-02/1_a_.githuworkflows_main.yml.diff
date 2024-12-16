@@ -1,0 +1,27 @@
+diff --git a/.github/workflows/main.yml b/.github/workflows/main.yml
+new file mode 100644
+index 0000000..6f06f1b
+--- /dev/null
+++ b/.github/workflows/main.yml
+@@ -0,0 +1,21 @@
+on:
+  push: { branches: [ master ] }
+  pull_request: { branches: [ master ] }
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with: { node-version: '14.x', cache: yarn }
+      - run: yarn install --frozen-lockfile
+      - run: yarn test --ci
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with: { node-version: '14.x', cache: yarn }
+      - run: yarn install --frozen-lockfile
+      - run: yarn lint

@@ -1,0 +1,101 @@
+name: ubuntu
+
+on:
+    push:
+        branches:
+            - '**'
+            - '!**notest**'
+            - '!**release**'
+        tags-ignore:
+            # I tag release pushes but those should have already been tested
+            - 'release-*'
+        paths-ignore:
+            # list all the files which are irrelevant to the tests
+            # non-code, support files, docs, etc
+            - '.appveyor.yml'
+            - '.circleci'
+            - '.gitattributes'
+            - '.github/workflows/tests.yml'
+            - '.gitignore'
+            - 'Changes'
+            - 'LICENSE'
+            - 'README.pod'
+        pull_request:
+
+env:
+    AUTHOR_TESTING: 1
+    RELEASE_TESTING: 0
+    TEST_JOBS: 9
+
+jobs:
+    perl:
+        runs-on: ${{ matrix.os }}
+        strategy:
+          matrix:
+            os:
+                - ubuntu-22.04
+            perl-version:
+                - '5.8'
+                - '5.10'
+                - '5.12'
+                - '5.14'
+                - '5.16'
+                - '5.18'
+                - '5.20'
+                - '5.22'
+                - '5.24'
+                - '5.26'
+                - '5.28'
+                - '5.30'
+                - '5.32'
+                - '5.34'
+                - '5.36'
+                - 'latest'
+        container:
+            image: perl:${{ matrix.perl-version }}
+        steps:
+            - name: Install Ubuntu packages
+              run: |
+                apt-get install aspell
+            - uses: actions/checkout@v3
+            - name: Platform check
+              run: uname -a
+            - name: Perl version check
+              run: |
+                perl -V
+                perl -v | perl -0777 -ne 'm/(v5\.\d+)/ && print "PERL_VERSION=$1"' >> $GITHUB_ENV
+# Some older versions of Perl have trouble with hostnames in certs. I
+# haven't figured out why.
+            - name: Setup environment
+              run: |
+                echo "PERL_LWP_SSL_VERIFY_HOSTNAME=0" >> $GITHUB_ENV
+            - name: Install cpanm and starter modules
+              run: |
+                curl -L https://cpanmin.us | perl - App::cpanminus
+                cpanm --notest IO::Socket::SSL ExtUtils::MakeMaker Test::More
+# Install the dependencies, again not testing them. This installs the
+# module in the current directory, so we end up installing the module,
+# but that's not a big deal.
+            - name: Install dependencies
+              run: |
+                cpanm --notest --installdeps --with-suggests --with-recommends .
+# Running tests in parallel should be faster, but it's also more
+# tricky in cases where different tests share a feature, such as a
+# file they want to write to. Parallel tests can stomp on each other.
+# Test in parallel to catch that, because other people will test your
+# stuff in parallel.
+            - name: Run tests in parallel
+              run: |
+                perl Makefile.PL
+                make
+                prove -b -r -s -j${{env.TEST_JOBS}} xt
+# The disttest target creates the distribution, unwraps it, changes
+# into the dist dir, then runs the tests there. That checks that
+# everything that should be in the dist is in the dist. If you forget
+# to update MANIFEST with new modules, data files, and so on, you
+# should notice the error.
+            - name: Run distribution tests
+              run: |
+                perl Makefile.PL
+                make disttest
+                make clean

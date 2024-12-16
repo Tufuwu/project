@@ -1,0 +1,36 @@
+name: Node.js CI
+
+on: [push, pull_request]
+
+env:
+  AWS_ACCESS_KEY_DEV: ${{ secrets.AWS_ACCESS_KEY_DEV }}
+  AWS_SECRET_ACCESS_KEY_DEV: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
+  AWS_ACCESS_KEY_PROD: ${{ secrets.AWS_ACCESS_KEY_PROD }}
+  AWS_SECRET_ACCESS_KEY_PROD: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Run before script
+        run: deploy/setup.sh
+
+      - name: Set ENV values
+        run: deploy/setup_env.sh
+
+      - name: Run deploy script
+        run: deploy/deploy.sh
+
+      - name: Deployment finished
+        run: echo 'deployed'
+
+  # You can add more jobs or steps as needed.

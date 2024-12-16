@@ -1,0 +1,23 @@
+diff --git a/travis/prepare_production_deployment.sh b/travis/prepare_production_deployment.sh
+deleted file mode 100755
+index 11acafa..0000000
+-- a/travis/prepare_production_deployment.sh
++++ /dev/null
+@@ -1,17 +0,0 @@
+#!/bin/bash
+
+set -ev
+
+# Only:
+# - Tagged commits
+# - Security env variables are available.
+if [ -n "$TRAVIS_TAG" ] && [ -n "$PROD_DEPLOYMENT_HOOK_TOKEN" ] && [ -n "$PROD_DEPLOYMENT_HOOK_URL" ]
+then
+  curl --silent --output /dev/null --write-out "%{http_code}" -X POST \
+     -F token="$PROD_DEPLOYMENT_HOOK_TOKEN" \
+     -F ref=master \
+     -F "variables[TRIGGER_RELEASE_COMMIT_TAG]=$TRAVIS_TAG" \
+      $PROD_DEPLOYMENT_HOOK_URL
+else
+  echo "[ERROR] Production deployment could not be prepared"
+fi
