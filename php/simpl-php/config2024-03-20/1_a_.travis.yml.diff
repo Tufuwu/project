@@ -21,4 +21,4 @@ matrix:
   allow_failures:
     - php: hhvm
     - php: nightly
-\ No newline at end of file
+
