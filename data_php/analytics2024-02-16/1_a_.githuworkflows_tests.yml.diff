@@ -28,4 +28,4 @@ jobs:
         run: |
           docker run --rm -v $PWD:/app composer sh -c \
           "composer install --ignore-platform-reqs && composer test -- --filter ${{matrix.services}}"
-\ No newline at end of file
+

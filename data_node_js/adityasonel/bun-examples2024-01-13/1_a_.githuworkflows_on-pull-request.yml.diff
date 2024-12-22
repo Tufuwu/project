@@ -1,4 +1,4 @@
-name: '?? Generate and Validate README'
+name: '🏗️ Generate and Validate README'
 
 on:
   pull_request:
