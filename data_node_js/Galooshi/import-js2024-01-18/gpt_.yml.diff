@@ -1,0 +1,53 @@
+name: Node.js CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10, 12, 14, 16]  # 指定支持的 Node.js 版本
+
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Node.js
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # Cache node_modules to speed up installs
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-node_modules
+          restore-keys: |
+            ${{ runner.os }}-node-${{ matrix.node-version }}-node_modules
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Run tests with coverage
+      - name: Run tests with coverage
+        run: npm run test:cover
+
+      # Upload coverage to Code Climate
+      - name: Upload coverage to Code Climate
+        if: success()
+        run: |
+          curl -L https://github.com/codeclimate/test-reporter/releases/download/v0.5.0/codeclimate-test-reporter-0.5.0-linux-amd64 > codeclimate-test-reporter
+          chmod +x codeclimate-test-reporter
+          ./codeclimate-test-reporter < coverage/lcov.info
