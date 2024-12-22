@@ -9,4 +9,4 @@ jobs:
   allow_failures:
     - rust: nightly
   fast_finish: true
-\ No newline at end of file
+

@@ -1,8 +1,4 @@
-diff --git a/.travis.yml b/.travis.yml
-index b677e6d..fc50fcc 100644
--- a/.travis.yml
-+++ b/.travis.yml
-@@ -1,4 +1,4 @@
+
  language: cpp
  compiler:
    - gcc
