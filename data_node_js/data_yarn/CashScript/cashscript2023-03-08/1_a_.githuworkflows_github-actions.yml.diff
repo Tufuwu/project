@@ -40,4 +40,4 @@ jobs:
         uses: borales/actions-yarn@v4
         with:
           cmd: spellcheck # will run `yarn spellcheck` command
-\ No newline at end of file
+

@@ -19,4 +19,4 @@ deploy:
   password: "$PYPI_TOKEN"
   on:
     branch: main
-\ No newline at end of file
+
