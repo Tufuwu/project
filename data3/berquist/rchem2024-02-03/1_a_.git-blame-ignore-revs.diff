@@ -1,8 +1,0 @@
-diff --git a/.git-blame-ignore-revs b/.git-blame-ignore-revs
-new file mode 100644
-index 0000000..ebdd8f8
---- /dev/null
-++ b/.git-blame-ignore-revs
-@@ -0,0 +1,2 @@
-# pre-commit
-814b7e7c239abe47e8b50c583c70ec281723b777

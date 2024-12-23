@@ -21,4 +21,3 @@ jobs:
       run: npm ci
     - name: Build
       run: npm run all
-\ No newline at end of file
