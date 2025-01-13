@@ -66,10 +66,11 @@ def process_repos_from_csv(csv_file, api_token):
     :param csv_file: 包含 GitHub 仓库信息的 CSV 文件
     :param api_token: GitHub API 的访问令牌
     """
-    parent_dir = 'D:/project/data'
+    parent_dir = 'D:/vscode/2/project/data1'
     df = pd.read_csv(csv_file)
     for index, row in df.iterrows():
         repo_full_name = row['full_name']
+        print(index)
         try:
             # 假设 workflow 文件在 `.github/workflows/` 下
             workflow_file_path = '.github/workflows/'
@@ -80,7 +81,7 @@ def process_repos_from_csv(csv_file, api_token):
             
             for c in commits:
                 b = c['commit']['message']
-                if 'Travis' in b and 'GitHub' in b:
+                if 'Travis' in b and 'Github' in b :
                     output_dir = os.path.join(parent_dir, repo_full_name)
                     os.makedirs(output_dir, exist_ok=True)
                     split_and_save_diffs(get_commit_diff(c['url'],api_token), output_dir)
@@ -109,7 +110,7 @@ def get_commit_diff(target_url, api_token):
 
 if __name__ == "__main__":
     # 从 CSV 文件中读取仓库，并获取每个仓库的 workflow 文件提交历史
-    api_token = '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'
-    csv_file = 'repos-min-5-forks-.csv'  # 假设这个CSV文件有 'full_name' 列
+    api_token = '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'
+    csv_file = 'python-repos.csv'  # 假设这个CSV文件有 'full_name' 列
     process_repos_from_csv(csv_file, api_token)
 

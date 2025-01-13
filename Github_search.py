@@ -8,7 +8,7 @@ def search_repo(start_date, out_file, api_token, stars=5, forks=5, lang='Java', 
     api_url = "https://api.github.com/search/repositories" 
     
     # 构建搜索查询
-    query = f"language:{lang} stars:>={stars} forks:>={forks} pushed:>={start_date}"
+    query = f"language:{lang} stars:<={stars} forks:>={forks} pushed:>={start_date}"
     
     headers = {
         "Authorization": f"token {api_token}",
@@ -70,6 +70,6 @@ if __name__ == "__main__":
     search_repo(start_date=date_year.date(),
                 out_file='python-repos.csv',
                 api_token='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',
-                stars=100,
+                stars=473,
                 lang='Python',
                 verbose=True)

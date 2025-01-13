@@ -1,0 +1,14 @@
+diff --git a/.gitignore b/.gitignore
+index 7caa25f..07b8970 100644
+--- a/.gitignore
+++ b/.gitignore
+@@ -5,4 +5,6 @@ context_menu.egg-info
+ __pycache__
+ .test_cm
+ direct_test.py
+-.idea
+\ No newline at end of file
+.idea
+.coverage
+pytest-report.html
+\ No newline at end of file
