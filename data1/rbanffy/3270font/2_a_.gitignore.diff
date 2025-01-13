@@ -1,0 +1,9 @@
+diff --git a/.gitignore b/.gitignore
+index 279805c..7562347 100644
+--- a/.gitignore
+++ b/.gitignore
+@@ -27,3 +27,4 @@ build
+ gfonts_files
+ 
+ 
+social_preview.png

@@ -1,0 +1,9 @@
+diff --git a/.gitignore b/.gitignore
+index d540666f..6c151bc2 100644
+--- a/.gitignore
+++ b/.gitignore
+@@ -70,3 +70,4 @@ djq
+ node_modules
+ /c.cache/
+ /dq
+/venv/

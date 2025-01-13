@@ -1,0 +1,15 @@
+diff --git a/.github/workflows/mysql.yml b/.github/workflows/mysql.yml
+index c476d1ef51..e34980165b 100644
+--- a/.github/workflows/mysql.yml
+++ b/.github/workflows/mysql.yml
+@@ -44,6 +44,7 @@ jobs:
+             AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
+             AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+ 
+-      - name: Coverage
+-        run: codecov
+-
+      - name: Codecov
+        uses: codecov/codecov-action@v1.0.11
+        with:
+          file: ./coverage.xml

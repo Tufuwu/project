@@ -1,0 +1,15 @@
+diff --git a/.github/workflows/sqlite.yml b/.github/workflows/sqlite.yml
+index 63ebddca40..59a5d17e02 100644
+--- a/.github/workflows/sqlite.yml
+++ b/.github/workflows/sqlite.yml
+@@ -36,6 +36,8 @@ jobs:
+             AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
+             AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+ 
+-      - name: Coverage
+-        run: codecov
+      - name: Codecov
+        uses: codecov/codecov-action@v1.0.11
+        with:
+          file: ./coverage.xml
+ 

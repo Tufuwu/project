@@ -1,0 +1,8 @@
+diff --git a/.ci/travis/README b/.ci/travis/README
+deleted file mode 100644
+index d9d5f65a..00000000
+-- a/.ci/travis/README
++++ /dev/null
+@@ -1,2 +0,0 @@
+This directory contains support files for Travis, a continuous integration
+service which runs tests on Linux and Windows on every push.

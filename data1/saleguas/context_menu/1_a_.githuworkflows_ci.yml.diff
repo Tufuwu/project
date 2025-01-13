@@ -36,4 +36,4 @@ jobs:
         run: tox -- -v --color=yes
         env:
             TOXENV: py${{ matrix.python-version}}-cov
-\ No newline at end of file
+
