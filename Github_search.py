@@ -8,7 +8,7 @@ def search_repo(start_date, out_file, api_token, stars=5, forks=5, lang='Java', 
     api_url = "https://api.github.com/search/repositories" 
     
     # 构建搜索查询
-    query = f"language:{lang} stars:>={stars} forks:>={forks} pushed:>={start_date}"
+    query = f"language:{lang} stars:<={stars} forks:>={forks} pushed:>={start_date}"
     
     headers = {
         "Authorization": f"token {api_token}",
@@ -35,8 +35,6 @@ def search_repo(start_date, out_file, api_token, stars=5, forks=5, lang='Java', 
 
         if not repos:
             break  # 如果没有更多数据，跳出循环
-        if num_i >890:
-            break
 
         for repo in repos:
             repo_info = {
@@ -53,21 +51,25 @@ def search_repo(start_date, out_file, api_token, stars=5, forks=5, lang='Java', 
                 print(f"发现仓库：{repo_info['name']} 有 {repo_info['stars']} 星和 {repo_info['forks']} 叉子",num_i)
             num_i += 1
 
+        existing_df = pd.read_csv(out_file)
+        df = pd.DataFrame(repo_list).drop_duplicates(subset='full_name')
+        combined_df = pd.concat([existing_df, df], ignore_index=True)
+        combined_df = pd.DataFrame(repo_list).drop_duplicates(subset='full_name')  # 按 full_name 去重
+        combined_df.to_csv(out_file, index=False)
         # 准备请求下一页的数据
         params['page'] += 1
+        print(params['page'])
 
     # 将仓库信息保存到 CSV 文件中
-    df = pd.DataFrame(repo_list).drop_duplicates(subset='full_name')  # 按 full_name 去重
-    df.to_csv(out_file, index=False)
-    print(f"已保存 {len(df)} 个仓库到 {out_file}")
+
 
 
     
 if __name__ == "__main__":
     date_year = parser.parse("2017-12-31")
     search_repo(start_date=date_year.date(),
-                out_file='repos-min-5-forks-.csv',
-                api_token='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',
-                stars=4,
+                out_file='python-repos.csv',
+                api_token='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',
+                stars=961,
                 lang='Python',
                 verbose=True)
