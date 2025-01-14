@@ -1,0 +1,13 @@
+diff --git a/.github/workflows/pythonpackage.yml b/.github/workflows/pythonpackage.yml
+index 2b027e55..8785d217 100644
+--- a/.github/workflows/pythonpackage.yml
+++ b/.github/workflows/pythonpackage.yml
+@@ -9,7 +9,7 @@ jobs:
+     strategy:
+       max-parallel: 4
+       matrix:
+-        python-version: [3.6, 3.7]
+        python-version: [3.6, 3.7, 3.8]
+ 
+     steps:
+     - uses: actions/checkout@master
