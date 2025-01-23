@@ -1,13 +1,25 @@
-diff --git a/.github/workflows/pr_check.yml b/.github/workflows/pr_check.yml
-index b29fc80..aafc4f9 100644
---- a/.github/workflows/pr_check.yml
-++ b/.github/workflows/pr_check.yml
-@@ -10,7 +10,7 @@ jobs:
-     strategy:
-       matrix:
-         os: [ubuntu-latest, windows-latest]
--        python-version: ["2.7", "3.7", "3.8", "3.9", "3.10", "3.11"]
+name: PR Check
+
+on:
+  - pull_request
+  - workflow_dispatch
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
         python-version: ["3.8", "3.9", "3.10", "3.11"]
-     steps:
-       - uses: actions/checkout@v3
-       - name: Set up Python ${{ matrix.python-version }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Dependencies
+        run: |
+          pip install .[dev]
+      - name: Run Tests
+        run: |
+          python -m pytest
