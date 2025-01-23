@@ -34,5 +34,3 @@ jobs:
       - name: End to End Tests
         run: |
           FACESWAP_BACKEND="cpu" KERAS_BACKEND="tensorflow" python tests/simple_tests.py;
- 
-\ No newline at end of file
