@@ -1,12 +1,24 @@
 import requests
+import pandas as pd
+import csv 
 
-url = 'https://api.github.com/rate_limit'
-response = requests.get(url)
+csv_file = 'D:/vscode/2/project/python_travis.csv'
+df = pd.read_csv('D:/vscode/2/project/python-csv/results1.csv')
+for index, row in df.iterrows():
+    new_data ={'full_name':row['full_name'],'commits':row['commits'],'forks':row['forks'],'createdAt':row['createdAt'],'pushedAt':row['pushedAt'],'updatedAt':row['updatedAt'],'lastCommit':row['lastCommit']}
+    if index == 3:
+        break 
 
-if response.status_code == 200:
-    data = response.json()
-    core_limit = data['resources']['core']
-    print(f"剩余请求次数: {core_limit['remaining']}")
-    print(f"速率限制重置时间: {core_limit['reset']}")
-else:
-    print(f"获取速率限制状态失败，错误代码: {response.status_code}")
+
+    with open(csv_file, mode='a', newline='', encoding='utf-8',errors='ignore') as file:
+        # 创建一个CSV写入器
+        writer = csv.DictWriter(file, fieldnames=new_data.keys())
+
+        # 如果文件是空的（或者是首次写入），就写入表头
+        if file.tell() == 0:
+            writer.writeheader()
+
+        # 写入新的数据行
+        writer.writerow(new_data)
+
+    print(f'已将新数据添加到 {csv_file}')
