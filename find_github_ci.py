@@ -35,11 +35,11 @@ def process_repos_from_csv(csv_file, api_token):
     df = pd.read_csv(csv_file)
     for index, row in df.iterrows():
         repo_full_name = row['full_name']
-        new_data ={'full_name':row['full_name'],'commits':row['commits'],'releases':row['releases'],'forks':row['forks'],'stargazers':row['stargazers'],'size':row['size'],'createdAt':row['createdAt'],'pushedAt':row['pushedAt'],'updatedAt':row['updatedAt'],'lastCommit':row['lastCommit']}
+        new_data ={'full_name':row['full_name'],'commits':row['commits'],'releases':row['releases'],'forks':row['forks'],'stargazers':row['stargazers'],'size':row['size'],'createdAt':row['createdAt'],'pushedAt':row['pushedAt'],'updatedAt':row['updatedAt'],'lastCommit':row['lastCommit'],'traviscommit':0}
         print(index)
         try:
             # 假设 workflow 文件在 `.github/workflows/` 下
-            workflow_file_path = '.github/workflows/'
+            workflow_file_path = '.travis.yml'
             print(f"正在获取仓库 {repo_full_name} 的 workflow 文件历史...")
             
             # 获取文件历史
@@ -49,10 +49,10 @@ def process_repos_from_csv(csv_file, api_token):
             if len(commits) > 0:
 
                 # 你要操作的CSV文件路径
-                csv_file = 'D:/vscode/2/project/python_travis.csv'
+                csv_file = 'D:/vscode/2/project/python_github.csv'
 
                 # 新的数据行
-
+                new_data['traviscommit'] = len(commits)
 
                 # 打开CSV文件并进行操作
                 with open(csv_file, mode='a', newline='', encoding='utf-8',errors='ignore') as file:
@@ -78,5 +78,5 @@ def process_repos_from_csv(csv_file, api_token):
 if __name__ == "__main__":
     # 从 CSV 文件中读取仓库，并获取每个仓库的 workflow 文件提交历史
     api_token = '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'
-    csv_file = 'D:/vscode/2/project/python-csv/results4.csv'  # 假设这个CSV文件有 'full_name' 列
+    csv_file = 'D:/vscode/2/project/python-csv/python_travis.csv'  # 假设这个CSV文件有 'full_name' 列
     process_repos_from_csv(csv_file, api_token)
