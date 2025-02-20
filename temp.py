@@ -34,8 +34,13 @@ def get_workflow_file_history(repo_full_name, file_path, api_token):
 if __name__ == "__main__":
     # 从 CSV 文件中读取仓库，并获取每个仓库的 workflow 文件提交历史
     api_token = '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'
-    repo_full_name = 'agilestrip/agilestrip.github.io'
+    repo_full_name = 'kovidgoyal/kitty'
     workflow_file_path = '.travis.yml'
     commits = get_workflow_file_history(repo_full_name, workflow_file_path, api_token)
-    print(len(commits))
-    print(commits)
+    for c in commits:
+        b = c['commit']['message']
+        if "Migrate" in b or 'Remove' in b:
+            print("sssss")
+            print(b)
+        #    break
+        #print(b)
