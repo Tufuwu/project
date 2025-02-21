@@ -35,7 +35,7 @@ def process_repos_from_csv(csv_file, api_token):
     df = pd.read_csv(csv_file)
     for index, row in df.iterrows():
         repo_full_name = row['full_name']
-        new_data ={'full_name':row['full_name'],'commits':row['commits'],'releases':row['releases'],'forks':row['forks'],'stargazers':row['stargazers'],'size':row['size'],'createdAt':row['createdAt'],'pushedAt':row['pushedAt'],'updatedAt':row['updatedAt'],'lastCommit':row['lastCommit'],'traviscommit':row['traviscommit']}
+        new_data ={'full_name':row['full_name'],'commits':row['commits'],'releases':row['releases'],'forks':row['forks'],'stargazers':row['stargazers'],'size':row['size'],'createdAt':row['createdAt'],'pushedAt':row['pushedAt'],'updatedAt':row['updatedAt'],'lastCommit':row['lastCommit'],'traviscommit':row['traviscommit'],'travisredate':0}
         print(index)
         try:
             # 假设 workflow 文件在 `.github/workflows/` 下
@@ -45,14 +45,15 @@ def process_repos_from_csv(csv_file, api_token):
             # 获取文件历史
             commits = get_workflow_file_history(repo_full_name, workflow_file_path, api_token)
             
-            for b in commits:
+            for c in commits:
+                b = c['commit']['message']
                 if "Migrate" in b or 'Remove' in b:
 
                     # 你要操作的CSV文件路径
                     csv_file = 'D:/vscode/3/project/travis.csv'
 
                     # 新的数据行
-
+                    new_data['travisredate'] = c['commit']['author']["date"]
 
                     # 打开CSV文件并进行操作
                     with open(csv_file, mode='a', newline='', encoding='utf-8',errors='ignore') as file:
@@ -67,6 +68,7 @@ def process_repos_from_csv(csv_file, api_token):
                         writer.writerow(new_data)
 
                     print(f'已将新数据添加到 {csv_file}')
+                    break
 
                 
         except Exception as e:
