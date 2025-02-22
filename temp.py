@@ -34,14 +34,13 @@ def get_workflow_file_history(repo_full_name, file_path, api_token):
 if __name__ == "__main__":
     # 从 CSV 文件中读取仓库，并获取每个仓库的 workflow 文件提交历史
     api_token = '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'
-    repo_full_name = 'public-apis/public-apis'
+    repo_full_name = 'pythological/kanren'
     workflow_file_path = '.travis.yml'
     commits = get_workflow_file_history(repo_full_name, workflow_file_path, api_token)
     for c in commits:
         b = c['commit']['message']
         if "Migrate" in b or 'Remove' in b:
-            print("sssss")
             print(b)
-            print(c['commit']['author']["date"])
+        #    print(c['commit']['author']["date"])
         #    break
         #print(b)
