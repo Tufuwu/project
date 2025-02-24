@@ -47,10 +47,10 @@ def process_repos_from_csv(csv_file, api_token):
             
             for c in commits:
                 b = c['commit']['message']
-                if "Migrate" in b or 'Remove' in b:
+                if ("Migrate" in b or 'Move' in b or'Replace' in b) and 'Travis' in b:
 
                     # 你要操作的CSV文件路径
-                    csv_file = 'D:/vscode/3/project/travis.csv'
+                    csv_file = 'D:/vscode/3/project/python-csv/target.csv'
 
                     # 新的数据行
                     new_data['travisredate'] = c['commit']['author']["date"]
@@ -80,5 +80,5 @@ def process_repos_from_csv(csv_file, api_token):
 if __name__ == "__main__":
     # 从 CSV 文件中读取仓库，并获取每个仓库的 workflow 文件提交历史
     api_token = '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'
-    csv_file = 'D:/vscode/3/project/python_github.csv'  # 假设这个CSV文件有 'full_name' 列
+    csv_file = 'D:/vscode/3/project/python-csv/travis_and_action.csv'  # 假设这个CSV文件有 'full_name' 列
     process_repos_from_csv(csv_file, api_token)
