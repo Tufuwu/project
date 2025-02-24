@@ -39,7 +39,7 @@ def process_repos_from_csv(csv_file, api_token):
         print(index)
         try:
             # 假设 workflow 文件在 `.github/workflows/` 下
-            workflow_file_path = '.travis.yml'
+            workflow_file_path = '.github/workflows/'
             print(f"正在获取仓库 {repo_full_name} 的 workflow 文件历史...")
             
             # 获取文件历史
