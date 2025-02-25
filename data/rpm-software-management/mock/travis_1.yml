@@ -1,0 +1,4 @@
+diff --git a/.travis/copr-build-setup b/.github/setup-copr-build/copr-build-setup
+similarity index 100%
+rename from .travis/copr-build-setup
+rename to .github/setup-copr-build/copr-build-setup

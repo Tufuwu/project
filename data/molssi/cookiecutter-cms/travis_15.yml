@@ -1,0 +1,4 @@
+diff --git a/{{cookiecutter.repo_name}}/devtools/travis-ci/before_install.sh b/cihelpers/legacy-miniconda-setup/before_install.sh
+similarity index 100%
+rename from {{cookiecutter.repo_name}}/devtools/travis-ci/before_install.sh
+rename to cihelpers/legacy-miniconda-setup/before_install.sh

@@ -1,0 +1,4 @@
+diff --git a/.github/workflows/main.yml b/.github/workflows/dlint.yml
+similarity index 100%
+rename from .github/workflows/main.yml
+rename to .github/workflows/dlint.yml

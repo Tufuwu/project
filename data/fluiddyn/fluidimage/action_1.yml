@@ -1,0 +1,5 @@
+-name: build
+name: ci-linux
+ 
+ on:
+   - push

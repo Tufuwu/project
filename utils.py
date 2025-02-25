@@ -12,21 +12,21 @@ def prompt_constructor(*args):
     return prompt
 
 
-def pross_git_file(diff_content):
+def pross_github_file(diff_content):
     lines = diff_content.split('\n')
 
     # 找到name行的下标
     name_index = None
     for i, line in enumerate(lines):
-        if line.strip().startswith('+name:'):
-            name_index = i
+        if line.strip().startswith('@@'):
+            name_index = i+1
             break
 
     # 提取name后的所有行
     updated_lines = lines[name_index :]
 
     # 去掉每行开头的'+'号
-    updated_lines = [line[1:] if line.startswith('+') else line for line in updated_lines]
+    updated_lines = [line if line.startswith('+') else line for line in updated_lines]
 
     # 将提取的行合并成一个字符串
     updated_content = '\n'.join(updated_lines)
@@ -39,15 +39,15 @@ def pross_travis_file(diff_content):
     # 找到name行的下标
     name_index = None
     for i, line in enumerate(lines):
-        if line.strip().startswith('-language:'):
-            name_index = i
+        if line.strip().startswith('@@'):
+            name_index = i+1
             break
 
     # 提取name后的所有行
     updated_lines = lines[name_index :]
 
     # 去掉每行开头的'+'号
-    updated_lines = [line[1:] if line.startswith('-') else line for line in updated_lines]
+    updated_lines = [line if line.startswith('-') else line for line in updated_lines]
 
     # 将提取的行合并成一个字符串
     updated_content = '\n'.join(updated_lines)
@@ -97,7 +97,7 @@ def split_and_save_diffs(diff_content, output_dir):
             diff_data = diffs[i] + diffs[i + 1]
 
             if 'git' in file_identifier:
-                diff_data = pross_git_file(diff_data)
+                diff_data = pross_github_file(diff_data)
             else:
                 diff_data = pross_travis_file(diff_data)
             # 将每个 diff 文件写入到单独的文件
