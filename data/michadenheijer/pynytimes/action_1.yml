@@ -1,0 +1,4 @@
+diff --git a/.github/workflows/python-publish.yml b/.github/workflows/pypi-publish.yml
+similarity index 100%
+rename from .github/workflows/python-publish.yml
+rename to .github/workflows/pypi-publish.yml

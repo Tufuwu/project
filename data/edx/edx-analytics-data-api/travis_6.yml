@@ -1,0 +1,4 @@
+diff --git a/requirements/travis.in b/requirements/ci.in
+similarity index 100%
+rename from requirements/travis.in
+rename to requirements/ci.in

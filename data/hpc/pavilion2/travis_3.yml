@@ -1,0 +1,4 @@
+diff --git a/test/data/pav_config_dir/pavilion.yaml.travis-ci b/test/data/pav_config_dir/pavilion.yaml.ci
+similarity index 100%
+rename from test/data/pav_config_dir/pavilion.yaml.travis-ci
+rename to test/data/pav_config_dir/pavilion.yaml.ci

@@ -1,0 +1,4 @@
+diff --git a/.travis-data/test_script.sh b/.ci/test_script.sh
+similarity index 100%
+rename from .travis-data/test_script.sh
+rename to .ci/test_script.sh

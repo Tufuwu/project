@@ -72,7 +72,6 @@ def process_repos_from_csv(csv_file, api_token):
     df = pd.read_csv(csv_file)
     for index, row in df.iterrows():
         repo_full_name = row['full_name']
-        new_data ={'full_name':row['full_name'],'commits':row['commits'],'releases':row['releases'],'forks':row['forks'],'stargazers':row['stargazers'],'size':row['size'],'createdAt':row['createdAt'],'pushedAt':row['pushedAt'],'updatedAt':row['updatedAt'],'lastCommit':row['lastCommit']}
         print(index)
 
         try:
@@ -85,7 +84,7 @@ def process_repos_from_csv(csv_file, api_token):
             
             for c in commits:
                 b = c['commit']['message']
-                if 'Travis' in b and 'Action' in b :
+                if 'Travis' in b :
                     output_dir = os.path.join(parent_dir, repo_full_name)
                     os.makedirs(output_dir, exist_ok=True)
                     split_and_save_diffs(get_commit_diff(c['url'],api_token), output_dir)
