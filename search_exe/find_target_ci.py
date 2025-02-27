@@ -1,5 +1,5 @@
 import pandas as pd
-from utils import get_history,write_file_in,re_match
+from utils import get_history,file_operate
 
 
 
@@ -21,11 +21,12 @@ def process_repos_from_csv(csv_file, api_token):
             
             # 获取文件历史
             gh = get_history()
+            fo = file_operate()
             commits = gh.get_workflow_file_history(repo_full_name, workflow_file_path, api_token)
             
             for c in commits:
                 b = c['commit']['message']
-                if (re_match("Migrate",b) or re_match('Move',b) or re_match('Replace',b) ) and re_match('Travis',b):
+                if (fo.re_match("Migrate",b) or fo.re_match('Move',b) or fo.re_match('Replace',b) ) and fo.re_match('Travis',b):
 
                     # 你要操作的CSV文件路径
                     csv_file = 'D:/vscode/3/project/python-csv/target.csv'
@@ -33,7 +34,7 @@ def process_repos_from_csv(csv_file, api_token):
                     # 新的数据行
                     new_data['travisredate'] = c['commit']['author']["date"]
 
-                    write_file_in(csv_file,new_data)
+                    fo.write_file_in(csv_file,new_data)
                     break
 
                 

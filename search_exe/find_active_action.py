@@ -1,7 +1,7 @@
 import requests
 import pandas as pd
 import csv 
-from utils import get_history,write_file_in
+from utils import get_history,file_operate
 
 
 
@@ -31,7 +31,8 @@ def process_repos_from_csv(csv_file, api_token):
                     csv_file = 'D:/vscode/3/project/python-csv/final.csv'
 
                     # 新的数据行
-                    write_file_in(csv_file,new_data)
+                    fo = file_operate()
+                    fo.write_file_in(csv_file,new_data)
                     break
 
                     
