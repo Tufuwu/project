@@ -107,3 +107,17 @@ def split_and_save_diffs(diff_content, output_dir):
                 diff_data=diff_data.decode('gbk')
                 f.write(diff_data)
             print(f"Saved diff to {output_path}")
+        
+
+class get_history():
+    def __init__(self):
+        pass
+
+    def s(self):
+        print('ssss')
+
+    def d(self):
+        print('ddddd')
+    def g(self):
+        print('ggggg')
+

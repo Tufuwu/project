@@ -2,7 +2,7 @@ import requests
 import pandas as pd
 import re
 import os
-from utils import pross_github_file,pross_travis_file
+from utils import pross_github_file,pross_travis_file,get_history
 
 def split_and_save_diffs(diff_content, output_dir):
     # 使用正则表达式来匹配每个 diff 文件的开头
@@ -39,28 +39,6 @@ def split_and_save_diffs(diff_content, output_dir):
             print(f"Saved diff to {output_path}")
 
 
-def get_workflow_file_history(repo_full_name, file_path, api_token):
-    """
-    获取 GitHub 仓库中文件的提交历史记录
-    :param repo_full_name: 仓库的完整名称（格式为 'owner/repo'）
-    :param file_path: 要查询的文件路径
-    :param api_token: GitHub API 的访问令牌
-    :return: 提交历史记录列表
-    """
-    api_url = f"https://api.github.com/repos/{repo_full_name}/commits"
-    params = {"path": file_path}
-    headers = {
-        "Authorization": f"token {api_token}",
-        "Accept": "application/vnd.github.v3+json"
-    }
-
-    response = requests.get(api_url, headers=headers, params=params)
-    
-    if response.status_code == 200:
-        return response.json()  # 返回提交历史记录
-    else:
-        raise Exception(f"错误：{response.status_code}, {response.text}")
-
 
 def process_repos_from_csv(csv_file, api_token):
     """
@@ -80,7 +58,8 @@ def process_repos_from_csv(csv_file, api_token):
             print(f"正在获取仓库 {repo_full_name} 的 workflow 文件历史...")
             
             # 获取文件历史
-            commits = get_workflow_file_history(repo_full_name, workflow_file_path, api_token)
+            gh = get_history()
+            commits = gh.get_workflow_file_history(repo_full_name, workflow_file_path, api_token)
             
             for c in commits:
                 b = c['commit']['message']

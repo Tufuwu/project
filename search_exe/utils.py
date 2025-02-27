@@ -1,7 +1,8 @@
 import os
 import requests
 import re
-
+import csv 
+import pandas as pd
 
 
 def prompt_constructor(*args):
@@ -107,3 +108,92 @@ def split_and_save_diffs(diff_content, output_dir):
                 diff_data=diff_data.decode('gbk')
                 f.write(diff_data)
             print(f"Saved diff to {output_path}")
+
+def write_file_in(csv_file,new_data):
+        # 打开CSV文件并进行操作
+    with open(csv_file, mode='a', newline='', encoding='utf-8',errors='ignore') as file:
+        # 创建一个CSV写入器
+        writer = csv.DictWriter(file, fieldnames=new_data.keys())
+
+        # 如果文件是空的（或者是首次写入），就写入表头
+        if file.tell() == 0:
+            writer.writeheader()
+
+        # 写入新的数据行
+        writer.writerow(new_data)
+
+    print(f'已将新数据添加到 {csv_file}')
+
+def re_match(tagert,string):
+    return re.search(tagert,string,re.I)
+
+
+
+class get_history():
+
+    def __init__(self):
+        pass
+
+
+    def get_workflow_file_history(self,repo_full_name, file_path, api_token):
+        """
+        获取 GitHub 仓库中文件的提交历史记录
+        :param repo_full_name: 仓库的完整名称（格式为 'owner/repo'）
+        :param file_path: 要查询的文件路径
+        :param api_token: GitHub API 的访问令牌
+        :return: 提交历史记录列表
+        """
+        api_url = f"https://api.github.com/repos/{repo_full_name}/commits"
+        params = {"path": file_path}
+        headers = {
+            "Authorization": f"token {api_token}",
+            "Accept": "application/vnd.github.v3+json"
+        }
+        response = requests.get(api_url, headers=headers, params=params)
+        
+        if response.status_code == 200:
+            return response.json()  # 返回提交历史记录
+        else:
+            raise Exception(f"错误：{response.status_code}, {response.text}")
+    
+
+    def get_workflow_run_history(self,repo_full_name, file_path, api_token):
+        """
+        获取 GitHub 仓库中文件的提交历史记录
+        :param repo_full_name: 仓库的完整名称（格式为 'owner/repo'）
+        :param file_path: 要查询的文件路径
+        :param api_token: GitHub API 的访问令牌
+        :return: 提交历史记录列表
+        """
+        api_url = f"https://api.github.com/repos/{repo_full_name}/actions/runs"
+        #params = {"path": file_path}
+        headers = {
+            "Authorization": f"token {api_token}",
+            "Accept": "application/vnd.github.v3+json"
+        }
+
+        response = requests.get(api_url, headers=headers)
+        
+        if response.status_code != 200:
+            print(f"Failed to fetch runs for : {response.status_code}")
+            return []
+        return response
+
+    def get_commit_diff(target_url, api_token):
+        # GitHub API 提交的 URL
+        url = target_url
+
+        # 设置请求头，指定接受 diff 文件
+        headers = {
+            "Authorization": f"token {api_token}",
+            "Accept": "application/vnd.github.v3.diff"  # 指定接受 diff 文件
+        }
+
+        # 发送 GET 请求
+        response = requests.get(url, headers=headers)
+
+        # 检查请求是否成功
+        if response.status_code == 200:
+            return response.text  # 返回 diff 内容
+        else:
+            raise Exception(f"请求失败: {response.status_code}, {response.text}")
