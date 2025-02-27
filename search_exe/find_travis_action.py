@@ -23,6 +23,7 @@ def process_repos_from_csv(csv_file, api_token):
             print(f"正在获取仓库 {repo_full_name} 的 workflow 文件历史...")
 
             gh = get_history()
+            fo = file_operate()
             # 获取文件历史
             action_commits = gh.get_workflow_file_history(repo_full_name, workflow_file_path, api_token)
             travis_commit =  gh.get_workflow_file_history(repo_full_name, travis_file_path, api_token)
@@ -36,7 +37,7 @@ def process_repos_from_csv(csv_file, api_token):
 
                     # 新的数据行
 
-                    write_file_in(csv_file,new_data)
+                    fo.write_file_in(csv_file,new_data)
 
                 
         except Exception as e:
