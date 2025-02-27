@@ -66,7 +66,7 @@ def process_repos_from_csv(csv_file, api_token):
                 if 'Travis' in b :
                     output_dir = os.path.join(parent_dir, repo_full_name)
                     os.makedirs(output_dir, exist_ok=True)
-                    split_and_save_diffs(get_commit_diff(c['url'],api_token), output_dir)
+                    split_and_save_diffs(gh.get_commit_diff(c['url'],api_token), output_dir)
         except Exception as e:
             print(f"无法获取 {repo_full_name} 的 workflow 文件历史: {e}")
 
