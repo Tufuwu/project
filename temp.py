@@ -1,6 +1,5 @@
 import re
-from utils import get_history
-
-
-s = get_history()
-s.d()
+s = 'moves sssss'
+d = 'move ddddd'
+if(re.search('move',s)):
+    print('2222')

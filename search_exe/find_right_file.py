@@ -71,24 +71,6 @@ def process_repos_from_csv(csv_file, api_token):
             print(f"无法获取 {repo_full_name} 的 workflow 文件历史: {e}")
 
 
-def get_commit_diff(target_url, api_token):
-    # GitHub API 提交的 URL
-    url = target_url
-
-    # 设置请求头，指定接受 diff 文件
-    headers = {
-        "Authorization": f"token {api_token}",
-        "Accept": "application/vnd.github.v3.diff"  # 指定接受 diff 文件
-    }
-
-    # 发送 GET 请求
-    response = requests.get(url, headers=headers)
-
-    # 检查请求是否成功
-    if response.status_code == 200:
-        return response.text  # 返回 diff 内容
-    else:
-        raise Exception(f"请求失败: {response.status_code}, {response.text}")
 
 if __name__ == "__main__":
     # 从 CSV 文件中读取仓库，并获取每个仓库的 workflow 文件提交历史
