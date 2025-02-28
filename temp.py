@@ -1,5 +1,4 @@
-import re
-s = 'moves sssss'
-d = 'move ddddd'
-if(re.search('move',s)):
-    print('2222')
+from search_exe import get_history,file_operate
+
+
+

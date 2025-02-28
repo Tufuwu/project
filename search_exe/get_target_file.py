@@ -1,6 +1,8 @@
+import requests
 import pandas as pd
-from utils import get_history,file_operate
-
+import re
+import os
+from utils import file_operate,get_history
 
 
 def process_repos_from_csv(csv_file, api_token):
@@ -9,11 +11,12 @@ def process_repos_from_csv(csv_file, api_token):
     :param csv_file: 包含 GitHub 仓库信息的 CSV 文件
     :param api_token: GitHub API 的访问令牌
     """
+    parent_dir = 'D:/vscode/3/project/data'
     df = pd.read_csv(csv_file)
     for index, row in df.iterrows():
         repo_full_name = row['full_name']
-        new_data ={'full_name':row['full_name'],'commits':row['commits'],'releases':row['releases'],'forks':row['forks'],'stargazers':row['stargazers'],'size':row['size'],'createdAt':row['createdAt'],'pushedAt':row['pushedAt'],'updatedAt':row['updatedAt'],'lastCommit':row['lastCommit'],'travisredate':0}
         print(index)
+
         try:
             # 假设 workflow 文件在 `.github/workflows/` 下
             workflow_file_path = '.github/workflows/'
@@ -26,26 +29,18 @@ def process_repos_from_csv(csv_file, api_token):
             
             for c in commits:
                 b = c['commit']['message']
-                if (fo.re_match("Migrate",b) or fo.re_match('Move',b) or fo.re_match('Replace',b) ) and fo.re_match('Travis',b):
-
-                    # 你要操作的CSV文件路径
-                    csv_file = 'D:/vscode/3/project/python-csv/target.csv'
-
-                    # 新的数据行
-                    new_data['travisredate'] = c['commit']['author']["date"]
-
-                    fo.write_file_in(csv_file,new_data)
-                    break
-
-                
+                if 'Travis' in b :
+                    output_dir = os.path.join(parent_dir, repo_full_name)
+                    os.makedirs(output_dir, exist_ok=True)
+                    fo.split_and_save_diffs(gh.get_commit_diff(c['url'],api_token), output_dir)
         except Exception as e:
             print(f"无法获取 {repo_full_name} 的 workflow 文件历史: {e}")
-
 
 
 
 if __name__ == "__main__":
     # 从 CSV 文件中读取仓库，并获取每个仓库的 workflow 文件提交历史
     api_token = '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'
-    csv_file = 'D:/vscode/3/project/python-csv/active_action.csv'  # 假设这个CSV文件有 'full_name' 列
+    csv_file = 'D:/vscode/3/project/python-csv/final.csv'  # 假设这个CSV文件有 'full_name' 列
     process_repos_from_csv(csv_file, api_token)
+

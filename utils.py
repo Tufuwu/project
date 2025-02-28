@@ -103,21 +103,9 @@ def split_and_save_diffs(diff_content, output_dir):
             # 将每个 diff 文件写入到单独的文件
             output_path = os.path.join(output_dir, file_name)
             with open(output_path, 'w') as f:
-                diff_data=diff_data.encode('gbk', errors='replace')
-                diff_data=diff_data.decode('gbk')
+
                 f.write(diff_data)
             print(f"Saved diff to {output_path}")
         
 
-class get_history():
-    def __init__(self):
-        pass
-
-    def s(self):
-        print('ssss')
-
-    def d(self):
-        print('ddddd')
-    def g(self):
-        print('ggggg')
 

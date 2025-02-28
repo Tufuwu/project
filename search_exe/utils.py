@@ -2,7 +2,6 @@ import os
 import requests
 import re
 import csv 
-import pandas as pd
 
 
 def prompt_constructor(*args):
@@ -100,7 +99,7 @@ class file_operate(diff_operate):
         
         # diffs[0] 会是空字符串，因为它是第一个 'diff --git' 之前的部分，所以可以忽略
         diffs = diffs[1:]
-        
+        temp = []
         # diff 文件的文件名计数
         file_count = 1
 
@@ -114,15 +113,15 @@ class file_operate(diff_operate):
                 # 获取完整的 diff 内容
                 diff_data = diffs[i] + diffs[i + 1]
 
-                if 'git' in file_identifier:
+                if self.re_match('git',file_identifier):
                     diff_data = self.pross_github_file(diff_data)
-                else:
+                    temp.append(diff_data)
+                elif self.re_match('travis',file_identifier):
                     diff_data = self.pross_travis_file(diff_data)
+                    temp.append(diff_data)
                 # 将每个 diff 文件写入到单独的文件
                 output_path = os.path.join(output_dir, file_name)
                 with open(output_path, 'w') as f:
-                    diff_data=diff_data.encode('gbk', errors='replace')
-                    diff_data=diff_data.decode('gbk')
                     f.write(diff_data)
                 print(f"Saved diff to {output_path}")
 
