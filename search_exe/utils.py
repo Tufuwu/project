@@ -120,11 +120,24 @@ class file_operate(diff_operate):
                     diff_data = self.pross_travis_file(diff_data)
                     temp.append(diff_data)
                 # 将每个 diff 文件写入到单独的文件
-                output_path = os.path.join(output_dir, file_name)
-                with open(output_path, 'w') as f:
-                    f.write(diff_data)
-                print(f"Saved diff to {output_path}")
+                #
+                #with open(output_path, 'w') as f:
+                #    f.write(diff_data)
+                #print(f"Saved diff to {output_path}")
 
+        if len(temp) ==2:
+         
+            file_name = f"action.yml"
+            output_path = os.path.join(output_dir, file_name)
+            with open(output_path, 'w') as f:
+                f.write(temp[0])
+            file_name = f"travis.yml"
+            output_path = os.path.join(output_dir, file_name)
+            with open(output_path, 'w') as f:
+                f.write(temp[1])
+          
+            return True
+        return False
 
 
 class get_history():
@@ -177,7 +190,7 @@ class get_history():
             return []
         return response
 
-    def get_commit_diff(target_url, api_token):
+    def get_commit_diff(self,target_url, api_token):
         # GitHub API 提交的 URL
         url = target_url
 
