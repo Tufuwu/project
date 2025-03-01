@@ -1,18 +1,29 @@
-from search_exe import get_history,file_operate
-import re
-'''
-gh = get_history()
-fo = file_operate()
-workflow_file_path = '.github/workflows/'
-api_token = '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'
-commits = gh.get_workflow_file_history('areski/python-nvd3', workflow_file_path, api_token)
+import os
+import pandas as pd
+import subprocess
 
-for c in commits:
-    b = c['commit']['message']
-    if (fo.re_match("Migrate",b) or fo.re_match('Move',b) or fo.re_match('Replace',b) ) and fo.re_match('Travis',b) :
-        temp_file = gh.get_commit_diff(c['url'],api_token)
-        print(temp_file)
-'''
-s = ' @@ -1,0 +1,36 @@ '
-if re.search(r'@@ \-1,\d+ \+\d+,\d+ @@',s):
+# 读取 CSV 文件
+
+
+# 指定本地存储目录
+base_download_path = "D:/vscode/3/project/repositories"
+
+
+# 遍历 CSV 中的仓库名称
+
+repo_full_name ='2gis/k8s-handle'
+
+    # 提取仓库名
+api_url = f"https://github.com/{repo_full_name}"
+
+output_path = os.path.join(base_download_path, repo_full_name)
+    # 如果仓库已存在，则跳过
+os.makedirs(output_path, exist_ok=True)
+
+# 克隆 GitHub 仓库
+print(f"正在克隆仓库: {api_url} 到 {output_path}")
+result =subprocess.run(["git", "clone", api_url, output_path])
+if result.returncode == 0:
     print('ssss')
+
+print("所有仓库克隆完成！")
