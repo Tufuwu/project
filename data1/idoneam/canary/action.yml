@@ -1,0 +1,6 @@
+     - name: run YAPF to test if python code is correctly formatted
+       uses: AlexanderMelde/yapf-action@master
+       with:
+-        args: --verbose
+\ No newline at end of file
+        args: --verbose

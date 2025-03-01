@@ -1,0 +1,5 @@
+-name: Python package
+name: Build
+ 
+ on:
+   - pull_request

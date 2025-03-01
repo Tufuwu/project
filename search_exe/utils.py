@@ -126,7 +126,7 @@ class file_operate(diff_operate):
                 #print(f"Saved diff to {output_path}")
 
         if len(temp) ==2:
-         
+            os.makedirs(output_dir, exist_ok=True)
             file_name = f"action.yml"
             output_path = os.path.join(output_dir, file_name)
             with open(output_path, 'w') as f:

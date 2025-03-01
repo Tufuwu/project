@@ -1,0 +1,5 @@
+-name: CodeCov
+name: CodeCov tests
+ 
+ on: [push, pull_request]
+ 

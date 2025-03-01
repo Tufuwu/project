@@ -31,7 +31,6 @@ def process_repos_from_csv(csv_file, api_token):
                 if (fo.re_match("Migrate",b) or fo.re_match('Move',b) or fo.re_match('Replace',b) ) and fo.re_match('Travis',b) :
                     output_dir = os.path.join(parent_dir, repo_full_name)
                     if fo.split_and_save_diffs(gh.get_commit_diff(c['url'],api_token), output_dir):
-                        os.makedirs(output_dir, exist_ok=True)
                         csv_file = 'D:/vscode/3/project/python-csv/final.csv'
                         fo.write_file_in(csv_file,new_data)
         except Exception as e:

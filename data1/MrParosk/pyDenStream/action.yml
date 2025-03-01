@@ -1,0 +1,5 @@
+-name: pyDenStream package
+name: master
+ 
+ on:
+   push:
