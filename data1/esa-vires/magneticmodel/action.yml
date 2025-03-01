@@ -35,4 +35,3 @@ jobs:
           mkdir -p ./test && cd ./test
           pip3 show -f eoxmagmod
           python3 -c 'import eoxmagmod' && python3 -m unittest discover -p '[a-z]*.py' -v eoxmagmod
-

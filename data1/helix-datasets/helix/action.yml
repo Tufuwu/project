@@ -1,5 +1,0 @@
--name: Commit Check
-name: Commit
- 
- on: [push]
- 

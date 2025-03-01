@@ -20,4 +20,3 @@ jobs:
     - run: ruff --format=github --ignore=E501 --target-version=py37 .
     - run: pytest
    
-\ No newline at end of file

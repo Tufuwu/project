@@ -1,28 +1,21 @@
--name: autodesk continuous integration
 name: Python CI
- 
- on:
-   push:
-@@ -8,7 +8,6 @@ on:
- 
- jobs:
-   build:
--
-     runs-on: ubuntu-latest
- 
-     steps:
-@@ -17,11 +16,11 @@ jobs:
-       uses: actions/setup-python@v2
-       with:
-         python-version: 3.9
--    - name: ci.sh script
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
     - name: Install requirements
-       run: |
-         python -m pip install --upgrade pip
-         pip install -r requirements.txt -r requirements-ci.txt
--    - name: Lint with flake8
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt -r requirements-ci.txt
     - name: Run ci.sh script
-       run: ci.sh
--    - name: Upload codecov
+      run: ci.sh
     - name: Upload to codecov
-       uses: codecov/codecov-action@v1.0.15
+      uses: codecov/codecov-action@v1.0.15

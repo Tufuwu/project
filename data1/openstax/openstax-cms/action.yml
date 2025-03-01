@@ -57,4 +57,3 @@ jobs:
           pip install --upgrade pip wheel pip-tools
           pip-sync requirements/dev.txt
           python manage.py test --verbosity=2 --settings=openstax.settings.test
-\ No newline at end of file

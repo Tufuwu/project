@@ -1,6 +1,0 @@
-           if echo "${{ steps.link-check-run.outputs.result }}" | grep http
-           then 
-             exit 1
--          fi
-\ No newline at end of file
-          fi

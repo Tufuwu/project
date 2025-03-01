@@ -29,4 +29,3 @@ jobs:
           pip install -e '.[test]'
     - name: Run tests
       run: nosetests
-\ No newline at end of file

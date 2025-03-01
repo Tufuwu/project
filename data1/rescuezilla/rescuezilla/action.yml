@@ -58,4 +58,3 @@ jobs:
             build/*SUM
             build/rescuezilla_${{env.DEB_VERSION}}-1_all.deb
             build/rescuezilla-${{github.ref_name}}-*.iso
-\ No newline at end of file

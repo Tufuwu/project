@@ -11,4 +11,3 @@ install:
 script:
   - behave
   - ./build.sh
-\ No newline at end of file

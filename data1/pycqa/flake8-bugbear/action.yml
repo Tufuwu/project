@@ -35,4 +35,3 @@ jobs:
     - name: Check formatting
       run: |
         black --check .
-\ No newline at end of file

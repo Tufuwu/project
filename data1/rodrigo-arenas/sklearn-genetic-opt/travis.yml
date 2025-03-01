@@ -17,4 +17,3 @@ script:
   - pytest sklearn_genetic/ --verbose --color=yes --assert=plain --cov-fail-under=$COV_THRESHOLD --cov-config=.coveragerc --cov=./ -p no:warnings
 after_success:
   - codecov
-\ No newline at end of file

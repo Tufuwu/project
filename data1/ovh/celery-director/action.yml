@@ -75,4 +75,3 @@ jobs:
             director celery worker -P solo > /dev/null 2>&1 &
             sleep 5
             pytest tests/ -v
-\ No newline at end of file

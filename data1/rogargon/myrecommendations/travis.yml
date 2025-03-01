@@ -38,4 +38,3 @@ after_success:
       wget -qO- https://toolbelt.heroku.com/install.sh | sh;
       heroku container:release web --app $PROJECT;
     fi
-\ No newline at end of file

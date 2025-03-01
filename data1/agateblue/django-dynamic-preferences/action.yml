@@ -39,4 +39,3 @@ jobs:
       - name: Upload coverage
         run: |
           codecov -e TOXENV,DJANGO
-\ No newline at end of file

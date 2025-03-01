@@ -1,5 +1,4 @@
--name: Python package
 name: CI
- on: [push]
- jobs:
-   build:
+on: [push]
+jobs:
+  build:

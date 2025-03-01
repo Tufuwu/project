@@ -9,4 +9,3 @@ virtualenv:
   system_site_packages: true
 script:
   - python3 -m unittest -v
-\ No newline at end of file

@@ -15,4 +15,3 @@ notifications:
     recipients:
       - code@ramiro.org
     on_failure: change
-\ No newline at end of file

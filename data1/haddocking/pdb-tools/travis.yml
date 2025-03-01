@@ -20,4 +20,3 @@ script:
 
 after_success:
   - "codecov --file coverage.xml -X pycov -X gcov"
-\ No newline at end of file

@@ -34,4 +34,3 @@ jobs:
         api_key: ${{ secrets.HEROKU_API_KEY }}
         app_name: 'myrecommendations'
         dockerfile_path: ''
-\ No newline at end of file

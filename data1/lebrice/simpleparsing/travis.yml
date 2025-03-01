@@ -20,4 +20,3 @@ deploy:
     tags: true
   distributions: "sdist bdist_wheel"
   skip_existing: true
-\ No newline at end of file

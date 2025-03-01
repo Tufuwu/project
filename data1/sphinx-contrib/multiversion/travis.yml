@@ -93,4 +93,3 @@ script:
 - git fetch --all
 - python -I -m sphinx_multiversion -W docs html
 - python setup.py build sdist bdist_wheel
-

@@ -26,4 +26,3 @@ jobs:
       - name: Test
         run: |
           python setup.py test
-\ No newline at end of file

@@ -93,4 +93,3 @@ jobs:
           user: __token__
           password: ${{ secrets.PYPI_PWD }}
           packages_dir: ./artifacts/transportService/linux_amd64/
-\ No newline at end of file

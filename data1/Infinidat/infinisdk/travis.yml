@@ -1,5 +1,5 @@
- language: python
- dist: xenial
+language: python
+dist: xenial
 python:
   - "3.6"
   - "3.7"
@@ -10,13 +10,10 @@ install:
   - pip install pylint>=2.0
 script:
   - pylint --rcfile=.pylintrc infinisdk setup.py
- jobs:
-   include:
-     - stage: deploy
-@@ -18,4 +8,4 @@ jobs:
-       script:
-         - python setup.py sdist bdist_wheel
-         - twine upload -u $PYPI_USERNAME -p $PYPI_PASSWORD dist/*
+jobs:
+  include:
+    - stage: deploy
+      script:
+        - python setup.py sdist bdist_wheel
+        - twine upload -u $PYPI_USERNAME -p $PYPI_PASSWORD dist/*
       if: tag IS present
-\ No newline at end of file
-+      if: tag IS present

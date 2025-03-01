@@ -30,4 +30,3 @@ jobs:
         run: pip install tox "django==${{ matrix.django }}"
       - name: Run unit tests
         run: tox -e py-3.8-django-${{ matrix.django }}
-\ No newline at end of file

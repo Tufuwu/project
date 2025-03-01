@@ -35,4 +35,3 @@ jobs:
       - name: Coveralls
         if: success() && github.event_name == 'push' && matrix.python-version == '3.7'
         run: coveralls
-

@@ -17,4 +17,3 @@ before_install:
 
 install:
   - conda build --python=$CONDA_PY --numpy=$CONDA_NPY .
-

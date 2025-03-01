@@ -79,4 +79,3 @@ jobs:
         with:
           name: windows
           path: dist/SpotifyLyrics.exe
-\ No newline at end of file

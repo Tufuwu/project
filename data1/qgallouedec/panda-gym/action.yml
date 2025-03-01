@@ -1,5 +1,3 @@
--name: Python package
 name: build
- 
- on: [push]
- 
+
+on: [push]

@@ -51,4 +51,3 @@ script:
   - echo -e "travis_fold:start:compat_tests"
   - ./01_compat_tests.sh
   - echo -e "travis_fold:end:compat_tests"
-

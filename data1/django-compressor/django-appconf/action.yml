@@ -26,4 +26,3 @@ jobs:
         run: tox --py current
       - name: codecov
         uses: codecov/codecov-action@v2
-\ No newline at end of file

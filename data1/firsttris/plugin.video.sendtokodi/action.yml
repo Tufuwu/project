@@ -15,4 +15,3 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: sh ./build-script.sh
-\ No newline at end of file

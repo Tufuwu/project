@@ -1,9 +1,8 @@
- name: Build
- 
--on: [push, pull_request]
+name: Build
+
 on: [push, pull_request, workflow_dispatch]
- 
- jobs:
+
+jobs:
   formatting:
     name: Check Formatting
     runs-on: ubuntu-latest
@@ -21,6 +20,6 @@ on: [push, pull_request, workflow_dispatch]
       with:
         options: "--check --diff -l 90"
 
-   build_wheels:
-     name: Build wheel on ${{matrix.platform}}
-     runs-on: ${{matrix.platform}}
+  build_wheels:
+    name: Build wheel on ${{matrix.platform}}
+    runs-on: ${{matrix.platform}}

@@ -10,4 +10,3 @@ install:
  - pip install pytest
  - pip install -e .
 script: pytest
-\ No newline at end of file

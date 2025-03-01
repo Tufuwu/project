@@ -66,4 +66,3 @@ jobs:
           paster --plugin=ckanext-archiver archiver init -c test.ini
       - name: Run tests
         run: pytest --ckan-ini=test.ini --cov=ckanext.archiver --disable-warnings ckanext/archiver/tests
-\ No newline at end of file

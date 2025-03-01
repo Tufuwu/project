@@ -45,4 +45,3 @@ jobs:
       run: |
         make requirements-dev
         make test    
-\ No newline at end of file

@@ -37,4 +37,3 @@ if [[ ${PYTHON_VERSION} == 2.7 ]]; then
 elif [[ ${PYTHON_VERSION} == 3.7 ]]; then
   pytype;
 fi
-

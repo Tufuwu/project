@@ -27,4 +27,3 @@ jobs:
         run: docker build -t ultisnips:${{ matrix.tag }} --build-arg PYTHON_IMAGE=${{ matrix.python_image }} --build-arg VIM_VERSION=${{ matrix.vim_version }} .
       - name: Run the tests
         run: docker run --rm -t ultisnips:${{ matrix.tag }} docker/run_tests.sh
-

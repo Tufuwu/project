@@ -12,4 +12,3 @@ install:
 # command to run tests
 script:
   - python test.py
-\ No newline at end of file

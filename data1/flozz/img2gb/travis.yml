@@ -14,4 +14,3 @@ install:
 script:
     - flake8 img2gb test
     - pytest -v test
-

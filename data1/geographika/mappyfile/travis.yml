@@ -19,4 +19,3 @@ script:
 
 after_success:
     - coveralls
-\ No newline at end of file

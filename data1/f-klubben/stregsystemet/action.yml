@@ -1,5 +1,4 @@
--name: Django CI and Codecov
 name: Django CI
- 
- on:
-   push:
+
+on:
+  push:

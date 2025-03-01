@@ -43,4 +43,3 @@ script:
   - python-codacy-coverage -r coverage.xml
   - flake8 .
   - make black arg=--check
-

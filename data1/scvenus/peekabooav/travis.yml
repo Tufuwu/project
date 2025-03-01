@@ -12,4 +12,3 @@ install:
 script:
   - cd tests
   - ./test.py
-

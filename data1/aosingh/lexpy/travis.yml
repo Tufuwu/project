@@ -31,4 +31,3 @@ script:
   - coverage run -m unittest discover -s lexpy/tests
   - coverage report -i -m
   - coveralls
-\ No newline at end of file

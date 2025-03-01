@@ -19,4 +19,3 @@ jobs:
         run: pip install -r tests/requirements.txt
       - name: Run test script
         run: python test_duo_openvpn.py
-

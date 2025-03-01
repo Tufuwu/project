@@ -12,4 +12,3 @@ script:
   - pytest --cov-report term --cov=lux tests/
 after_success:
   - bash <(curl -s https://codecov.io/bash)
-\ No newline at end of file

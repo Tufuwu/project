@@ -26,4 +26,3 @@ jobs:
       - name: Test with pytest
         run: |
           pytest
-\ No newline at end of file

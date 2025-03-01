@@ -51,4 +51,3 @@ install:
 
 # Finally start our test runner passing it the blender executable from the downloaded blender release
 script: python test/testrunner.py ./tmp/blender/blender
-

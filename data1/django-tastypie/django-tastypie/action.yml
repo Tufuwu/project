@@ -56,4 +56,3 @@ jobs:
       run: coveralls --service=github
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}      
-\ No newline at end of file

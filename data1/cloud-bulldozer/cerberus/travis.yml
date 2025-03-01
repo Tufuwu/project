@@ -13,4 +13,3 @@ install:
   - sudo pip3 install tox
 
 script: tox .
-

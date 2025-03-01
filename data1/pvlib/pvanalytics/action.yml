@@ -1,16 +1,12 @@
- name: lint and test
- 
--on: [push, pull_request]
+name: lint and test
+
 on: [push, pull_request_target]
- 
- jobs:
-   test:
-@@ -29,8 +29,36 @@ jobs:
-         pip install -r ${{ matrix.requirements }} .[all]
-     - name: Test with pytest
-       run: |
--        pip install pytest
--        pytest pvanalytics --runslow
+
+jobs:
+  test:
+        pip install -r ${{ matrix.requirements }} .[all]
+    - name: Test with pytest
+      run: |
         pip install pytest pytest-cov
         pytest --cov=pvanalytics --cov-config=.coveragerc --cov-report term-missing pvanalytics --runslow
     - name: Upload Coverage
@@ -41,6 +37,5 @@ on: [push, pull_request_target]
           coveralls --finish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
- 
-   lint:
- 
+
+  lint:

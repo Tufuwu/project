@@ -1,9 +1,0 @@
- *.prj
- *.shx
- *.dbf
-*.tif
-*.tiff
-*.h5
- docs/_build
- docs/api
-\ No newline at end of file

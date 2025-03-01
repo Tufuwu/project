@@ -17,4 +17,3 @@ jobs:
         run: pip install tox
       - name: Run tox
         run: tox -e py,flake8
-\ No newline at end of file

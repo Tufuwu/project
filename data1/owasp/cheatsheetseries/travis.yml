@@ -13,4 +13,3 @@ script:
   - sed -i 's/python/python3\.5/g' Generate_Site.sh
   - bash Generate_Site.sh
   - ls -l ../generated/site/
-\ No newline at end of file

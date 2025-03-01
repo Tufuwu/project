@@ -32,4 +32,3 @@ jobs:
         python -m pip install --no-deps --ignore-installed .
         pytest -v tests
         cd tests && bash run_test.sh
-\ No newline at end of file

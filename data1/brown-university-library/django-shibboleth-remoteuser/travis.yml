@@ -23,4 +23,3 @@ install:
  - pip install Django==$DJANGO_VERSION
 # Tell Travis how to run the test script itself
 script: python quicktest.py shibboleth
-

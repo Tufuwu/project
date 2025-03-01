@@ -28,4 +28,3 @@ jobs:
       run: |
         coverage run --source=stcgal setup.py test
         coveralls
-\ No newline at end of file

@@ -35,4 +35,3 @@ jobs:
           BRANCH: gh-pages
           FOLDER: docs/_build/html
           CLEAN: true
-\ No newline at end of file

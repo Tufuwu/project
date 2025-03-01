@@ -24,17 +24,25 @@ class diff_operate():
         name_index = None
         for i, line in enumerate(lines):
             if line.strip().startswith('@@'):
-                name_index = i+1
+                name_index = i
                 break
+
 
         # 提取name后的所有行
         updated_lines = lines[name_index :]
 
         # 去掉每行开头的'+'号
-        updated_lines = [line[1:] if line.startswith('+') else line for line in updated_lines]
-
+        temp_lines = []
+        if re.search(r'@@ \-\d+,\d+ \+1,\d+ @@',updated_lines[0]):
+            for line in updated_lines:
+                if line.startswith('+'):
+                    temp_lines.append(line[1:])
+                elif line.startswith(' '):
+                    temp_lines.append(line[1:])
+        else:
+            return  False
         # 将提取的行合并成一个字符串
-        updated_content = '\n'.join(updated_lines)
+        updated_content = '\n'.join(temp_lines)
 
         return updated_content
     
@@ -46,17 +54,28 @@ class diff_operate():
         name_index = None
         for i, line in enumerate(lines):
             if line.strip().startswith('@@'):
-                name_index = i+1
+                name_index = i
                 break
+
+
+
 
         # 提取name后的所有行
         updated_lines = lines[name_index :]
 
         # 去掉每行开头的'+'号
-        updated_lines = [line[1:] if line.startswith('-') else line for line in updated_lines]
-
+        temp_lines = []
+        if re.search(r'@@ \-1,\d+ \+\d+,\d+ @@',updated_lines[0]):     
+            for line in updated_lines:
+   
+                if line.startswith('-'):
+                    temp_lines.append(line[1:])
+                elif line.startswith(' '):
+                    temp_lines.append(line[1:])
+        else:
+            return False
         # 将提取的行合并成一个字符串
-        updated_content = '\n'.join(updated_lines)
+        updated_content = '\n'.join(temp_lines)
 
         return updated_content
     
@@ -115,10 +134,12 @@ class file_operate(diff_operate):
 
                 if self.re_match('git',file_identifier):
                     diff_data = self.pross_github_file(diff_data)
-                    temp.append(diff_data)
+                    if diff_data:
+                        temp.append(diff_data)
                 elif self.re_match('travis',file_identifier):
                     diff_data = self.pross_travis_file(diff_data)
-                    temp.append(diff_data)
+                    if diff_data:
+                        temp.append(diff_data)
                 # 将每个 diff 文件写入到单独的文件
                 #
                 #with open(output_path, 'w') as f:

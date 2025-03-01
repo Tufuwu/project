@@ -28,4 +28,3 @@ jobs:
     - name: openapi linter
       run: |
         python -m openapi3 openapi.yaml
-\ No newline at end of file
