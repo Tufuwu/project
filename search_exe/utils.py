@@ -210,6 +210,29 @@ class get_history():
             print(f"Failed to fetch runs for : {response.status_code}")
             return []
         return response
+    
+    def get_request_commit(self,repo_full_name,api_token,count):
+        """
+        获取 GitHub 仓库中文件的提交历史记录
+        :param repo_full_name: 仓库的完整名称（格式为 'owner/repo'）
+        :param file_path: 要查询的文件路径
+        :param api_token: GitHub API 的访问令牌
+        :return: 提交历史记录列表
+        """
+        api_url = f"https://api.github.com/repos/{repo_full_name}/pull/{count}/commit"
+        #params = {"path": file_path}
+        headers = {
+            "Authorization": f"token {api_token}",
+            "Accept": "application/vnd.github.v3+json"
+        }
+
+        response = requests.get(api_url, headers=headers)
+        
+        if response.status_code != 200:
+            print(f"Failed to fetch runs for : {response.status_code}")
+            return []
+        return response
+
 
     def get_commit_diff(self,target_url, api_token):
         # GitHub API 提交的 URL
