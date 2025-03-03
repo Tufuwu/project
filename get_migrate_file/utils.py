@@ -1,5 +1,6 @@
 import requests
 import subprocess
+import os
 
 
 
@@ -52,3 +53,15 @@ def push_repositories(commit_message):
 # 强制推送到远程仓库（覆盖原仓库中的内容）
     subprocess.run(["git", "push", "-f", "origin", "main"], check=True)  # 如果主分支是main
     print("Changes pushed to GitHub, overwriting the remote repository.")
+
+
+
+
+
+def copy_files(source_dir, target_dir):
+        source_file = source_dir
+        target_file = target_dir
+    
+        with open(source_file, 'r', encoding='utf-8') as sf, open(target_file, 'w', encoding='utf-8') as tf:
+            tf.write(sf.read())
+        print(f"已复制  到 {target_dir}")
