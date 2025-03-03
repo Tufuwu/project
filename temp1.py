@@ -32,7 +32,7 @@ if "origin" in check_remote.stdout:
 subprocess.run(["git", "remote", "add", "origin", github_repo_url], check=True)
 '''
 # 读取CSV文件，获取文件路径
-count = 84
+count = 102
 
 df = pd.read_csv(csv_file_path)
 for index, row in df.iterrows():
@@ -50,5 +50,6 @@ for index, row in df.iterrows():
     for c in data:
         output_dir = os.path.join(parent_dir, repo_full_name)
         fo.split_and_save_diffs(gh.get_commit_diff(c['url'],api_token), output_dir)
+    
     count+=1
 
