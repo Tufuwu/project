@@ -1,0 +1,90 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      PYTHON_VERSION: '2.7'
+      ANACONDA: https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: wget "${ANACONDA}" -O miniconda.sh;
+    - run: bash miniconda.sh -b -p ${{ github.workspace }}/miniconda
+    - run: export PATH="${{ github.workspace }}/miniconda/bin:$PATH"
+    - run: hash -r
+    - run: conda config --set always_yes yes --set changeps1 no
+    - run: conda config --append channels potassco
+    - run: conda update -q conda
+    - run: conda info -a
+    - run: conda create -q -n test-environment python="${PYTHON_VERSION}"
+    - run: source activate test-environment
+    - run: conda install -q clingo
+    - run: python setup.py test
+  test_2:
+    runs-on: ubuntu-latest
+    env:
+      PYTHON_VERSION: '3.6'
+      ANACONDA: https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: wget "${ANACONDA}" -O miniconda.sh;
+    - run: bash miniconda.sh -b -p ${{ github.workspace }}/miniconda
+    - run: export PATH="${{ github.workspace }}/miniconda/bin:$PATH"
+    - run: hash -r
+    - run: conda config --set always_yes yes --set changeps1 no
+    - run: conda config --append channels potassco
+    - run: conda update -q conda
+    - run: conda info -a
+    - run: conda create -q -n test-environment python="${PYTHON_VERSION}"
+    - run: source activate test-environment
+    - run: conda install -q clingo
+    - run: python setup.py test
+  test_3:
+    runs-on: macos-latest
+    env:
+      PYTHON_VERSION: '2.7'
+      ANACONDA: https://repo.continuum.io/miniconda/Miniconda2-latest-MacOSX-x86_64.sh
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: wget "${ANACONDA}" -O miniconda.sh;
+    - run: bash miniconda.sh -b -p ${{ github.workspace }}/miniconda
+    - run: export PATH="${{ github.workspace }}/miniconda/bin:$PATH"
+    - run: hash -r
+    - run: conda config --set always_yes yes --set changeps1 no
+    - run: conda config --append channels potassco
+    - run: conda update -q conda
+    - run: conda info -a
+    - run: conda create -q -n test-environment python="${PYTHON_VERSION}"
+    - run: source activate test-environment
+    - run: conda install -q clingo
+    - run: python setup.py test
+  test_4:
+    runs-on: macos-latest
+    env:
+      PYTHON_VERSION: '3.6'
+      ANACONDA: https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: wget "${ANACONDA}" -O miniconda.sh;
+    - run: bash miniconda.sh -b -p ${{ github.workspace }}/miniconda
+    - run: export PATH="${{ github.workspace }}/miniconda/bin:$PATH"
+    - run: hash -r
+    - run: conda config --set always_yes yes --set changeps1 no
+    - run: conda config --append channels potassco
+    - run: conda update -q conda
+    - run: conda info -a
+    - run: conda create -q -n test-environment python="${PYTHON_VERSION}"
+    - run: source activate test-environment
+    - run: conda install -q clingo
+    - run: python setup.py test

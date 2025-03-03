@@ -1,0 +1,79 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+    - 1.0
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: macos-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: if [ "${{ runner.os }}" == "linux" ]; then docker pull $DOCKER_IMAGE; fi
+    - run: if [ "${{ runner.os }}" == "linux" ]; then docker run --rm -v $PWD:/io $DOCKER_IMAGE $PRE_CMD /io/scripts/build-wheels-linux.sh; fi
+    - run: if [ "${{ runner.os }}" == "osx" ]; then scripts/build-wheels-macos.sh; fi
+    - run: ls dist/
+    - uses: softprops/action-gh-release@v0.1.15
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        GITHUB_REPOSITORY: "${{ github.repository }}"
+      with:
+        files: dist/*.whl
+      if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+#     # This item has no matching transformer
+#     - email: false
+  test_2:
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_IMAGE: quay.io/pypa/manylinux1_x86_64
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: if [ "${{ runner.os }}" == "linux" ]; then docker pull $DOCKER_IMAGE; fi
+    - run: if [ "${{ runner.os }}" == "linux" ]; then docker run --rm -v $PWD:/io $DOCKER_IMAGE $PRE_CMD /io/scripts/build-wheels-linux.sh; fi
+    - run: if [ "${{ runner.os }}" == "osx" ]; then scripts/build-wheels-macos.sh; fi
+    - run: ls dist/
+    - uses: softprops/action-gh-release@v0.1.15
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        GITHUB_REPOSITORY: "${{ github.repository }}"
+      with:
+        files: dist/*.whl
+      if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+#     # This item has no matching transformer
+#     - email: false
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_3:
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_IMAGE: quay.io/pypa/manylinux1_i686
+      PRE_CMD: linux32
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: if [ "${{ runner.os }}" == "linux" ]; then docker pull $DOCKER_IMAGE; fi
+    - run: if [ "${{ runner.os }}" == "linux" ]; then docker run --rm -v $PWD:/io $DOCKER_IMAGE $PRE_CMD /io/scripts/build-wheels-linux.sh; fi
+    - run: if [ "${{ runner.os }}" == "osx" ]; then scripts/build-wheels-macos.sh; fi
+    - run: ls dist/
+    - uses: softprops/action-gh-release@v0.1.15
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        GITHUB_REPOSITORY: "${{ github.repository }}"
+      with:
+        files: dist/*.whl
+      if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+#     # This item has no matching transformer
+#     - email: false
+    services:
+#       # This item has no matching transformer
+#       docker:

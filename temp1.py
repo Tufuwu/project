@@ -32,12 +32,13 @@ if "origin" in check_remote.stdout:
 subprocess.run(["git", "remote", "add", "origin", github_repo_url], check=True)
 '''
 # 读取CSV文件，获取文件路径
-count = 3
+count = 58
 
 df = pd.read_csv(csv_file_path)
 for index, row in df.iterrows():
     repo_full_name = row['full_name']
     base_download_path =f"D:/vscode/3/project/data1/{repo_full_name}/travis.yml"
+    
     copy_files(base_download_path,local_file)
     os.chdir(local_directory)
     push_repositories('Update files from CSV')
@@ -49,5 +50,8 @@ for index, row in df.iterrows():
     for c in data:
         output_dir = os.path.join(parent_dir, repo_full_name)
         fo.split_and_save_diffs(gh.get_commit_diff(c['url'],api_token), output_dir)
+    '''    
     count += 1
-    '''
+
+    if count ==68:
+        break
