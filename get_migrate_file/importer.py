@@ -11,7 +11,7 @@ csv_file_path = "D:/vscode/3/project/python-csv/repositiries.csv"  # 存放文�
 
 api_token = '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'
 # 确保Git仓库初始化
-'''
+
 
 # 检查当前是否为Git仓库，如果没有则初始化
 if not os.path.isdir(".git"):
@@ -24,7 +24,7 @@ if "origin" in check_remote.stdout:
     subprocess.run(["git", "remote", "remove", "origin"], check=True)
 # 设置远程仓库
 subprocess.run(["git", "remote", "add", "origin", github_repo_url], check=True)
-'''
+
 # 读取CSV文件，获取文件路径
 
 df = pd.read_csv(csv_file_path)
