@@ -1,9 +1,8 @@
-import os
-from search_exe.utils import get_history,file_operate
+from search_exe import get_history,file_operate
 import os
 import time
 import pandas as pd
-from utils import add_comments,push_repositories,copy_files
+from get_migrate_file import add_comments,push_repositories,copy_files
 
 # 配置
 github_repo_url = "https://github.com/Tufuwu/test2.git"  # GitHub仓库URL
@@ -44,19 +43,11 @@ for index, row in df.iterrows():
     push_repositories('Update files from CSV')
     add_comments(api_token)
     time.sleep(90)
+    '''
     commits = gh.get_request_commit('Tufuwu/myproject',api_token,str(count))
     data = commits.json()
     for c in data:
         output_dir = os.path.join(parent_dir, repo_full_name)
         fo.split_and_save_diffs(gh.get_commit_diff(c['url'],api_token), output_dir)
     count += 1
-
-'''
-if __name__ == "__main__":
-    os.chdir(local_directory)
-    base_download_path = f"D:/vscode/3/project/data1/xanaduai/thewalrus/travis.yml"
-    copy_files(base_download_path,local_file)
-
-    push_repositories('Update files from CSV')
-    add_comments(api_token)
-'''
+    '''

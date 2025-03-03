@@ -1,0 +1,48 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+env:
+  TWINE_USERNAME: letterror-ci
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 2.7
+    - run: pip install -U setuptools wheel
+    - run: python setup.py bdist_wheel
+    - run: |
+        if [ ${{ github.ref }} ] && [ $PYPI_DEPLOY ]; then
+          python -m pip install twine
+          python setup.py sdist
+          python -m twine upload dist/*
+        fi
+      if: "${{ success() }}"
+  test_2:
+    runs-on: ubuntu-latest
+    env:
+      PYPI_DEPLOY: 'true'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: pip install -U setuptools wheel
+    - run: python setup.py bdist_wheel
+    - run: |
+        if [ ${{ github.ref }} ] && [ $PYPI_DEPLOY ]; then
+          python -m pip install twine
+          python setup.py sdist
+          python -m twine upload dist/*
+        fi
+      if: "${{ success() }}"

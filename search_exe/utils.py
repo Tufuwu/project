@@ -141,11 +141,12 @@ class file_operate(diff_operate):
                     if diff_data:
                         temp.append(diff_data)
                 # 将每个 diff 文件写入到单独的文件
-                #
-                #with open(output_path, 'w') as f:
-                #    f.write(diff_data)
-                #print(f"Saved diff to {output_path}")
-
+                file_name = f"importer.yml"
+                output_path = os.path.join(output_dir, file_name)
+                with open(output_path, 'w') as f:
+                    f.write(diff_data)
+                print(f"Saved diff to {output_dir}")
+        '''
         if len(temp) ==2:
             os.makedirs(output_dir, exist_ok=True)
             file_name = f"action.yml"
@@ -159,7 +160,7 @@ class file_operate(diff_operate):
           
             return True
         return False
-
+        '''
 
 class get_history():
 
@@ -219,7 +220,7 @@ class get_history():
         :param api_token: GitHub API 的访问令牌
         :return: 提交历史记录列表
         """
-        api_url = f"https://api.github.com/repos/{repo_full_name}/pull/{count}/commit"
+        api_url = f"https://api.github.com/repos/{repo_full_name}/pulls/{count}/commits"
         #params = {"path": file_path}
         headers = {
             "Authorization": f"token {api_token}",
