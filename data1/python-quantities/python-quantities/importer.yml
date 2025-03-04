@@ -1,0 +1,622 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.8.2
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '2.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_2:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.9.3
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '2.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_3:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.10.4
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '2.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_4:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.11.3
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '2.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_5:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.12.1
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '2.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_6:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.13.3
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '2.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_7:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.14.5
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '2.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_8:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.15.1
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '2.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_9:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.8.2
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.4'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_10:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.9.3
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.4'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_11:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.10.4
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.4'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_12:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.11.3
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.4'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_13:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.12.1
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.4'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_14:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.13.3
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.4'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_15:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.14.5
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.4'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_16:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.8.2
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.5'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_17:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.9.3
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.5'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_18:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.10.4
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.5'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_19:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.11.3
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.5'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_20:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.12.1
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.5'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_21:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.13.3
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.5'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_22:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.14.5
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.5'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_23:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.8.2
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_24:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.9.3
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_25:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.10.4
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_26:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.11.3
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_27:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.12.1
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_28:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.13.3
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_29:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.14.5
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_30:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.15.4
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_31:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.16.1
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_32:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.14.5
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_33:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.15.4
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_34:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.16.1
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_35:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.17.2
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
+  test_36:
+    runs-on: ubuntu-16.04
+    env:
+      NUMPY_VERSION: 1.17.2
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install "numpy==$NUMPY_VERSION"
+    - run: python setup.py install
+    - run: python setup.py test
+    - run: python -m doctest README.rst
+#     # This item has no matching transformer
+#     - email: false
