@@ -1,0 +1,44 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: "${{ matrix.python }}"
+    - run: pip install flake8 coverage codecov
+    - run: flake8
+    - run: coverage run --source=pdbtools/ setup.py test
+    - run: coverage xml
+    - run: codecov --file coverage.xml -X pycov -X gcov
+      if: "${{ success() }}"
+    strategy:
+      matrix:
+        python:
+        - '2.7'
+        - '3.6'
+  test_2:
+    runs-on: ubuntu-16.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install flake8 coverage codecov
+    - run: flake8
+    - run: coverage run --source=pdbtools/ setup.py test
+    - run: coverage xml
+    - run: codecov --file coverage.xml -X pycov -X gcov
+      if: "${{ success() }}"

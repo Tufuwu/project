@@ -1,0 +1,29 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: ruby/setup-ruby@v1.165.1
+      with:
+        ruby-version: 2.4.1
+    - run: gem install bundler
+    - run: bundle install --jobs=3 --retry=3
+    - run: gem install awesome_bot
+    - run: awesome_bot README.md --allow-redirect --white-list http://hacktoberfest.com/,https://hacktoberfest.com/,https://hacktoberfest.digitalocean.com/,https://github.com/search
+  test_2:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: pip install -r requirements.txt
+    - run: python validate-alphabetical.py README.md

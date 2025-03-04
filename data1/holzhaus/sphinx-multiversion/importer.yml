@@ -1,0 +1,145 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  Ubuntu_Python_3_6:
+    runs-on: ubuntu-16.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: python -m pip install pre-commit setuptools wheel
+    - run: python -m pip install -r requirements.txt
+    - run: python setup.py install
+    - run: pre-commit run --all-files --show-diff-on-failure
+    - run: python -m unittest --verbose
+    - run: mkdir html
+    - run: git fetch --all
+    - run: python -I -m sphinx_multiversion -W docs html
+    - run: python setup.py build sdist bdist_wheel
+  Ubuntu_Python_3_7:
+    needs:
+    - Ubuntu_Python_3_6
+    - Ubuntu_Python_3_7
+    - Windows_Python_3_6
+    - Windows_Python_3_7
+    runs-on: ubuntu-16.04
+    if: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/master' || github.ref  'refs/tags/present)' }}
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: python -m pip install pre-commit setuptools wheel
+    - run: python -m pip install -r requirements.txt
+    - run: python setup.py install
+    - run: pre-commit run --all-files --show-diff-on-failure
+    - run: python -m unittest --verbose
+    - run: mkdir html
+    - run: git fetch --all
+    - run: python -I -m sphinx_multiversion -W docs html
+    - run: python setup.py build sdist bdist_wheel
+    - run: touch html/.nojekyll
+    - run: cp assets/gh-pages-redirect.html html/index.html
+#     # This item has no matching transformer
+#     - pypi:
+#         provider: pypi
+#         username: __token__
+#         password:
+#           secure: 0bFhY80KT5zp5wpsQwmBdHNvrC1aXnCUnL268UBb5bcVrTQ/cVr08CPVEZLefRU96CCqCZHCQPh1iP9DCtPEszB3XI0pVydoNJ9Fei9ccHI6bJBtfpLnTwlyygiBiTT3uNlal+/+videWqhDXAs2EHZAQn4L41Na6h1pHBoTu+V8KIJinNJccgiUXeeHdDc4lWCVKU0GfeKtzvgmFZq9B1w7jo+VnOQFKYH3rS80u1xkTrWNiVb3vdt+36PHssNXv5XI9kULsE+ofSdKIwYd7zGxs3ouw+LYhEM6QpDp1ERITAPWhdrY6DTTVdatnClTlzvxRMiqbeKmx/cYIx1x2aXqGxQo0UIcjK2N647ZG6lQAmJnRBc71CJvzGOFQQ+PNnlRlUcOmhnqr8K4bHDhe6Cf1PAFW6SCZvZ8ruXRV726FhRqMzmE/fJwtOY97F0BHJWwBAjbTdDM0J9Hph68YjkMcB96/bRTvGqkwVZTVqPtGppa3uRX2+ljt9pFY3j/jsk77mTYoY5VJrDB8lQSK7dzn8U/vg6q7lbRA5QfYXVIc77/7w29BFgVKv418LlfEh9zlq2/mB0+EX9BGEtEFNMEDzmXvJpEMQ2isDhfACKLO6B8opkfNEgUKhEpUBOTKf0VNSTVdQy1VL+jnXk7SzHo6ncb7PCMMK/yWmlCsvc=
+#         distributions: sdist bdist_wheel
+#         skip_existing: true
+#         'on':
+#           branch: master
+#           repo: Holzhaus/sphinx-multiversion
+#           tags: true
+#       if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+    - uses: softprops/action-gh-release@v0.1.15
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        GITHUB_REPOSITORY: "${{ github.repository }}"
+      with:
+        files: dist/*
+        draft: false
+        name: "${{ github.ref }}"
+      if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+#     # This item has no matching transformer
+#     - pages:
+#         provider: pages
+#         skip_cleanup: true
+#         keep_history: false
+#         token: "$GITHUB_TOKEN"
+#         local_dir: html
+#         'on':
+#           branch: master
+#           repo: Holzhaus/sphinx-multiversion
+#       if: "${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}"
+  Windows_Python_3_6:
+    runs-on: ubuntu-16.04
+    env:
+      PATH: "/c/Python36:/c/Python36/Scripts:$PATH"
+      SKIP: check-executables-have-shebangs
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - run: choco install python --version 3.6.8
+    - run: python -m pip install pre-commit setuptools wheel
+    - run: python -m pip install -r requirements.txt
+    - run: python setup.py install
+    - run: pre-commit run --all-files --show-diff-on-failure
+    - run: python -m unittest --verbose
+    - run: mkdir html
+    - run: git fetch --all
+    - run: python -I -m sphinx_multiversion -W docs html
+    - run: python setup.py build sdist bdist_wheel
+  Windows_Python_3_7:
+    runs-on: ubuntu-16.04
+    env:
+      PATH: "/c/Python37:/c/Python37/Scripts:$PATH"
+      SKIP: check-executables-have-shebangs
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - run: choco install python --version 3.7.8
+    - run: python -m pip install pre-commit setuptools wheel
+    - run: python -m pip install -r requirements.txt
+    - run: python setup.py install
+    - run: pre-commit run --all-files --show-diff-on-failure
+    - run: python -m unittest --verbose
+    - run: mkdir html
+    - run: git fetch --all
+    - run: python -I -m sphinx_multiversion -W docs html
+    - run: python setup.py build sdist bdist_wheel

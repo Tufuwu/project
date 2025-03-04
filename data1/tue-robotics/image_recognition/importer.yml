@@ -1,0 +1,30 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+env:
+  BEFORE_INIT: apt-get install -y -q python-pip && pip install --upgrade pip && hash -r pip && pip install --upgrade enum34 pyasn1-modules 'tensorflow>=2.1' 'keras<2.4' --progress-bar=off
+jobs:
+  kinetic:
+    runs-on: ubuntu-18.04
+    env:
+      ROS_DISTRO: kinetic
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: git clone https://github.com/ros-industrial/industrial_ci.git .ci_config
+    - run: ".ci_config/travis.sh"
+  melodic:
+    runs-on: ubuntu-18.04
+    env:
+      ROS_DISTRO: melodic
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: git clone https://github.com/ros-industrial/industrial_ci.git .ci_config
+    - run: ".ci_config/travis.sh"
