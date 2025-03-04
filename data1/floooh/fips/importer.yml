@@ -1,0 +1,107 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'compiler' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: echo ${{ runner.os }}
+    - run: echo ${{ runner.os }}
+    - run: sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+    - run: sudo apt-get update -qq
+    - run: sudo apt-get install -qq g++-4.8
+    - run: sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 50
+    - run: sudo apt-get install -qq cmake
+    - run: sudo apt-get install -qq ccache
+    - run: echo ${{ runner.os }}
+    - run: git --version
+    - run: python --version
+    - run: python fips
+    - run: python fips clone https://github.com/floooh/fips-hello-world.git
+    - run: cd ../fips-hello-world
+    - run: python fips help
+    - run: python fips help clone
+    - run: python fips help config
+    - run: python fips help open
+    - run: python fips help setup
+    - run: python fips help list
+    - run: python fips list
+    - run: python fips list all
+    - run: python fips list configs
+    - run: python fips list build-tools
+    - run: python fips list registry
+    - run: python fips list settings
+    - run: python fips list exports
+    - run: python fips list imports
+    - run: python fips list targets
+    - run: python fips help diag
+    - run: python fips diag
+    - run: python fips diag all
+    - run: python fips diag fips
+    - run: python fips diag tools
+    - run: python fips diag configs
+    - run: python fips diag imports
+    - run: python fips help fetch
+    - run: python fips fetch
+    - run: python fips fetch fips-hello-dep2
+    - run: python fips help gen
+    - run: python fips gen
+    - run: python fips gen linux-make-release
+    - run: python fips list targets
+    - run: python fips help build
+    - run: python fips build
+    - run: python fips build linux-make-release
+    - run: python fips help run
+    - run: python fips run hello
+    - run: python fips run hello -- arg0 arg1 arg2
+    - run: python fips run hello linux-make-release
+    - run: python fips run hello linux-make-release -- arg0 arg1 arg2
+    - run: python fips help clean
+    - run: python fips clean
+    - run: python fips clean linux-make-release
+    - run: python fips clean all
+    - run: python fips help set
+    - run: python fips set config linux-make-release
+    - run: python fips set ccache on
+    - run: python fips make hello
+    - run: python fips run hello
+    - run: python fips make hello linux-make-debug
+    - run: python fips run hello linux-make-debug
+    - run: python fips update
+    - run: python fips help unset
+    - run: python fips unset config
+    - run: python fips unset ccache
+    - run: python fips help init
+    - run: mkdir ../test-project
+    - run: python fips init test-project
+    - run: python fips help fips-hello-test
+    - run: python fips fips-hello-test
+    - run: python fips help fips-hello-dep1
+    - run: python fips fips-hello-dep1
+    - run: python fips clean all
+    - run: python fips set target hello
+    - run: python fips set jobs 1
+    - run: python fips set config linux-make-release
+    - run: python fips list settings
+    - run: python fips make
+    - run: python fips run
+    - run: python fips unset config
+    - run: python fips unset target
+    - run: python fips unset jobs
+    - run: python fips list settings
+    - run: cd ../fips-hello-dep1
+    - run: python fips gen
+    - run: python fips build
+    - run: python fips clone https://github.com/fungos/fips-tests.git
+    - run: cd ../fips-tests
+    - run: python fips testrunner linux-make-debug
+    - run: python fips testrunner linux-make-release

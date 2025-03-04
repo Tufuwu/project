@@ -1,0 +1,132 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+    - master
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+env:
+  PYTHON_VERSION: '3.6'
+  CODECOV: 'true'
+  PYTEST_FLAGS: "-v --disable-pytest-warnings --durations=20 --low-performance --cov=gromacs"
+  PYTEST_LIST: tests
+  MAIN_CMD: pytest ${PYTEST_LIST}
+  SETUP_CMD: "${PYTEST_FLAGS}"
+  BUILD_CMD: pip install -v .
+  CONDA_DEPENDENCIES: six scipy matplotlib pandas gromacs
+  CONDA_CHANNELS: defaults conda-forge bioconda
+  CONDA_CHANNEL_PRIORITY: 'True'
+  PIP_DEPENDENCIES: numkit codecov
+  NUMPY_VERSION: stable
+  MPLBACKEND: agg
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: git clone --depth 1 git://github.com/astropy/ci-helpers.git
+    - run: source ci-helpers/travis/setup_conda.sh
+    - run: eval $BUILD_CMD
+    - run: cd ${{ github.workspace }}
+    - run: if [[ ${{ runner.os }} == 'osx' ]]; then ulimit -S -n 2048; fi
+    - run: echo $MAIN_CMD $SETUP_CMD
+    - run: eval $MAIN_CMD $SETUP_CMD
+    - run: |-
+        if [[ $CODECOV == 'true' ]]; then \
+          codecov; \
+        fi
+      if: "${{ success() }}"
+    strategy:
+      matrix:
+        include:
+        - GROMACS_VERSION: 4.6.5
+          PYTHON_VERSION: '2.7'
+          NUMPY_VERSION: '1.16'
+        - GROMACS_VERSION: '2019.1'
+          PYTHON_VERSION: '2.7'
+          NUMPY_VERSION: '1.16'
+        - GROMACS_VERSION: 4.6.5
+          PYTHON_VERSION: '3.6'
+        - GROMACS_VERSION: '2018.6'
+          PYTHON_VERSION: '3.6'
+        - GROMACS_VERSION: '2019.1'
+          PYTHON_VERSION: '3.6'
+        - GROMACS_VERSION: '2019.1'
+          PYTHON_VERSION: '3.7'
+        - SETUP_CMD: "${SETUP_CMD} --link-gmx-mpi --no-append-suffix"
+          GROMACS_VERSION: '2018.6'
+          PYTHON_VERSION: '3.6'
+    env:
+      GROMACS_VERSION: "${{ matrix.GROMACS_VERSION }}"
+      PYTHON_VERSION: "${{ matrix.PYTHON_VERSION }}"
+      NUMPY_VERSION: "${{ matrix.NUMPY_VERSION }}"
+      SETUP_CMD: "${{ matrix.SETUP_CMD }}"
+  test_2:
+    runs-on: macos-latest
+    env:
+      GROMACS_VERSION: 4.6.5
+      PYTHON_VERSION: '3.6'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: git clone --depth 1 git://github.com/astropy/ci-helpers.git
+    - run: source ci-helpers/travis/setup_conda.sh
+    - run: eval $BUILD_CMD
+    - run: cd ${{ github.workspace }}
+    - run: if [[ ${{ runner.os }} == 'osx' ]]; then ulimit -S -n 2048; fi
+    - run: echo $MAIN_CMD $SETUP_CMD
+    - run: eval $MAIN_CMD $SETUP_CMD
+    - run: |-
+        if [[ $CODECOV == 'true' ]]; then \
+          codecov; \
+        fi
+      if: "${{ success() }}"
+  test_3:
+    runs-on: macos-latest
+    env:
+      GROMACS_VERSION: '2019.1'
+      PYTHON_VERSION: '2.7'
+      NUMPY_VERSION: '1.16'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: git clone --depth 1 git://github.com/astropy/ci-helpers.git
+    - run: source ci-helpers/travis/setup_conda.sh
+    - run: eval $BUILD_CMD
+    - run: cd ${{ github.workspace }}
+    - run: if [[ ${{ runner.os }} == 'osx' ]]; then ulimit -S -n 2048; fi
+    - run: echo $MAIN_CMD $SETUP_CMD
+    - run: eval $MAIN_CMD $SETUP_CMD
+    - run: |-
+        if [[ $CODECOV == 'true' ]]; then \
+          codecov; \
+        fi
+      if: "${{ success() }}"
+  test_4:
+    runs-on: macos-latest
+    env:
+      GROMACS_VERSION: '2019.1'
+      PYTHON_VERSION: '3.6'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: git clone --depth 1 git://github.com/astropy/ci-helpers.git
+    - run: source ci-helpers/travis/setup_conda.sh
+    - run: eval $BUILD_CMD
+    - run: cd ${{ github.workspace }}
+    - run: if [[ ${{ runner.os }} == 'osx' ]]; then ulimit -S -n 2048; fi
+    - run: echo $MAIN_CMD $SETUP_CMD
+    - run: eval $MAIN_CMD $SETUP_CMD
+    - run: |-
+        if [[ $CODECOV == 'true' ]]; then \
+          codecov; \
+        fi
+      if: "${{ success() }}"

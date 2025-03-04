@@ -1,0 +1,94 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 2.7
+    - run: "./provision/python.sh"
+    - run: pycodestyle mediawiki/
+    - run: coverage run --source=mediawiki setup.py test
+    - run: "./scripts/py-lint.sh"
+    - run: coveralls
+      if: "${{ success() }}"
+  test_2:
+    runs-on: ubuntu-16.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.4
+    - run: "./provision/python.sh"
+    - run: pycodestyle mediawiki/
+    - run: coverage run --source=mediawiki setup.py test
+    - run: "./scripts/py-lint.sh"
+    - run: coveralls
+      if: "${{ success() }}"
+  test_3:
+    runs-on: ubuntu-16.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.5
+    - run: "./provision/python.sh"
+    - run: pycodestyle mediawiki/
+    - run: coverage run --source=mediawiki setup.py test
+    - run: "./scripts/py-lint.sh"
+    - run: coveralls
+      if: "${{ success() }}"
+  test_4:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: "./provision/python.sh"
+    - run: pycodestyle mediawiki/
+    - run: coverage run --source=mediawiki setup.py test
+    - run: "./scripts/py-lint.sh"
+    - run: coveralls
+      if: "${{ success() }}"
+  test_5:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: "./provision/python.sh"
+    - run: pycodestyle mediawiki/
+    - run: coverage run --source=mediawiki setup.py test
+    - run: "./scripts/py-lint.sh"
+    - run: coveralls
+      if: "${{ success() }}"
+  test_6:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.8
+    - run: "./provision/python.sh"
+    - run: pycodestyle mediawiki/
+    - run: coverage run --source=mediawiki setup.py test
+    - run: "./scripts/py-lint.sh"
+    - run: coveralls
+      if: "${{ success() }}"

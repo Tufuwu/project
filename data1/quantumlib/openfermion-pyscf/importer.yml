@@ -1,0 +1,82 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-4.9
+      CXX: g++-4.9
+      PYTHON: '2.7'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '2.7'
+    - run: apt-get -y install gcc-4.9 g++-4.9
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install --upgrade pip setuptools wheel
+    - run: pip install -r requirements.txt
+    - run: pip install .
+    - run: pytest .
+  test_2:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-4.9
+      CXX: g++-4.9
+      PYTHON: '3.4'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.4'
+    - run: apt-get -y install gcc-4.9 g++-4.9
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install --upgrade pip setuptools wheel
+    - run: pip install -r requirements.txt
+    - run: pip install .
+    - run: pytest .
+  test_3:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-4.9
+      CXX: g++-4.9
+      PYTHON: '3.5'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.5'
+    - run: apt-get -y install gcc-4.9 g++-4.9
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install --upgrade pip setuptools wheel
+    - run: pip install -r requirements.txt
+    - run: pip install .
+    - run: pytest .
+  test_4:
+    runs-on: ubuntu-latest
+    env:
+      CC: gcc-4.9
+      CXX: g++-4.9
+      PYTHON: '3.6'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: apt-get -y install gcc-4.9 g++-4.9
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install --upgrade pip setuptools wheel
+    - run: pip install -r requirements.txt
+    - run: pip install .
+    - run: pytest .

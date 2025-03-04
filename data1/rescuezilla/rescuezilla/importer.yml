@@ -1,0 +1,52 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: false
+    - run: docker build --no-cache=true --tag builder.image .
+    - run: docker run --rm --detach --privileged --name=builder.container --volume=`pwd`:/home/rescuezilla/ --tty builder.image cat
+    - run: git clean -dfX && git clean -dfx
+    - run: git reset --hard HEAD
+    - run: docker exec --interactive --tty --workdir=/home/rescuezilla/ builder.container ./git_add_safe_directory.sh
+    - run: docker exec --interactive --tty --workdir=/home/rescuezilla/ builder.container make test
+    - run: travis_wait 180 sleep infinity &
+    - run: docker exec --interactive --tty --workdir=/home/rescuezilla/ builder.container make status
+    - run: docker exec --interactive --tty --workdir=/home/rescuezilla/ builder.container make impish
+    - run: docker exec --interactive --tty --workdir=/home/rescuezilla/ builder.container make status
+    - run: docker exec --interactive --tty --workdir=/home/rescuezilla/ builder.container make focal
+    - run: docker exec --interactive --tty --workdir=/home/rescuezilla/ builder.container make status
+    - run: sudo mv build/rescuezilla.amd64.focal.iso build/rescuezilla-${{ github.ref }}-64bit.focal.iso
+    - run: sudo mv build/rescuezilla.amd64.impish.iso build/rescuezilla-${{ github.ref }}-64bit.impish.iso
+    - run: rm -f SHA256SUM SHA1SUM MD5SUM
+    - run: sha256sum build/rescuezilla-${{ github.ref }}-64bit.impish.iso build/rescuezilla-${{ github.ref }}-64bit.focal.iso > SHA256SUM
+    - run: sha1sum build/rescuezilla-${{ github.ref }}-64bit.impish.iso build/rescuezilla-${{ github.ref }}-64bit.focal.iso > SHA1SUM
+    - run: md5sum build/rescuezilla-${{ github.ref }}-64bit.impish.iso build/rescuezilla-${{ github.ref }}-64bit.focal.iso > MD5SUM
+    - uses: softprops/action-gh-release@v0.1.15
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        GITHUB_REPOSITORY: "${{ github.repository }}"
+      with:
+        files: |-
+          build/rescuezilla-${{ github.ref }}-64bit.impish.iso
+          build/rescuezilla-${{ github.ref }}-64bit.focal.iso
+          build/rescuezilla_${{ github.ref }}-1_all.deb
+          SHA256SUMS
+          SHA1SUMS
+          MD5SUMS
+        draft: true
+      if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+    services:
+#       # This item has no matching transformer
+#       docker:

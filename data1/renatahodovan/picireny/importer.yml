@@ -1,0 +1,210 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: windows-latest
+    env:
+      TOXENV: py2
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: false
+    - run: choco install openjdk python2
+    - run: eval $(powershell -NonInteractive -Command 'write("export PATH=`"" + ([Environment]::GetEnvironmentVariable("PATH","Machine") + ";" + [Environment]::GetEnvironmentVariable("PATH","User")).replace("\","/").replace("C:","/c").replace(";",":") + ":`$PATH`"")')
+    - run: python --version
+    - run: pip --version
+    - run: pip install -U certifi
+    - run: pip install -U tox
+    - run: tox -v
+  test_2:
+    runs-on: windows-latest
+    env:
+      TOXENV: py3
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: false
+    - run: choco install openjdk python3
+    - run: eval $(powershell -NonInteractive -Command 'write("export PATH=`"" + ([Environment]::GetEnvironmentVariable("PATH","Machine") + ";" + [Environment]::GetEnvironmentVariable("PATH","User")).replace("\","/").replace("C:","/c").replace(";",":") + ":`$PATH`"")')
+    - run: python --version
+    - run: pip --version
+    - run: pip install -U certifi
+    - run: pip install -U tox
+    - run: tox -v
+  test_3:
+    runs-on: macos-latest
+    env:
+      TOXENV: py2
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: false
+    - run: pip install -U tox
+    - run: tox -v
+  test_4:
+    runs-on: macos-latest
+    env:
+      TOXENV: py3
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: false
+    - run: pip install -U tox
+    - run: tox -v
+  test_5:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: false
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 2.7
+    - run: pip install -U tox
+    - run: tox -v
+  test_6:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: false
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.5
+    - run: pip install -U tox
+    - run: tox -v
+  test_7:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: false
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: pip install -U tox
+    - run: tox -v
+  test_8:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: false
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: pip install -U tox
+    - run: tox -v
+  test_9:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: false
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.8
+    - run: pip install -U tox
+    - run: tox -v
+  test_10:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: lint
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: false
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.5
+    - run: pip install -U tox
+    - run: tox -v
+  coverage:
+    needs:
+    - test
+    - test_2
+    - test_3
+    - test_4
+    - test_5
+    - test_6
+    - test_7
+    - test_8
+    - test_9
+    - test_10
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: cov
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: false
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.5
+    - run: pip install -U tox
+    - run: pip install -U coveralls
+    - run: tox -v
+    - run: coveralls
+      if: "${{ success() }}"
+  deploy:
+    needs:
+    - test
+    - test_2
+    - test_3
+    - test_4
+    - test_5
+    - test_6
+    - test_7
+    - test_8
+    - test_9
+    - test_10
+    - coverage
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: false
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.5
+    - run: skip
+    - run: skip
+#     # This item has no matching transformer
+#     - pypi:
+#         provider: pypi
+#         user: renatahodovan
+#         password:
+#           secure: yDpVN1T0xwNzxS0uNSVtRntEqxKIaWiF+C0Zy5l0qc6b/Fo5qzmV+Zcm9K5gUmv3wwQ/uR4RI30LBJHiZXzgFpWODKw82pVzuJ2ytLzU5NxPVGzmw5sx6oCjB0DnkrSHJQPwtGXS+g5yeGJ3udz0DBlS/pLl1U9vJ+1rhNV/9SM0LumdUpAJXjXieM3I3/ATMSFLlgjRZJtMcDEGiB8GS4GDwl8dTCVPxC/RgBiqIveOO8ON/JJQWKx8fgWUGZPqcy9YjTgnrswHtzHPRLnn0zu/bjeIsQml2spAGVnqbGqWLLXqsnlVHE/LI7yxpJzdswEqKYCk+QgLiPtM9rXWnQv0dk4ZNwXuxk0pPbvixNWXnUuCX+BYhAaGZfmsdWSnE0KFK+Hag+X1fWoBLG6pJ2vYeDTdoUt3JWQ5n6OYE3VakCT8CyXvHEgPgaI6HZeldCSH95WYrr2PIfmcnt5Q8v97xggGi9xy9oHPrUTpo2QRXQr3tGcdYooeX5MvyXvBIYW/AQjyNwhDK6TIO0BP6ggei5JBgaFjOmC6HOPS8W4Wdw+8F69WbTdIAg1S+A2ZjfsYWfeFDvGypnCjzkIOIHOTI2G1R4QRTqZj9bYnnm1pHesiiHEoKc/oVZI6FiEOAhyyNV57CiixqIw0ALt4EmVFe8QbuI+/gsFauRxajSg=
+#         'on':
+#           repo: renatahodovan/picireny
+#           tags: true
+#       if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"

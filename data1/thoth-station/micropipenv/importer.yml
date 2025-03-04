@@ -1,0 +1,625 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py36-pip90-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_2:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py36-pip191-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_3:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py36-pip192-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_4:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py36-pip193-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_5:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py36-pip200-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_6:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py36-pip201-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_7:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py36-piplatest-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_8:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py36-pipgit-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_9:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py37-pip90-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_10:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py37-pip191-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_11:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py37-pip192-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_12:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py37-pip193-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_13:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py37-pip200-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_14:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py37-pip201-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_15:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py37-piplatest-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_16:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py37-pipgit-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_17:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py38-pip90-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_18:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py38-pip191-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_19:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py38-pip192-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_20:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py38-pip193-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_21:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py38-pip200-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_22:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py38-pip201-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_23:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py38-piplatest-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_24:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py38-pipgit-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_25:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py39-pip90-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_26:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py39-pip191-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_27:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py39-pip192-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_28:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py39-pip193-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_29:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py39-pip200-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_30:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py39-pip201-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_31:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py39-piplatest-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_32:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py39-pipgit-toml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_33:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py36-pip90-pytoml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_34:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py36-piplatest-pytoml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_35:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py36-pipgit-pytoml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_36:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py38-pip90-pytoml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_37:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py38-piplatest-pytoml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_38:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py38-pipgit-pytoml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_39:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py39-pip90-pytoml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_40:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py39-piplatest-pytoml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_41:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py39-pipgit-pytoml
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker pull fedorapython/fedora-python-tox
+    - run: docker images
+    - run: pip install -r requirements.txt
+    - run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox
+    services:
+#       # This item has no matching transformer
+#       docker:

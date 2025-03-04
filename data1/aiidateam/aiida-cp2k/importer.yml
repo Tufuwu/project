@@ -1,0 +1,33 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: 3
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: python .ci/check_travis_tag.py
+    - run: docker build -t aiida_cp2k_test .
+    - run: export DOCKERID=`docker run -d aiida_cp2k_test`
+    - run: gem install bundler
+    - run: bundle install --jobs=3 --retry=3
+    - run: docker exec --tty $DOCKERID wait-for-services
+    - run: docker exec -it --user aiida $DOCKERID /bin/bash -l -c 'cd /opt/aiida-cp2k/ && pre-commit run --all-files || ( git status --short ; git diff ; exit 1 )'
+    - run: docker exec -it --user aiida $DOCKERID /bin/bash -l -c 'cd /opt/aiida-cp2k/ && py.test --cov aiida_cp2k --cov-append .'
+    - run: docker exec -it --user aiida $DOCKERID /bin/bash -l -c 'cd /opt/aiida-cp2k/docs && make'
+    - run: docker logs $DOCKERID
+    - run: docker exec -e TRAVIS=$TRAVIS -e TRAVIS_JOB_ID=${{ github.job }} -e TRAVIS_BRANCH=${{ github.ref }} -it --user aiida $DOCKERID /bin/bash -l -c 'cd /opt/aiida-cp2k/ && coveralls'
+      if: "${{ success() }}"
+    services:
+#       # This item has no matching transformer
+#       docker:

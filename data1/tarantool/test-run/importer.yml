@@ -1,0 +1,24 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 2.7
+    - run: sudo apt update -y
+    - run: sudo apt-get -y install lua5.1 luarocks
+    - run: sudo luarocks install luacheck
+    - run: pip install -r requirements.txt
+    - run: pip install -r requirements-test.txt
+    - run: make lint

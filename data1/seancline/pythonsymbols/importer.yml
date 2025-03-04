@@ -1,0 +1,31 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+    - run: sudo apt-get -qq update
+    - run: sudo apt-get install -y p7zip-full
+    - run: pip install -r requirements.txt
+    - run: python pysymsrv.py
+    - run: python generateindex.py
+#     # This item has no matching transformer
+#     - pages:
+#         provider: pages
+#         skip_cleanup: true
+#         keep_history: true
+#         verbose: true
+#         github_token: "$GITHUB_TOKEN"
+#       if: "${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}"

@@ -1,0 +1,35 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: "${{ matrix.python }}"
+    - run: pip install cython>=0.28
+    - run: pip install numpy=="$NUMPY"
+    - run: pip install scipy matplotlib
+    - run: if [ "${{ github.ref }}" = "master" ]; then pip install raysect; else pip install git+https://github.com/raysect/source@development; fi
+    - run: dev/build.sh
+    - run: dev/test.sh
+    strategy:
+      matrix:
+        NUMPY:
+        - 1.15.0
+        - 1.16.6
+        - 1.19.2
+        python:
+        - '3.6'
+        - '3.7'
+    env:
+      NUMPY: "${{ matrix.NUMPY }}"

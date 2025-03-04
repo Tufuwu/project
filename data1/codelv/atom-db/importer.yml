@@ -1,0 +1,172 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    env:
+      DATABASE_URL: "'mysql://travis:@127.0.0.1:3306/test_atomdb'"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+    - run: pip install -U atom motor aiomysql aiopg
+    - run: pip install -U 'sqlalchemy<1.4'
+    - run: pip install -U codecov pytest pytest-coverage pytest-asyncio faker mypy isort black
+    - run: python setup.py develop
+    - run: pytest -v tests --cov atomdb --cov-report xml
+    - run: mypy atomdb --ignore-missing-imports
+    - run: black atomdb --check --diff
+    - run: isort atomdb --check --diff
+    - run: codecov
+      if: "${{ success() }}"
+    services:
+      mongodb:
+        image: mongo
+      mysql:
+        image: mysql
+      postgresql:
+        image: postgres
+  test_2:
+    runs-on: ubuntu-18.04
+    env:
+      DATABASE_URL: "'mysql://travis:@127.0.0.1:3306/test_atomdb'"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.9'
+    - run: pip install -U atom motor aiomysql aiopg
+    - run: pip install -U 'sqlalchemy<1.4'
+    - run: pip install -U codecov pytest pytest-coverage pytest-asyncio faker mypy isort black
+    - run: python setup.py develop
+    - run: pytest -v tests --cov atomdb --cov-report xml
+    - run: mypy atomdb --ignore-missing-imports
+    - run: black atomdb --check --diff
+    - run: isort atomdb --check --diff
+    - run: codecov
+      if: "${{ success() }}"
+    services:
+      mongodb:
+        image: mongo
+      mysql:
+        image: mysql
+      postgresql:
+        image: postgres
+  test_3:
+    runs-on: ubuntu-18.04
+    env:
+      DATABASE_URL: "'mysql://travis:@127.0.0.1:3306/test_atomdb'"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.10'
+    - run: pip install -U atom motor aiomysql aiopg
+    - run: pip install -U 'sqlalchemy<1.4'
+    - run: pip install -U codecov pytest pytest-coverage pytest-asyncio faker mypy isort black
+    - run: python setup.py develop
+    - run: pytest -v tests --cov atomdb --cov-report xml
+    - run: mypy atomdb --ignore-missing-imports
+    - run: black atomdb --check --diff
+    - run: isort atomdb --check --diff
+    - run: codecov
+      if: "${{ success() }}"
+    services:
+      mongodb:
+        image: mongo
+      mysql:
+        image: mysql
+      postgresql:
+        image: postgres
+  test_4:
+    runs-on: ubuntu-18.04
+    env:
+      DATABASE_URL: "'postgres://postgres:@127.0.0.1:5432/test_atomdb'"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+    - run: pip install -U atom motor aiomysql aiopg
+    - run: pip install -U 'sqlalchemy<1.4'
+    - run: pip install -U codecov pytest pytest-coverage pytest-asyncio faker mypy isort black
+    - run: python setup.py develop
+    - run: pytest -v tests --cov atomdb --cov-report xml
+    - run: mypy atomdb --ignore-missing-imports
+    - run: black atomdb --check --diff
+    - run: isort atomdb --check --diff
+    - run: codecov
+      if: "${{ success() }}"
+    services:
+      mongodb:
+        image: mongo
+      mysql:
+        image: mysql
+      postgresql:
+        image: postgres
+  test_5:
+    runs-on: ubuntu-18.04
+    env:
+      DATABASE_URL: "'postgres://postgres:@127.0.0.1:5432/test_atomdb'"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.9'
+    - run: pip install -U atom motor aiomysql aiopg
+    - run: pip install -U 'sqlalchemy<1.4'
+    - run: pip install -U codecov pytest pytest-coverage pytest-asyncio faker mypy isort black
+    - run: python setup.py develop
+    - run: pytest -v tests --cov atomdb --cov-report xml
+    - run: mypy atomdb --ignore-missing-imports
+    - run: black atomdb --check --diff
+    - run: isort atomdb --check --diff
+    - run: codecov
+      if: "${{ success() }}"
+    services:
+      mongodb:
+        image: mongo
+      mysql:
+        image: mysql
+      postgresql:
+        image: postgres
+  test_6:
+    runs-on: ubuntu-18.04
+    env:
+      DATABASE_URL: "'postgres://postgres:@127.0.0.1:5432/test_atomdb'"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.10'
+    - run: pip install -U atom motor aiomysql aiopg
+    - run: pip install -U 'sqlalchemy<1.4'
+    - run: pip install -U codecov pytest pytest-coverage pytest-asyncio faker mypy isort black
+    - run: python setup.py develop
+    - run: pytest -v tests --cov atomdb --cov-report xml
+    - run: mypy atomdb --ignore-missing-imports
+    - run: black atomdb --check --diff
+    - run: isort atomdb --check --diff
+    - run: codecov
+      if: "${{ success() }}"
+    services:
+      mongodb:
+        image: mongo
+      mysql:
+        image: mysql
+      postgresql:
+        image: postgres

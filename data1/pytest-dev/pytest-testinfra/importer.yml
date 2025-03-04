@@ -1,0 +1,99 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  flake8:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: sudo modprobe ip6table_filter iptable_filter
+    - run: pip install tox
+    - run: tox -e flake8
+    services:
+#       # This item has no matching transformer
+#       docker:
+  check_manifest:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: sudo modprobe ip6table_filter iptable_filter
+    - run: pip install tox
+    - run: tox -e check-manifest
+    services:
+#       # This item has no matching transformer
+#       docker:
+  sphinxdoc:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: sudo modprobe ip6table_filter iptable_filter
+    - run: pip install tox
+    - run: tox -e sphinxdoc
+    services:
+#       # This item has no matching transformer
+#       docker:
+  python_tests:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: sudo modprobe ip6table_filter iptable_filter
+    - run: pip install tox
+    - run: tox -e py3
+    services:
+#       # This item has no matching transformer
+#       docker:
+  deploy_to_pypi:
+    needs:
+    - flake8
+    - check_manifest
+    - sphinxdoc
+    - python_tests
+    runs-on: ubuntu-latest
+    if: ${{ github.repository == 'pytest-dev/pytest-testinfra' && github.ref }}
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: sudo modprobe ip6table_filter iptable_filter
+    - run: pip install tox
+    - run: skip
+#     # This item has no matching transformer
+#     - pypi:
+#         provider: pypi
+#         username: __token__
+#         'on':
+#           tags: true
+#         distributions: sdist bdist_wheel
+#       if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+    services:
+#       # This item has no matching transformer
+#       docker:
