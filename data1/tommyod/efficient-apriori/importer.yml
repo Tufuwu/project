@@ -1,0 +1,37 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: "${{ matrix.python }}"
+    - run: pip install pep8 flake8 black==19.10b0 mypy
+    - run: pip install -r requirements.txt
+    - run: flake8 --show-source --ignore=F811,W293,W391,W292,W291,E252,W503,E203 --max-line-length=79 --exclude='conf.py,__init__.py';
+    - run: black . --check -l 79;
+    - run: mypy efficient_apriori/*.py --ignore-missing-imports --show-error-context;
+    - run: pip install -r requirements.txt
+    - run: pip install pytest
+    - run: pip install .
+    - run: pytest --doctest-modules -v efficient_apriori
+    - run:
+    - run: if [[ -z "${{ github.base_ref }}" && "${{ github.event.number }}" == 'false' && "${{ github.ref }}" == 'master' ]]; then pip install twine; python setup.py sdist bdist_wheel; python -m twine upload dist/* -u tommyod -p $TWINE --skip-existing; fi
+#     # This item has no matching transformer
+#     - email: false
+    strategy:
+      matrix:
+        python:
+        - 3.6
+        - 3.7
+        - 3.8

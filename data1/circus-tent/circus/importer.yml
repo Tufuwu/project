@@ -1,0 +1,178 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-16.04
+    env:
+      TOX_ENV: py38
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.8
+    - run: apt-get -y install libev-dev libevent-dev
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install tox coveralls
+    - run: if [ "${{ runner.os }}" == "linux" ]; then sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'; fi
+    - run: tox -v -e $TOX_ENV
+    - run: coveralls
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email: tarek@mozilla.com
+    - uses: rectalogic/notify-irc@v1
+      with:
+        server: irc.freenode.org
+        port: 6697
+        channel: mozilla-circus
+        nickname: Default nickname
+        message: Default message
+#     # This item has no matching transformer
+#     - on_success: change
+  test_2:
+    runs-on: ubuntu-16.04
+    env:
+      TOX_ENV: py37
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: apt-get -y install libev-dev libevent-dev
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install tox coveralls
+    - run: if [ "${{ runner.os }}" == "linux" ]; then sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'; fi
+    - run: tox -v -e $TOX_ENV
+    - run: coveralls
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email: tarek@mozilla.com
+    - uses: rectalogic/notify-irc@v1
+      with:
+        server: irc.freenode.org
+        port: 6697
+        channel: mozilla-circus
+        nickname: Default nickname
+        message: Default message
+#     # This item has no matching transformer
+#     - on_success: change
+  test_3:
+    runs-on: ubuntu-16.04
+    env:
+      TOX_ENV: docs
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: apt-get -y install libev-dev libevent-dev
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install tox coveralls
+    - run: if [ "${{ runner.os }}" == "linux" ]; then sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'; fi
+    - run: tox -v -e $TOX_ENV
+    - run: coveralls
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email: tarek@mozilla.com
+    - uses: rectalogic/notify-irc@v1
+      with:
+        server: irc.freenode.org
+        port: 6697
+        channel: mozilla-circus
+        nickname: Default nickname
+        message: Default message
+#     # This item has no matching transformer
+#     - on_success: change
+  test_4:
+    runs-on: ubuntu-16.04
+    env:
+      TOX_ENV: flake8
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: apt-get -y install libev-dev libevent-dev
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install tox coveralls
+    - run: if [ "${{ runner.os }}" == "linux" ]; then sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'; fi
+    - run: tox -v -e $TOX_ENV
+    - run: coveralls
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email: tarek@mozilla.com
+    - uses: rectalogic/notify-irc@v1
+      with:
+        server: irc.freenode.org
+        port: 6697
+        channel: mozilla-circus
+        nickname: Default nickname
+        message: Default message
+#     # This item has no matching transformer
+#     - on_success: change
+  test_5:
+    runs-on: ubuntu-16.04
+    env:
+      TOX_ENV: py36
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: apt-get -y install libev-dev libevent-dev
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install tox coveralls
+    - run: if [ "${{ runner.os }}" == "linux" ]; then sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'; fi
+    - run: tox -v -e $TOX_ENV
+    - run: coveralls
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email: tarek@mozilla.com
+    - uses: rectalogic/notify-irc@v1
+      with:
+        server: irc.freenode.org
+        port: 6697
+        channel: mozilla-circus
+        nickname: Default nickname
+        message: Default message
+#     # This item has no matching transformer
+#     - on_success: change
+  test_6:
+    runs-on: ubuntu-16.04
+    env:
+      TOX_ENV: py35
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.5
+    - run: apt-get -y install libev-dev libevent-dev
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install tox coveralls
+    - run: if [ "${{ runner.os }}" == "linux" ]; then sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'; fi
+    - run: tox -v -e $TOX_ENV
+    - run: coveralls
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email: tarek@mozilla.com
+    - uses: rectalogic/notify-irc@v1
+      with:
+        server: irc.freenode.org
+        port: 6697
+        channel: mozilla-circus
+        nickname: Default nickname
+        message: Default message
+#     # This item has no matching transformer
+#     - on_success: change

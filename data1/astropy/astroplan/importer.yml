@@ -1,0 +1,155 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+env:
+  PYTHON_VERSION: '3.7'
+  NUMPY_VERSION: stable
+  ASTROPY_VERSION: stable
+  MAIN_CMD: "'python setup.py'"
+  CONDA_DEPENDENCIES: "'pytz qt pyqt six'"
+  PIP_DEPENDENCIES: "'pytest-astropy'"
+  SETUP_CMD: "'test -V'"
+  CONDA_CHANNELS: "'astropy'"
+jobs:
+  Initial_tests:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: apt-get -y install graphviz texlive-latex-extra dvipng
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: git clone git://github.com/astropy/ci-helpers.git
+    - run: source ci-helpers/travis/setup_conda.sh
+    - run: "$MAIN_CMD $SETUP_CMD"
+    - run: if [[ $SETUP_CMD == *--coverage* ]]; then coveralls --rcfile='astroplan/tests/coveragerc'; fi
+      if: "${{ success() }}"
+    strategy:
+      matrix: {}
+#       # 'allow_failures' transformations are currently unsupported.
+  Initial_tests_2:
+    runs-on: ubuntu-latest
+    env:
+      SETUP_CMD: "'egg_info'"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: apt-get -y install graphviz texlive-latex-extra dvipng
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: git clone git://github.com/astropy/ci-helpers.git
+    - run: source ci-helpers/travis/setup_conda.sh
+    - run: "$MAIN_CMD $SETUP_CMD"
+    - run: if [[ $SETUP_CMD == *--coverage* ]]; then coveralls --rcfile='astroplan/tests/coveragerc'; fi
+      if: "${{ success() }}"
+  Initial_tests_3:
+    runs-on: ubuntu-latest
+    env:
+      SETUP_CMD: "'build_docs"
+      "-w'": "${{ secrets._W }}"
+      CONDA_DEPENDENCIES: "'pytz"
+      matplotlib: "${{ secrets.MATPLOTLIB }}"
+      six': "${{ secrets.SIX }}"
+      PIP_DEPENDENCIES: "'pytest-mpl"
+      pytest-astropy: "${{ secrets.PYTEST_ASTROPY }}"
+      astroquery': "${{ secrets.ASTROQUERY }}"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: apt-get -y install graphviz texlive-latex-extra dvipng
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: git clone git://github.com/astropy/ci-helpers.git
+    - run: source ci-helpers/travis/setup_conda.sh
+    - run: "$MAIN_CMD $SETUP_CMD"
+    - run: if [[ $SETUP_CMD == *--coverage* ]]; then coveralls --rcfile='astroplan/tests/coveragerc'; fi
+      if: "${{ success() }}"
+  Initial_tests_4:
+    runs-on: ubuntu-latest
+    env:
+      PYTHON_VERSION: '3.6'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: apt-get -y install graphviz texlive-latex-extra dvipng
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: git clone git://github.com/astropy/ci-helpers.git
+    - run: source ci-helpers/travis/setup_conda.sh
+    - run: "$MAIN_CMD $SETUP_CMD"
+    - run: if [[ $SETUP_CMD == *--coverage* ]]; then coveralls --rcfile='astroplan/tests/coveragerc'; fi
+      if: "${{ success() }}"
+  Initial_tests_5:
+    runs-on: windows-latest
+    env:
+      CONDA_DEPENDENCIES: "'pytz"
+      matplotlib: "${{ secrets.MATPLOTLIB }}"
+      six': "${{ secrets.SIX }}"
+      PIP_DEPENDENCIES: "'pyephem"
+      pytest-mpl: "${{ secrets.PYTEST_MPL }}"
+      pytest-astropy': "${{ secrets.PYTEST_ASTROPY }}"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: apt-get -y install graphviz texlive-latex-extra dvipng
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: git clone git://github.com/astropy/ci-helpers.git
+    - run: source ci-helpers/travis/setup_conda.sh
+    - run: "$MAIN_CMD $SETUP_CMD"
+    - run: if [[ $SETUP_CMD == *--coverage* ]]; then coveralls --rcfile='astroplan/tests/coveragerc'; fi
+      if: "${{ success() }}"
+  Initial_tests_6:
+    runs-on: ubuntu-latest
+    env:
+      SETUP_CMD: "'test"
+      "--remote-data": "${{ secrets.__REMOTE_DATA }}"
+      "-V'": "${{ secrets._V }}"
+      CONDA_DEPENDENCIES: "'pytz"
+      matplotlib: "${{ secrets.MATPLOTLIB }}"
+      six': "${{ secrets.SIX }}"
+      PIP_DEPENDENCIES: "'pytest-mpl"
+      pytest-astropy': "${{ secrets.PYTEST_ASTROPY }}"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: apt-get -y install graphviz texlive-latex-extra dvipng
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: git clone git://github.com/astropy/ci-helpers.git
+    - run: source ci-helpers/travis/setup_conda.sh
+    - run: "$MAIN_CMD $SETUP_CMD"
+    - run: if [[ $SETUP_CMD == *--coverage* ]]; then coveralls --rcfile='astroplan/tests/coveragerc'; fi
+      if: "${{ success() }}"
+  Initial_tests_7:
+    runs-on: ubuntu-latest
+    env:
+      ASTROPY_VERSION: dev
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: apt-get -y install graphviz texlive-latex-extra dvipng
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: git clone git://github.com/astropy/ci-helpers.git
+    - run: source ci-helpers/travis/setup_conda.sh
+    - run: "$MAIN_CMD $SETUP_CMD"
+    - run: if [[ $SETUP_CMD == *--coverage* ]]; then coveralls --rcfile='astroplan/tests/coveragerc'; fi
+      if: "${{ success() }}"
+  Initial_tests_8:
+    runs-on: ubuntu-latest
+    env:
+      MAIN_CMD: "'flake8"
+      astroplan: "${{ secrets.ASTROPLAN }}"
+      "--count": "${{ secrets.__COUNT }}"
+      "--max-line-length": 100'
+      SETUP_CMD: "''"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: apt-get -y install graphviz texlive-latex-extra dvipng
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: git clone git://github.com/astropy/ci-helpers.git
+    - run: source ci-helpers/travis/setup_conda.sh
+    - run: "$MAIN_CMD $SETUP_CMD"
+    - run: if [[ $SETUP_CMD == *--coverage* ]]; then coveralls --rcfile='astroplan/tests/coveragerc'; fi
+      if: "${{ success() }}"

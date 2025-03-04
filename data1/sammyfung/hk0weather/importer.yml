@@ -1,0 +1,22 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-16.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: pip install -r requirements.txt
+    - run: coverage run -m scrapy list
+    - run: coverage run -m scrapy crawl regional -t csv -o regional.csv
+    - run: coverage run -m scrapy crawl hkoforecast -t csv -o hkoforecast.csv
+    - run: coverage run -m scrapy crawl hko9dayforecast -t csv -o hko9dayforecast.csv
+    - run: bash <(curl -s https://codecov.io/bash)
+      if: "${{ success() }}"

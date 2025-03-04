@@ -1,0 +1,29 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: # this agent type is not supported: [[{"dist"=>"trusty"}]]
+             ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.5'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install -U setuptools
+    - run: pip install -U git+https://github.com/colcon/colcon-core
+    - run: pip install -U git+https://github.com/colcon/colcon-library-path
+    - run: pip install -U git+https://github.com/colcon/colcon-cmake
+    - run: pip install -U git+https://github.com/colcon/colcon-python-setup-py
+    - run: pip install -U flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-quotes pep8-naming pylint pytest pytest-cov scspell3k
+    - run: python -m pytest --cov=colcon_ros --cov-branch
+#     # This item has no matching transformer
+#     - email: false

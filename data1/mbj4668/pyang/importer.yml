@@ -1,0 +1,41 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: "${{ matrix.python }}"
+    - run: apt-get -y install xsltproc jing libxml2-utils bash
+    - run: pip install -r requirements.txt
+    - run: pip install -r dev-requirements.txt
+    - run: source env.sh
+    - run: export USE_VIRTUALENV=true
+    - run: make pylint test TEST_MODE=coverage
+    - run: find . -name '.coverage*' -exec mv -t . {} +
+    - run: coverage combine
+    - run: TMP=$(tempfile)
+    - run: git ls-files . --exclude-standard --others | tee "$TMP"
+    - run: if test -s "$TMP"; then false; else true; fi
+    - run: git ls-files -i --exclude-standard | tee "$TMP"
+    - run: if test -s "$TMP"; then false; else true; fi
+    - run: coveralls
+      if: "${{ success() }}"
+    strategy:
+      matrix:
+        python:
+        - '2.7'
+        - '3.6'
+        - '3.7'
+        - '3.8'
+        - '3.9'

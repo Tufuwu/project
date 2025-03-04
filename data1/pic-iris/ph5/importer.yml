@@ -1,0 +1,37 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '2.7'
+    - run: sudo apt-get update
+    - run: if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh; else wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh; fi
+    - run: bash miniconda.sh -b -p ${{ github.workspace }}/miniconda
+    - run: export PATH="${{ github.workspace }}/miniconda/bin:$PATH"
+    - run: hash -r
+    - run: conda config --set always_yes yes --set changeps1 no
+    - run: conda update -q conda
+    - run: conda create -q -n ph5 python=$TRAVIS_PYTHON_VERSION
+    - run: conda config --add channels conda-forge
+    - run: conda config --set restore_free_channel true
+    - run: conda env update --name ph5 --file environment.yml
+    - run: source activate ph5
+    - run: conda info -a
+    - run: conda list
+    - run: python setup.py develop
+    - run: flake8 ph5
+    - run: pyflakes ph5
+    - run: bash create_ph5.sh
+    - run: python runtests.py

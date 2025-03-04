@@ -1,0 +1,39 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+    - master
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-16.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: "${{ matrix.python }}"
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends texlive texlive-latex-extra cm-super dvipng latexmk
+    - run: pip install --upgrade pip
+    - run: pip install -e .[docs,test]
+    - run: pytest --cov=psrqpy
+    - run: cd docs
+    - run: mkdir source/_static
+    - run: make html
+    - run: cd ..
+    - run: codecov
+      if: "${{ success() }}"
+    strategy:
+      matrix:
+        python:
+        - '3.6'
+        - '3.7'
+        - '3.8'
+    services:
+#       # This item has no matching transformer
+#       xvfb:

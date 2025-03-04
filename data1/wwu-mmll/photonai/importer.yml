@@ -1,0 +1,36 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7.6
+    - run: docker pull mongo:latest
+    - run: docker run -d -p 27017-27019:27017-27019 --name mongodb mongo
+    - run: sudo apt-get update
+    - run: sudo apt-get -y install gfortran swig
+    - run: python setup.py egg_info
+    - run: pip install -r photonai.egg-info/requires.txt
+    - run: pip install -r photonai/optimization/smac/requirements.txt
+    - run: pip install -r photonai/optimization/nevergrad/requirements.txt
+    - run: pip install tensorflow
+    - run: pip install pytest
+    - run: pip install pytest-cov
+    - run: pip install coveralls
+    - run: PYTHONPATH=./ pytest ./test --cov=./photonai
+    - run: coveralls
+      if: "${{ success() }}"
+    services:
+#       # This item has no matching transformer
+#       docker:

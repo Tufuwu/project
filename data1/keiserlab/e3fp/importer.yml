@@ -1,0 +1,130 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 2.7
+    - run: sudo apt-get update
+    - run: if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh; else wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh; fi
+    - run: bash miniconda.sh -b -p ${{ github.workspace }}/miniconda
+    - run: source "${{ github.workspace }}/miniconda/etc/profile.d/conda.sh"
+    - run: export PATH="${{ github.workspace }}/miniconda/bin:$PATH"
+    - run: hash -r
+    - run: conda config --set always_yes yes --set changeps1 no
+    - run: conda update conda
+    - run: conda info -a
+    - run: sed -i -e "s/python=3/python=$TRAVIS_PYTHON_VERSION/" environment.yml
+    - run: conda env create -n test_env environment.yml
+    - run: conda activate test_env
+    - run: pip install coveralls
+    - run: python setup.py build_ext --inplace
+    - run: python setup.py install
+    - run: if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then conda install futures; fi
+    - run: conda install mpi4py h5py
+    - run: pip install standardiser
+    - run: conda install nose mock
+    - run: nosetests --with-coverage --with-doctest --doctest-options=+ELLIPSIS e3fp;
+    - run: coveralls
+      if: "${{ success() }}"
+  test_2:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: sudo apt-get update
+    - run: if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh; else wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh; fi
+    - run: bash miniconda.sh -b -p ${{ github.workspace }}/miniconda
+    - run: source "${{ github.workspace }}/miniconda/etc/profile.d/conda.sh"
+    - run: export PATH="${{ github.workspace }}/miniconda/bin:$PATH"
+    - run: hash -r
+    - run: conda config --set always_yes yes --set changeps1 no
+    - run: conda update conda
+    - run: conda info -a
+    - run: sed -i -e "s/python=3/python=$TRAVIS_PYTHON_VERSION/" environment.yml
+    - run: conda env create -n test_env environment.yml
+    - run: conda activate test_env
+    - run: pip install coveralls
+    - run: python setup.py build_ext --inplace
+    - run: python setup.py install
+    - run: if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then conda install futures; fi
+    - run: conda install mpi4py h5py
+    - run: pip install standardiser
+    - run: conda install nose mock
+    - run: nosetests --with-coverage --with-doctest --doctest-options=+ELLIPSIS e3fp;
+    - run: coveralls
+      if: "${{ success() }}"
+  test_3:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: sudo apt-get update
+    - run: if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh; else wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh; fi
+    - run: bash miniconda.sh -b -p ${{ github.workspace }}/miniconda
+    - run: source "${{ github.workspace }}/miniconda/etc/profile.d/conda.sh"
+    - run: export PATH="${{ github.workspace }}/miniconda/bin:$PATH"
+    - run: hash -r
+    - run: conda config --set always_yes yes --set changeps1 no
+    - run: conda update conda
+    - run: conda info -a
+    - run: sed -i -e "s/python=3/python=$TRAVIS_PYTHON_VERSION/" environment.yml
+    - run: conda env create -n test_env environment.yml
+    - run: conda activate test_env
+    - run: pip install coveralls
+    - run: python setup.py build_ext --inplace
+    - run: python setup.py install
+    - run: if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then conda install futures; fi
+    - run: conda install mpi4py h5py
+    - run: pip install standardiser
+    - run: conda install nose mock
+    - run: nosetests --with-coverage --with-doctest --doctest-options=+ELLIPSIS e3fp;
+    - run: coveralls
+      if: "${{ success() }}"
+  test_4:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.8
+    - run: sudo apt-get update
+    - run: if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh; else wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh; fi
+    - run: bash miniconda.sh -b -p ${{ github.workspace }}/miniconda
+    - run: source "${{ github.workspace }}/miniconda/etc/profile.d/conda.sh"
+    - run: export PATH="${{ github.workspace }}/miniconda/bin:$PATH"
+    - run: hash -r
+    - run: conda config --set always_yes yes --set changeps1 no
+    - run: conda update conda
+    - run: conda info -a
+    - run: sed -i -e "s/python=3/python=$TRAVIS_PYTHON_VERSION/" environment.yml
+    - run: conda env create -n test_env environment.yml
+    - run: conda activate test_env
+    - run: pip install coveralls
+    - run: python setup.py build_ext --inplace
+    - run: python setup.py install
+    - run: if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then conda install futures; fi
+    - run: conda install mpi4py h5py
+    - run: pip install standardiser
+    - run: conda install nose mock
+    - run: nosetests --with-coverage --with-doctest --doctest-options=+ELLIPSIS e3fp;
+    - run: coveralls
+      if: "${{ success() }}"

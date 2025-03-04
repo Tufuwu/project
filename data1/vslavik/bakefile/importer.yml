@@ -1,0 +1,30 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '2.7'
+    - run: pip install Sphinx
+    - run: pip install pytest
+    - run: pip install clint
+    - run: make test
+#     # This item has no matching transformer
+#     - email:
+#         recipients:
+#         - vz-bakefile@zeitlins.org
+#     # This item has no matching transformer
+#     - on_success: change
+#     # This item has no matching transformer
+#     - on_failure: always

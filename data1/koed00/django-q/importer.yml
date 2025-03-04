@@ -1,0 +1,53 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-16.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: "${{ matrix.python }}"
+    - run: apt-get -y install tcl8.5
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install -q django==$DJANGO
+    - run: pip install -r requirements.txt
+    - run: pip install pytest --upgrade
+    - run: pip install pytest-django codecov sphinx poetry
+    - run: poetry install
+    - run: git clone https://github.com/antirez/disque.git disque_server
+    - run: cd disque_server/src && make && PREFIX=../ make install && cd -
+    - run: "./disque_server/bin/disque-server &"
+    - run: "./disque_server/bin/disque PING"
+    - run: coverage run --source=django_q -m py.test
+    - run: sphinx-build -b html -d docs/_build/doctrees  -nW docs docs/_build/html
+    - run: codecov
+      if: "${{ success() }}"
+    - uses: distributhor/workflow-webhook@v3.0.5
+      env:
+        webhook_url: https://webhooks.gitter.im/e/cbcff78c4be241602332
+        webhook_secret: "${{ secrets.WEBHOOK_SECRET }}"
+    strategy:
+      matrix:
+        DJANGO:
+        - 3.1.2
+        - 2.2.16
+        python:
+        - '3.7'
+        - '3.8'
+    services:
+      redis:
+        image: redis
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+      mongodb:
+        image: mongo
+    env:
+      DJANGO: "${{ matrix.DJANGO }}"
