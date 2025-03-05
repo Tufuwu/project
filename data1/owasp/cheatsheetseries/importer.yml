@@ -1,0 +1,29 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-node@v4.0.0
+      with:
+        cache: npm
+    - run: npm install
+    - run: sudo apt-get install python3.5 python3-pip python3-setuptools python3-wheel
+    - run: pip3 install requests feedgen wheel
+    - run: npm install -g markdown-link-check
+    - run: npm install -g gitbook-cli
+    - run: chmod +x scripts/Generate_Site.sh
+    - run: cd scripts
+    - run: echo "Try to generate the offline website..."
+    - run: sed -i 's/python/python3\.5/g' Generate_Site.sh
+    - run: bash Generate_Site.sh
+    - run: ls -l ../generated/site/

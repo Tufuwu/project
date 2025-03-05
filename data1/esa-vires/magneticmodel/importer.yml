@@ -1,0 +1,136 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 2.7
+    - run: apt-get -y install gcc gfortran libhdf5-dev
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: "( cd libcdf && make build && sudo make install )"
+    - run: "( cd qdipole && ./configure && make build && sudo make install )"
+    - run: pip install scipy
+    - run: pip install ./eoxmagmod/
+    - run: pip list
+    - run: mkdir -p ./test && cd ./test
+    - run: pip show -f eoxmagmod
+    - run: python -c 'import eoxmagmod' && python -m unittest discover -p '[a-z]*.py' -v eoxmagmod
+    - uses: rtCamp/action-slack-notify@v2.2.1
+      env:
+        SLACK_WEBHOOK: "${{ secrets.SLACK_WEBHOOK }}"
+  test_2:
+    runs-on: ubuntu-16.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.4
+    - run: apt-get -y install gcc gfortran libhdf5-dev
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: "( cd libcdf && make build && sudo make install )"
+    - run: "( cd qdipole && ./configure && make build && sudo make install )"
+    - run: pip install scipy
+    - run: pip install ./eoxmagmod/
+    - run: pip list
+    - run: mkdir -p ./test && cd ./test
+    - run: pip show -f eoxmagmod
+    - run: python -c 'import eoxmagmod' && python -m unittest discover -p '[a-z]*.py' -v eoxmagmod
+    - uses: rtCamp/action-slack-notify@v2.2.1
+      env:
+        SLACK_WEBHOOK: "${{ secrets.SLACK_WEBHOOK }}"
+  test_3:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.5
+    - run: apt-get -y install gcc gfortran libhdf5-dev
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: "( cd libcdf && make build && sudo make install )"
+    - run: "( cd qdipole && ./configure && make build && sudo make install )"
+    - run: pip install scipy
+    - run: pip install ./eoxmagmod/
+    - run: pip list
+    - run: mkdir -p ./test && cd ./test
+    - run: pip show -f eoxmagmod
+    - run: python -c 'import eoxmagmod' && python -m unittest discover -p '[a-z]*.py' -v eoxmagmod
+    - uses: rtCamp/action-slack-notify@v2.2.1
+      env:
+        SLACK_WEBHOOK: "${{ secrets.SLACK_WEBHOOK }}"
+  test_4:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: apt-get -y install gcc gfortran libhdf5-dev
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: "( cd libcdf && make build && sudo make install )"
+    - run: "( cd qdipole && ./configure && make build && sudo make install )"
+    - run: pip install scipy
+    - run: pip install ./eoxmagmod/
+    - run: pip list
+    - run: mkdir -p ./test && cd ./test
+    - run: pip show -f eoxmagmod
+    - run: python -c 'import eoxmagmod' && python -m unittest discover -p '[a-z]*.py' -v eoxmagmod
+    - uses: rtCamp/action-slack-notify@v2.2.1
+      env:
+        SLACK_WEBHOOK: "${{ secrets.SLACK_WEBHOOK }}"
+  test_5:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: apt-get -y install gcc gfortran libhdf5-dev
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: "( cd libcdf && make build && sudo make install )"
+    - run: "( cd qdipole && ./configure && make build && sudo make install )"
+    - run: pip install scipy
+    - run: pip install ./eoxmagmod/
+    - run: pip list
+    - run: mkdir -p ./test && cd ./test
+    - run: pip show -f eoxmagmod
+    - run: python -c 'import eoxmagmod' && python -m unittest discover -p '[a-z]*.py' -v eoxmagmod
+    - uses: rtCamp/action-slack-notify@v2.2.1
+      env:
+        SLACK_WEBHOOK: "${{ secrets.SLACK_WEBHOOK }}"
+  test_6:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.8
+    - run: apt-get -y install gcc gfortran libhdf5-dev
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: "( cd libcdf && make build && sudo make install )"
+    - run: "( cd qdipole && ./configure && make build && sudo make install )"
+    - run: pip install scipy
+    - run: pip install ./eoxmagmod/
+    - run: pip list
+    - run: mkdir -p ./test && cd ./test
+    - run: pip show -f eoxmagmod
+    - run: python -c 'import eoxmagmod' && python -m unittest discover -p '[a-z]*.py' -v eoxmagmod
+    - uses: rtCamp/action-slack-notify@v2.2.1
+      env:
+        SLACK_WEBHOOK: "${{ secrets.SLACK_WEBHOOK }}"

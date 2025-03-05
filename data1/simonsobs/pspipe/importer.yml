@@ -1,0 +1,24 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    if: ${{ github.ref == 'refs/heads/master' && github.event_name == 'push' }}
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: gem install bundler
+    - run: bundle install --jobs=3 --retry=3
+    - run: echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
+    - run: docker build -t ${DOCKERHUB_ORG}/pspipe .
+    - run: docker run --rm ${DOCKERHUB_ORG}/pspipe python -c "import camb"
+    services:
+#       # This item has no matching transformer
+#       docker:

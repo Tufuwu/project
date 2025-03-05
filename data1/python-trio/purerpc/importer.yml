@@ -1,0 +1,81 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install -r requirements.txt
+    - run: "./ci/run_tests_in_docker.sh $PYTHON_IMAGE $PURERPC_BACKEND"
+    strategy:
+      matrix:
+        include:
+        - PYTHON_IMAGE: pypy:3.6
+          PURERPC_BACKEND: asyncio
+        - PYTHON_IMAGE: pypy:3.6
+          PURERPC_BACKEND: curio
+        - PYTHON_IMAGE: pypy:3.6
+          PURERPC_BACKEND: trio
+        - PYTHON_IMAGE: python:3.6
+          PURERPC_BACKEND: asyncio
+        - PYTHON_IMAGE: python:3.6
+          PURERPC_BACKEND: uvloop
+        - PYTHON_IMAGE: python:3.6
+          PURERPC_BACKEND: curio
+        - PYTHON_IMAGE: python:3.6
+          PURERPC_BACKEND: trio
+        - PYTHON_IMAGE: python:3.7
+          PURERPC_BACKEND: asyncio
+        - PYTHON_IMAGE: python:3.7
+          PURERPC_BACKEND: uvloop
+        - PYTHON_IMAGE: python:3.7
+          PURERPC_BACKEND: curio
+        - PYTHON_IMAGE: python:3.7
+          PURERPC_BACKEND: trio
+    services:
+#       # This item has no matching transformer
+#       docker:
+    env:
+      PYTHON_IMAGE: "${{ matrix.PYTHON_IMAGE }}"
+      PURERPC_BACKEND: "${{ matrix.PURERPC_BACKEND }}"
+  deploy:
+    needs:
+    - test
+    runs-on: ubuntu-latest
+    env:
+      PYTHON_IMAGE: pypy:3.6
+      PURERPC_BACKEND: asyncio
+    if: ${{ github.ref && github.event_name != 'pull_request' }}
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install -r requirements.txt
+    - run: skip
+#     # This item has no matching transformer
+#     - pypi:
+#         provider: pypi
+#         user: "$TWINE_USER"
+#         password: "$TWINE_PASSWORD"
+#         distributions: sdist bdist_wheel
+#         'on':
+#           tags: true
+#       if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+    services:
+#       # This item has no matching transformer
+#       docker:

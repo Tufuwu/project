@@ -1,0 +1,354 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  Python_3_7_Tests:
+    runs-on: ubuntu-16.04
+    env:
+      TOXENV: py37
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: ".stestr"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+    - run: pip install -U tox pip virtualenv setuptools six
+    - run: tox
+#     # This item has no matching transformer
+#     - email: false
+  Linter_Checks:
+    runs-on: ubuntu-16.04
+    env:
+      TOXENV: lint
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: ".stestr"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+    - run: pip install -U tox pip virtualenv setuptools six
+    - run: tox
+#     # This item has no matching transformer
+#     - email: false
+  Python_3_7_Tests_on_OSX:
+    runs-on: macos-latest
+    env:
+      MPLBACKEND: ps
+      PYTHON_VERSION: 3.7.6
+      TOXENV: py37
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: maxim-lobanov/setup-xcode@v1.6.0
+      with:
+        xcode-version: '9.2'
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: |-
+          ~/python-interpreters/
+          .stestr
+        key: "${{ runner.os }}-path"
+    - run: |
+        if [ ${{ runner.os }} = "osx" ]; then
+          if [[ ! -d ~/python-interpreters/$PYTHON_VERSION ]]; then
+            git clone git://github.com/pyenv/pyenv.git
+            cd pyenv/plugins/python-build
+            ./install.sh
+            cd ../../..
+            python-build $PYTHON_VERSION ~/python-interpreters/$PYTHON_VERSION
+          fi
+          virtualenv --python ~/python-interpreters/$PYTHON_VERSION/bin/python venv
+          source venv/bin/activate
+        fi
+    - run: pip install -U tox pip virtualenv setuptools six
+    - run: tox
+#     # This item has no matching transformer
+#     - email: false
+  Python_3_5_Tests:
+    needs:
+    - Python_3_7_Tests
+    - Linter_Checks
+    - Python_3_7_Tests_on_OSX
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py35
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: ".stestr"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.5'
+    - run: pip install -U tox pip virtualenv setuptools six
+    - run: tox
+#     # This item has no matching transformer
+#     - email: false
+  Python_3_6_Tests:
+    needs:
+    - Python_3_7_Tests
+    - Linter_Checks
+    - Python_3_7_Tests_on_OSX
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py36
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: ".stestr"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: pip install -U tox pip virtualenv setuptools six
+    - run: tox
+#     # This item has no matching transformer
+#     - email: false
+  Python_3_8_Tests:
+    needs:
+    - Python_3_7_Tests
+    - Linter_Checks
+    - Python_3_7_Tests_on_OSX
+    runs-on: ubuntu-16.04
+    env:
+      TOXENV: py38
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: ".stestr"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+    - run: pip install -U tox pip virtualenv setuptools six
+    - run: tox
+#     # This item has no matching transformer
+#     - email: false
+  Python_3_5_Tests_on_OSX:
+    needs:
+    - Python_3_7_Tests
+    - Linter_Checks
+    - Python_3_7_Tests_on_OSX
+    runs-on: macos-latest
+    env:
+      MPLBACKEND: ps
+      PYTHON_VERSION: 3.5.9
+      TOXENV: py35
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: maxim-lobanov/setup-xcode@v1.6.0
+      with:
+        xcode-version: '9.2'
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: |-
+          ~/python-interpreters/
+          .stestr
+        key: "${{ runner.os }}-path"
+    - run: |
+        if [ ${{ runner.os }} = "osx" ]; then
+          if [[ ! -d ~/python-interpreters/$PYTHON_VERSION ]]; then
+            git clone git://github.com/pyenv/pyenv.git
+            cd pyenv/plugins/python-build
+            ./install.sh
+            cd ../../..
+            python-build $PYTHON_VERSION ~/python-interpreters/$PYTHON_VERSION
+          fi
+          virtualenv --python ~/python-interpreters/$PYTHON_VERSION/bin/python venv
+          source venv/bin/activate
+        fi
+    - run: pip install -U tox pip virtualenv setuptools six
+    - run: tox
+#     # This item has no matching transformer
+#     - email: false
+  Python_3_6_Tests_on_OSX:
+    needs:
+    - Python_3_7_Tests
+    - Linter_Checks
+    - Python_3_7_Tests_on_OSX
+    runs-on: macos-latest
+    env:
+      MPLBACKEND: ps
+      PYTHON_VERSION: 3.6.10
+      TOXENV: py36
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: maxim-lobanov/setup-xcode@v1.6.0
+      with:
+        xcode-version: '9.2'
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: |-
+          ~/python-interpreters/
+          .stestr
+        key: "${{ runner.os }}-path"
+    - run: |
+        if [ ${{ runner.os }} = "osx" ]; then
+          if [[ ! -d ~/python-interpreters/$PYTHON_VERSION ]]; then
+            git clone git://github.com/pyenv/pyenv.git
+            cd pyenv/plugins/python-build
+            ./install.sh
+            cd ../../..
+            python-build $PYTHON_VERSION ~/python-interpreters/$PYTHON_VERSION
+          fi
+          virtualenv --python ~/python-interpreters/$PYTHON_VERSION/bin/python venv
+          source venv/bin/activate
+        fi
+    - run: pip install -U tox pip virtualenv setuptools six
+    - run: tox
+#     # This item has no matching transformer
+#     - email: false
+  Python_3_8_Tests_on_OSX:
+    needs:
+    - Python_3_7_Tests
+    - Linter_Checks
+    - Python_3_7_Tests_on_OSX
+    runs-on: macos-latest
+    env:
+      MPLBACKEND: ps
+      PYTHON_VERSION: 3.8.1
+      TOXENV: py38
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: maxim-lobanov/setup-xcode@v1.6.0
+      with:
+        xcode-version: '9.2'
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: |-
+          ~/python-interpreters/
+          .stestr
+        key: "${{ runner.os }}-path"
+    - run: |
+        if [ ${{ runner.os }} = "osx" ]; then
+          if [[ ! -d ~/python-interpreters/$PYTHON_VERSION ]]; then
+            git clone git://github.com/pyenv/pyenv.git
+            cd pyenv/plugins/python-build
+            ./install.sh
+            cd ../../..
+            python-build $PYTHON_VERSION ~/python-interpreters/$PYTHON_VERSION
+          fi
+          virtualenv --python ~/python-interpreters/$PYTHON_VERSION/bin/python venv
+          source venv/bin/activate
+        fi
+    - run: pip install -U tox pip virtualenv setuptools six
+    - run: tox
+#     # This item has no matching transformer
+#     - email: false
+  all_python_2:
+    needs:
+    - Python_3_7_Tests
+    - Linter_Checks
+    - Python_3_7_Tests_on_OSX
+    runs-on: ubuntu-latest
+    env:
+      TWINE_USERNAME: qiskit
+    if: ${{ github.ref }}
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: ".stestr"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: pip install -U twine
+    - run: python3 setup.py sdist bdist_wheel
+    - run: twine upload dist/qiskit*
+#     # This item has no matching transformer
+#     - email: false

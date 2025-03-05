@@ -1,0 +1,35 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+    - master
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: if [ $TASK = tests ]; then pip install requests-oauthlib; fi
+    - run: if [ $TASK == isort ]; then pip install isort; fi
+    - run: if [ $TASK == flake8 ]; then pip install flake8; fi
+    - run: if [ $TASK = tests ]; then python setup.py test; fi
+    - run: if [ $TASK = isort ]; then isort --diff --check-only; fi
+    - run: if [ $TASK = flake8 ]; then flake8; fi
+#     # This item has no matching transformer
+#     - email: false
+    strategy:
+      matrix:
+        TASK:
+        - tests
+        - isort
+        - flake8
+    env:
+      TASK: "${{ matrix.TASK }}"

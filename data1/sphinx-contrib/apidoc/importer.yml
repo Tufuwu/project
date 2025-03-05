@@ -1,0 +1,64 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: "${{ matrix.python }}"
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install tox-travis
+    - run: tox
+    strategy:
+      matrix:
+        python:
+        - 2.7
+        - 3.4
+        - 3.5
+        - 3.6
+        - pypy
+  deploy:
+    needs:
+    - test
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: skip
+    - run: skip
+#     # This item has no matching transformer
+#     - pypi:
+#         provider: pypi
+#         user: stephenfin
+#         password:
+#           secure: fDhsfRt8Gbo9YNedv3PCfhX1AYVlW9RJAyg8H1uo790ET22yVBtd+CKEI7MLHkF4wXHs4/hMKkwZASyDFc2q+Fk7h6YuTlXuJ7bTYhc4cPhdbCeau8hr8tUKpepUZdzvdWVdbR4ftIOiz77knD1aQldqPcCeQcX0HabYa0UayUJ1Nkc2gWHE9Lqnr+LNMTsUFWCZNPa5XdruHd5avmWg3dhAZXdcSBkMnZstdf+bcZLF8+UetQ65P751Vf241rJTbz91IoGhhd31OxbCDeBibtVO6KUTFs0hmafMgSihS9omlpTJH0LOGLkOEVvPjHKGyP3wM+yPXWaxukBIQyFhyrPJFIGCAl3iwk6A/dRIoD3tPd7REZCREDYinNwG1fGwSHT/AIqrc0sg4xVMKtXN+LrTIEZg0Bh8gzSyN3OGow7+7NmaAEL5a+jUqHsrQiAuTPXHdWp6K5BnxVkr9LW+znTNFTehXGOKDIXuE5dqG3+ZFvJbouLznBcTan8g6fRpuIOHOqSTHdJXn5OQAlAEnu/Uncp0x/ory2icCS5MKRAr+Lhys2QaTTtb34TMrVHpiz6Naj25sNGToUuWMf+xipYlzsqT3m25d9vmOfEK4xijRQ98MnqMhzLSCz+Am3o9KR9EcG/J65GuKc/JbQJNmNMyB69Wyu6ST3zCbeTK+i4=
+#         'on':
+#           tags: true
+#         distributions: sdist bdist_wheel
+#       if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"

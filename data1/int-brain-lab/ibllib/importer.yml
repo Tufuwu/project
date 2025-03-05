@@ -1,0 +1,27 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+    - master
+    - develop
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+    - run: pip install -r requirements.txt
+    - run: pip install -e .
+    - run: pip install git+https://github.com/cortex-lab/phylib
+    - run: echo "exec('from oneibl.one import ONE; ONE(silent=True)')" | python
+    - run: sed -i 's|null|"'$IBLFLATIRONPASS'"|g' /home/travis/.one_params
+    - run: bash ./run_tests
+    - run: flake8 .

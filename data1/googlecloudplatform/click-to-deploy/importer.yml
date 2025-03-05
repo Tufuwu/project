@@ -1,0 +1,43 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      TARGET: python-test
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 2.7
+    - run: pip install jinja2 pyyaml
+    - run: make "${TARGET}"
+  test_2:
+    runs-on: ubuntu-latest
+    env:
+      TARGET: vm-lint
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: make "${TARGET}"
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_3:
+    runs-on: ubuntu-16.04
+    env:
+      TARGET: vm-generate-triggers
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: wget https://packages.chef.io/files/stable/chefdk/4.2.0/ubuntu/16.04/chefdk_4.2.0-1_amd64.deb
+    - run: sudo dpkg -i chefdk_4.2.0-1_amd64.deb
+    - run: make "${TARGET}"

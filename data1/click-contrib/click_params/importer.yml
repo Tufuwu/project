@@ -1,0 +1,80 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-16.04
+    env:
+      NOXSESSION: tests-3.6
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: pip install -U pip setuptools nox
+    - run: nox -s $NOXSESSION
+    - run: nox -s deploy
+      if: "${{ github.event_name == 'push' && $NOXSESSION == tests-3.8 && ${{ github.ref }} }}"
+  test_2:
+    runs-on: ubuntu-16.04
+    env:
+      NOXSESSION: tests-3.7
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+    - run: pip install -U pip setuptools nox
+    - run: nox -s $NOXSESSION
+    - run: nox -s deploy
+      if: "${{ github.event_name == 'push' && $NOXSESSION == tests-3.8 && ${{ github.ref }} }}"
+  test_3:
+    runs-on: ubuntu-16.04
+    env:
+      NOXSESSION: tests-3.8
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+    - run: pip install -U pip setuptools nox
+    - run: nox -s $NOXSESSION
+    - run: nox -s deploy
+      if: "${{ github.event_name == 'push' && $NOXSESSION == tests-3.8 && ${{ github.ref }} }}"
+  test_4:
+    runs-on: ubuntu-16.04
+    env:
+      NOXSESSION: lint
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+    - run: pip install -U pip setuptools nox
+    - run: nox -s $NOXSESSION
+    - run: nox -s deploy
+      if: "${{ github.event_name == 'push' && $NOXSESSION == tests-3.8 && ${{ github.ref }} }}"
+  test_5:
+    runs-on: ubuntu-16.04
+    env:
+      NOXSESSION: docs
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+    - run: pip install -U pip setuptools nox
+    - run: nox -s $NOXSESSION
+    - run: nox -s deploy
+      if: "${{ github.event_name == 'push' && $NOXSESSION == tests-3.8 && ${{ github.ref }} }}"

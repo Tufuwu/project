@@ -1,0 +1,51 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: # this agent type is not supported: [[{"dist"=>"trusty"}]]
+             ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: apt-get -y install libffi-dev pkg-config
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: export VER=$(git describe --always --tags)
+    - run: echo ${VER}
+    - run: echo -e "travis_fold:start:build_micropython"
+    - run: echo "Building micropython"
+    - run: git clone --recursive https://github.com/micropython/micropython.git
+    - run: pushd micropython/ports/unix
+    - run: git describe --always --tags
+    - run: make axtls
+    - run: make
+    - run: export PATH=$PATH:$PWD
+    - run: test $(micropython -c 'print("test")') = "test"
+    - run: popd
+    - run: echo -e "travis_fold:end:build_micropython"
+    - run: echo -e "travis_fold:start:build_binutils"
+    - run: echo "Building binutils-esp32ulp"
+    - run: git clone https://github.com/espressif/binutils-esp32ulp.git
+    - run: pushd binutils-esp32ulp
+    - run: git describe --always --tags
+    - run: "./configure --target=esp32ulp-elf --prefix=$PWD/dist --disable-doc --disable-gdb --disable-libdecnumber --disable-readline --disable-sim"
+    - run: echo "MAKEINFO = :" >> Makefile
+    - run: make
+    - run: make install-strip
+    - run: export PATH=$PATH:$PWD/dist/bin
+    - run: esp32ulp-elf-as --version | grep 'esp32ulp-elf' > /dev/null
+    - run: popd
+    - run: echo -e "travis_fold:end:build_binutils"
+    - run: pushd tests
+    - run: echo -e "travis_fold:start:unit_tests"
+    - run: "./00_unit_tests.sh"
+    - run: echo -e "travis_fold:end:unit_tests"
+    - run: echo -e "travis_fold:start:compat_tests"
+    - run: "./01_compat_tests.sh"
+    - run: echo -e "travis_fold:end:compat_tests"

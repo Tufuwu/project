@@ -1,0 +1,22 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: docker-compose -f test/docker-compose.yml -p brainzutils_test build
+    - run: docker-compose -f test/docker-compose.yml -p brainzutils_test up -d redis musicbrainz_db
+    - run: docker-compose -f test/docker-compose.yml -p brainzutils_test run --rm test
+    - run: docker-compose -f test/docker-compose.yml -p brainzutils_test down
+    services:
+#       # This item has no matching transformer
+#       docker:

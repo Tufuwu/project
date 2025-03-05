@@ -1,0 +1,26 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-go@v5.0.0
+      with:
+        go-version: 1.x
+    - run: go get github.com/golang/lint/golint github.com/stretchr/testify/assert
+    - run: go get -d ./...
+    - run: go get -d ./...
+    - run: "./scripts/licensecheck.sh"
+    - run: go build ./...
+    - run: "./scripts/golint.sh"
+    - run: go vet ./...
+    - run: go test -v ./...

@@ -1,0 +1,315 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+    - master
+    - "/^releases.*$/"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+env:
+  PIP_WHEEL_DIR: "${{ github.workspace }}/.cache/pip/wheels"
+  PIP_FIND_LINKS: file://${{ github.workspace }}/.cache/pip/wheels
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    env:
+      TOXENV: py36-django22
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: rm -rf ${{ github.workspace }}/.cache/pip/log
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache/pip"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: apt-get -y install enchant
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install tox codecov
+    - run: tox
+    - run: codecov
+      if: "${{ success() }}"
+    services:
+      postgresql:
+        image: postgres:10
+  test_2:
+    runs-on: ubuntu-18.04
+    env:
+      TOXENV: py37-django22
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: rm -rf ${{ github.workspace }}/.cache/pip/log
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache/pip"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: apt-get -y install enchant
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install tox codecov
+    - run: tox
+    - run: codecov
+      if: "${{ success() }}"
+    services:
+      postgresql:
+        image: postgres:10
+  test_3:
+    runs-on: ubuntu-18.04
+    env:
+      TOXENV: py38-django22
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: rm -rf ${{ github.workspace }}/.cache/pip/log
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache/pip"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.8
+    - run: apt-get -y install enchant
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install tox codecov
+    - run: tox
+    - run: codecov
+      if: "${{ success() }}"
+    services:
+      postgresql:
+        image: postgres:10
+  test_4:
+    runs-on: ubuntu-18.04
+    env:
+      TOXENV: py36-django30
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: rm -rf ${{ github.workspace }}/.cache/pip/log
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache/pip"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: apt-get -y install enchant
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install tox codecov
+    - run: tox
+    - run: codecov
+      if: "${{ success() }}"
+    services:
+      postgresql:
+        image: postgres:10
+  test_5:
+    runs-on: ubuntu-18.04
+    env:
+      TOXENV: py37-django30
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: rm -rf ${{ github.workspace }}/.cache/pip/log
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache/pip"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: apt-get -y install enchant
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install tox codecov
+    - run: tox
+    - run: codecov
+      if: "${{ success() }}"
+    services:
+      postgresql:
+        image: postgres:10
+  test_6:
+    runs-on: ubuntu-18.04
+    env:
+      TOXENV: py38-django30
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: rm -rf ${{ github.workspace }}/.cache/pip/log
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache/pip"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.8
+    - run: apt-get -y install enchant
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install tox codecov
+    - run: tox
+    - run: codecov
+      if: "${{ success() }}"
+    services:
+      postgresql:
+        image: postgres:10
+  test_7:
+    runs-on: ubuntu-18.04
+    env:
+      TOXENV: py36-django31
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: rm -rf ${{ github.workspace }}/.cache/pip/log
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache/pip"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: apt-get -y install enchant
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install tox codecov
+    - run: tox
+    - run: codecov
+      if: "${{ success() }}"
+    services:
+      postgresql:
+        image: postgres:10
+  test_8:
+    runs-on: ubuntu-18.04
+    env:
+      TOXENV: py37-django31
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: rm -rf ${{ github.workspace }}/.cache/pip/log
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache/pip"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: apt-get -y install enchant
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install tox codecov
+    - run: tox
+    - run: codecov
+      if: "${{ success() }}"
+    services:
+      postgresql:
+        image: postgres:10
+  test_9:
+    runs-on: ubuntu-18.04
+    env:
+      TOXENV: py38-django31
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: rm -rf ${{ github.workspace }}/.cache/pip/log
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache/pip"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.8
+    - run: apt-get -y install enchant
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install tox codecov
+    - run: tox
+    - run: codecov
+      if: "${{ success() }}"
+    services:
+      postgresql:
+        image: postgres:10
+  test_10:
+    runs-on: ubuntu-18.04
+    env:
+      TOXENV: lint
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: rm -rf ${{ github.workspace }}/.cache/pip/log
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache/pip"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: apt-get -y install enchant
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install tox codecov
+    - run: tox
+    - run: codecov
+      if: "${{ success() }}"
+    services:
+      postgresql:
+        image: postgres:10
+  test_11:
+    runs-on: ubuntu-18.04
+    env:
+      TOXENV: sandbox
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: rm -rf ${{ github.workspace }}/.cache/pip/log
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache/pip"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: apt-get -y install enchant
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install tox codecov
+    - run: tox
+    - run: codecov
+      if: "${{ success() }}"
+    services:
+      postgresql:
+        image: postgres:10
+  test_12:
+    runs-on: ubuntu-18.04
+    env:
+      TOXENV: docs
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: rm -rf ${{ github.workspace }}/.cache/pip/log
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache/pip"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: apt-get -y install enchant
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install tox codecov
+    - run: tox
+    - run: codecov
+      if: "${{ success() }}"
+    services:
+      postgresql:
+        image: postgres:10
