@@ -20,6 +20,6 @@ for index, row in df.iterrows():
     result = subprocess.run(["git", "clone", api_url, output_path])
     if result.returncode == 0:
         csv_repositiries = 'D:/vscode/3/project/python-csv/repositiries.csv'
-        fo.write_file_in(csv_file,new_data)
+        fo.write_file_in(csv_repositiries,new_data)
 
 print("所有仓库克隆完成！")
