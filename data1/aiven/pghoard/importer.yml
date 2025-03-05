@@ -1,0 +1,313 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  fmt:
+    runs-on: ubuntu-20.04
+    env:
+      PG_VERSION: '9.6'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+    - run: wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+    - run: sudo apt update
+    - run: sudo apt install -y libsnappy-dev
+    - run: sudo apt install -y postgresql-${PG_VERSION}
+    - run: pip install -r requirements.txt
+    - run: pip install --upgrade -r requirements.dev.txt
+    - run: pip install -e .
+    - run: make fmt
+    - run: if [ $(git diff --name-only --diff-filter=ACMR | wc -l ) != 0 ]; then echo "Reformatting failed! Please run make fmt on your commits and resubmit!" 1>&2 ; git diff ; exit 1 ; fi
+  lint:
+    runs-on: ubuntu-20.04
+    env:
+      PG_VERSION: '9.6'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+    - run: wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+    - run: sudo apt update
+    - run: sudo apt install -y libsnappy-dev
+    - run: sudo apt install -y postgresql-${PG_VERSION}
+    - run: pip install -r requirements.txt
+    - run: pip install --upgrade -r requirements.dev.txt
+    - run: pip install -e .
+    - run: make lint
+  unittest:
+    needs:
+    - fmt
+    - lint
+    runs-on: ubuntu-20.04
+    env:
+      PG_VERSION: '10'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+    - run: wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+    - run: sudo apt update
+    - run: sudo apt install -y libsnappy-dev
+    - run: sudo apt install -y postgresql-${PG_VERSION}
+    - run: pip install -r requirements.txt
+    - run: pip install --upgrade -r requirements.dev.txt
+    - run: pip install -e .
+    - run: make unittest
+  unittest_2:
+    needs:
+    - fmt
+    - lint
+    runs-on: ubuntu-20.04
+    env:
+      PG_VERSION: '11'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+    - run: wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+    - run: sudo apt update
+    - run: sudo apt install -y libsnappy-dev
+    - run: sudo apt install -y postgresql-${PG_VERSION}
+    - run: pip install -r requirements.txt
+    - run: pip install --upgrade -r requirements.dev.txt
+    - run: pip install -e .
+    - run: make unittest
+  unittest_3:
+    needs:
+    - fmt
+    - lint
+    runs-on: ubuntu-20.04
+    env:
+      PG_VERSION: '12'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+    - run: wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+    - run: sudo apt update
+    - run: sudo apt install -y libsnappy-dev
+    - run: sudo apt install -y postgresql-${PG_VERSION}
+    - run: pip install -r requirements.txt
+    - run: pip install --upgrade -r requirements.dev.txt
+    - run: pip install -e .
+    - run: make unittest
+  unittest_4:
+    needs:
+    - fmt
+    - lint
+    runs-on: ubuntu-20.04
+    env:
+      PG_VERSION: '9.6'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+    - run: wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+    - run: sudo apt update
+    - run: sudo apt install -y libsnappy-dev
+    - run: sudo apt install -y postgresql-${PG_VERSION}
+    - run: pip install -r requirements.txt
+    - run: pip install --upgrade -r requirements.dev.txt
+    - run: pip install -e .
+    - run: make unittest
+  unittest_5:
+    needs:
+    - fmt
+    - lint
+    runs-on: ubuntu-20.04
+    env:
+      PG_VERSION: '10'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+    - run: sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+    - run: wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+    - run: sudo apt update
+    - run: sudo apt install -y libsnappy-dev
+    - run: sudo apt install -y postgresql-${PG_VERSION}
+    - run: pip install -r requirements.txt
+    - run: pip install --upgrade -r requirements.dev.txt
+    - run: pip install -e .
+    - run: make unittest
+  unittest_6:
+    needs:
+    - fmt
+    - lint
+    runs-on: ubuntu-20.04
+    env:
+      PG_VERSION: '11'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+    - run: sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+    - run: wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+    - run: sudo apt update
+    - run: sudo apt install -y libsnappy-dev
+    - run: sudo apt install -y postgresql-${PG_VERSION}
+    - run: pip install -r requirements.txt
+    - run: pip install --upgrade -r requirements.dev.txt
+    - run: pip install -e .
+    - run: make unittest
+  unittest_7:
+    needs:
+    - fmt
+    - lint
+    runs-on: ubuntu-20.04
+    env:
+      PG_VERSION: '12'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+    - run: sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+    - run: wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+    - run: sudo apt update
+    - run: sudo apt install -y libsnappy-dev
+    - run: sudo apt install -y postgresql-${PG_VERSION}
+    - run: pip install -r requirements.txt
+    - run: pip install --upgrade -r requirements.dev.txt
+    - run: pip install -e .
+    - run: make unittest
+  unittest_8:
+    needs:
+    - fmt
+    - lint
+    runs-on: ubuntu-20.04
+    env:
+      PG_VERSION: '9.6'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+    - run: sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+    - run: wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+    - run: sudo apt update
+    - run: sudo apt install -y libsnappy-dev
+    - run: sudo apt install -y postgresql-${PG_VERSION}
+    - run: pip install -r requirements.txt
+    - run: pip install --upgrade -r requirements.dev.txt
+    - run: pip install -e .
+    - run: make unittest
+  unittest_9:
+    needs:
+    - fmt
+    - lint
+    runs-on: ubuntu-20.04
+    env:
+      PG_VERSION: '10'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+    - run: sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+    - run: wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+    - run: sudo apt update
+    - run: sudo apt install -y libsnappy-dev
+    - run: sudo apt install -y postgresql-${PG_VERSION}
+    - run: pip install -r requirements.txt
+    - run: pip install --upgrade -r requirements.dev.txt
+    - run: pip install -e .
+    - run: make unittest
+  unittest_10:
+    needs:
+    - fmt
+    - lint
+    runs-on: ubuntu-20.04
+    env:
+      PG_VERSION: '11'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+    - run: sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+    - run: wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+    - run: sudo apt update
+    - run: sudo apt install -y libsnappy-dev
+    - run: sudo apt install -y postgresql-${PG_VERSION}
+    - run: pip install -r requirements.txt
+    - run: pip install --upgrade -r requirements.dev.txt
+    - run: pip install -e .
+    - run: make unittest
+  unittest_11:
+    needs:
+    - fmt
+    - lint
+    runs-on: ubuntu-20.04
+    env:
+      PG_VERSION: '12'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+    - run: sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+    - run: wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+    - run: sudo apt update
+    - run: sudo apt install -y libsnappy-dev
+    - run: sudo apt install -y postgresql-${PG_VERSION}
+    - run: pip install -r requirements.txt
+    - run: pip install --upgrade -r requirements.dev.txt
+    - run: pip install -e .
+    - run: make unittest
+  unittest_12:
+    needs:
+    - fmt
+    - lint
+    runs-on: ubuntu-20.04
+    env:
+      PG_VERSION: '9.6'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+    - run: sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+    - run: wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+    - run: sudo apt update
+    - run: sudo apt install -y libsnappy-dev
+    - run: sudo apt install -y postgresql-${PG_VERSION}
+    - run: pip install -r requirements.txt
+    - run: pip install --upgrade -r requirements.dev.txt
+    - run: pip install -e .
+    - run: make unittest

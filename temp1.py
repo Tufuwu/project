@@ -32,7 +32,7 @@ if "origin" in check_remote.stdout:
 subprocess.run(["git", "remote", "add", "origin", github_repo_url], check=True)
 '''
 # 读取CSV文件，获取文件路径
-count = 442
+count = 489
 
 df = pd.read_csv(csv_file_path)
 for index, row in df.iterrows():
