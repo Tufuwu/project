@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -35,4 +34,3 @@ jobs:
       run: tox
     - name: Run coveralls
       run: coveralls
-```

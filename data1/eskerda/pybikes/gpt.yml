@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -24,4 +23,3 @@ jobs:
         CFLAGS="-O0" pip install .
     - name: Run tests
       run: ./runtests.sh
-```

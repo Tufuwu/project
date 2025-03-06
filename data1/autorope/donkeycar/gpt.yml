@@ -1,4 +1,3 @@
-```yaml
 name: Push docs
 
 on:
@@ -28,4 +27,3 @@ jobs:
           conda install mkdocs
           mkdocs gh-deploy --force -v
           echo Docs were made and pushed to docs.donkeycar.com
-```

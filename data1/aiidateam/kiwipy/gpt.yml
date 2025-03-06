@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -50,4 +49,3 @@ jobs:
         pip install flake8
     - name: Build docs
       run: sphinx-build -nT -b dummy docs/source build/html
-```

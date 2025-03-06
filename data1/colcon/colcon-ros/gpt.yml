@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -26,4 +25,3 @@ jobs:
         pip install -U flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-quotes pep8-naming pylint pytest pytest-cov scspell3k
     - name: Run tests
       run: python -m pytest --cov=colcon_ros --cov-branch
-```

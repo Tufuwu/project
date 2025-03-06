@@ -1,4 +1,3 @@
-```yaml
 name: Kazoo Awesome Testing
 
 on: [push]
@@ -65,4 +64,3 @@ jobs:
 
       - name: Publish Codecov report
         uses: codecov/codecov-action@v2
-```

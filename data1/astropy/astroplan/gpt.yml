@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on:
@@ -63,4 +62,3 @@ jobs:
         if [[ ${{ matrix.os }} == "linux" ]]; then
           coveralls --rcfile='astroplan/tests/coveragerc'
         fi
-```

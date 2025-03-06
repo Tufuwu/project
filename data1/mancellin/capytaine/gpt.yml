@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -33,4 +32,3 @@ jobs:
 
     - name: Build package
       run: conda build --python=${{ env.CONDA_PY }} --numpy=${{ env.CONDA_NPY }} .
-```

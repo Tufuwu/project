@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on:
@@ -56,4 +55,3 @@ jobs:
         https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         git remote add github git@github.com:sphinx-doc/sphinx-doc-translations.git
         git push github master
-```

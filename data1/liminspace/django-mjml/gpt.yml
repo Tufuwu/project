@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -56,4 +55,3 @@ jobs:
     - name: Test with pytest
       run: |
         python tools.py test
-```

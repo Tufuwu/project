@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -42,4 +41,3 @@ jobs:
     - name: Upload coverage
       if: matrix.python-version == 3.8
       run: codecov
-```

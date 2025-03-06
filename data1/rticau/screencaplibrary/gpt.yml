@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -26,4 +25,3 @@ jobs:
       run: python atest/run.py -e no-xvfb -e gtk atest
     - name: Run tests with XVFB
       run: python atest/run.py -i gtk atest
-```

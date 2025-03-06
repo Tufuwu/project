@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -35,4 +34,3 @@ jobs:
         black --check --diff --target-version py${{ matrix.python-version }}
     - name: Dummy run
       run: python random_street_view.py --help
-```

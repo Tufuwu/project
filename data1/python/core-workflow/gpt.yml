@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on:
@@ -52,4 +51,3 @@ jobs:
         pip install flit
         flit install
         # Add other tests here if needed
-```

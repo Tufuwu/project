@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -26,4 +25,3 @@ jobs:
       run: docker run draft-kings-fun flake8 draftfast
     - name: Run nosetests with coverage
       run: docker run draft-kings-fun nosetests --with-coverage --cover-package=.
-```

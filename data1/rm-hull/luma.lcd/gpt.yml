@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -30,4 +29,3 @@ jobs:
       run: coveralls
       env:
         TOXENV: py39
-```

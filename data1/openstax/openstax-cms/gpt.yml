@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -46,4 +45,3 @@ jobs:
       run: coverage run manage.py test --verbosity=2 --settings=openstax.settings.test
     - name: Upload coverage to Codecov
       run: codecov
-```

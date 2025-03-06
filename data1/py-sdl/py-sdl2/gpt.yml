@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -63,4 +62,3 @@ jobs:
 
     - name: Run tests
       run: python -B -m pytest -vvl -rxXP
-```

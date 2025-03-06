@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -25,4 +24,3 @@ jobs:
       run: bash ./scripts/deploy.sh
       env:
         ENCRYPTION_LABEL: "6c9ad971e3e1"
-```

@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -32,4 +31,3 @@ jobs:
       run: flake8 --statistics --count
     - name: Check code formatting with black
       run: black --check --diff .
-```

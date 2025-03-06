@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on:
@@ -42,4 +41,3 @@ jobs:
       continue-on-error: true
     - name: Build Docs
       run: python setup.py build_docs
-```

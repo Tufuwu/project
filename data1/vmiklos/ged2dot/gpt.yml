@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -24,4 +23,3 @@ jobs:
       run: make check
     - name: Ignore private branches
       if: github.ref =~ /^refs\/heads\/(?!private\/).*$/
-```

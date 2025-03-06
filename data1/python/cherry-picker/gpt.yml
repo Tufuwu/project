@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on:
@@ -68,4 +67,3 @@ jobs:
       run: |
         touch setup.py
         twine upload --skip-existing dist/*
-```

@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -25,4 +24,3 @@ jobs:
         coverage run tests/test_bugbear.py
         coverage report -m
         black --check .
-```

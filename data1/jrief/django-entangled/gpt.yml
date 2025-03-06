@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -27,4 +26,3 @@ jobs:
       run: tox -r -e "$TOX_ENV"
     - name: Upload coverage to Codecov
       run: bash <(curl -s https://codecov.io/bash)
-```

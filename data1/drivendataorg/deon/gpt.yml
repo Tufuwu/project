@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -27,4 +26,3 @@ jobs:
         make examples
         make docs
       if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.9'
-```

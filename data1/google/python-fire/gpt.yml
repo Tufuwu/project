@@ -1,4 +1,3 @@
-```yaml
 name: Python Fire
 
 on: [push]
@@ -27,4 +26,3 @@ jobs:
         run: ./.github/scripts/build.sh
         env:
           PYTHON_VERSION: ${{ matrix.python-version }}
-```

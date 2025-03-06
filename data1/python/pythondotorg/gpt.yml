@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -38,4 +37,3 @@ jobs:
       run: |
         python -Wd -m coverage run manage.py test -v2
         coverage report -m --fail-under=75
-```

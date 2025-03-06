@@ -1,4 +1,3 @@
-```yaml
 name: CI/CD Pipeline
 
 on:
@@ -56,4 +55,3 @@ jobs:
         tox -e deploy
 ```
 
-Note: Replace `'your_username'` with your actual GitHub username in the `deploy` job condition. Also, ensure that the `PYPI_PASSWORD` secret is set in your repository settings.

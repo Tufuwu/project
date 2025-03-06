@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -57,4 +56,3 @@ jobs:
       run: |
         python bench/tests/test_init.py TestBenchInit.basic
         python bench/tests/test_setup_production.py TestSetupProduction.production
-```

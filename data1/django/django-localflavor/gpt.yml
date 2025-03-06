@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -42,4 +41,3 @@ jobs:
       with:
         script: |
           core.setFailed('Allowing failure for main branch build')
-```

@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -38,4 +37,3 @@ jobs:
       run: |
         python manage.py test
         if [ "${{ matrix.python-version }}" = "3.11" ]; then black --check zen_queries; fi
-```

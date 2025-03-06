@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -44,4 +43,3 @@ jobs:
       run: make test
     - name: Upload coverage
       run: codecov
-```

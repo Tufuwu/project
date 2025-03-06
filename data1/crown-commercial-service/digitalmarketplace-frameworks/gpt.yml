@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -22,4 +21,3 @@ jobs:
         pip install -r requirements-dev.txt
     - name: Run tests
       run: make test
-```

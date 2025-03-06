@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -53,4 +52,3 @@ jobs:
         create_map -d -m 23
         identify xplanet/images/clouds_2048.jpg
         rm xplanet/images/clouds_2048.jpg
-```

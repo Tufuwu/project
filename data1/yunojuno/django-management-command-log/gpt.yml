@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -30,4 +29,3 @@ jobs:
     - name: Allow failures for djangomaster
       if: matrix.toxenv == 'py39-djangomaster' || matrix.toxenv == 'py310-djangomaster'
       continue-on-error: true
-```

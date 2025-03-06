@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -28,4 +27,3 @@ jobs:
         flake8 . --exit-zero --select=C,E,F,W
     - name: Test with pytest
       run: pytest
-```

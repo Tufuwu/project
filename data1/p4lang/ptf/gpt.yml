@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -37,4 +36,3 @@ jobs:
         python CI/travis/check-nnpy.py
         ./CI/travis/run_tests.sh
         sudo python3 /usr/local/bin/nose2 utests.tests
-```

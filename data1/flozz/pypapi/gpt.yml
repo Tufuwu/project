@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -28,4 +27,3 @@ jobs:
         git submodule update
         flake8 pypapi
         python setup.py build
-```

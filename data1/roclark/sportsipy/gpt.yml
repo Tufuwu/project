@@ -1,4 +1,3 @@
-```yaml
 name: Sportsreference push tests
 
 on: [push]
@@ -75,4 +74,3 @@ jobs:
       with:
         user: __token__
         password: ${{ secrets.PYPI_PASSWORD }}
-```

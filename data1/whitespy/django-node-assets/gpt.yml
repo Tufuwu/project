@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -22,4 +21,3 @@ jobs:
       run: isort django_node_assets --check
     - name: Run black check
       run: black django_node_assets --check
-```

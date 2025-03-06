@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -31,4 +30,3 @@ jobs:
         flags: unittests
         name: python-${{ matrix.python-version }}
         fail_ci_if_error: true
-```

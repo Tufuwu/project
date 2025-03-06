@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -25,4 +24,3 @@ jobs:
         cd tests
         python test_cvss2.py
         python test_cvss3.py
-```

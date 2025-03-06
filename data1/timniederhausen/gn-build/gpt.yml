@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -85,4 +84,3 @@ jobs:
 
       - name: Run the built binary
         run: cd out && ./hello
-```

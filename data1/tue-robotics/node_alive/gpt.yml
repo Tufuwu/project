@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on:
@@ -35,4 +34,3 @@ jobs:
 
     - name: Test package
       run: bash test-package.sh --package=$PACKAGE
-```

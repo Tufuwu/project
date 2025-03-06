@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -87,4 +86,3 @@ jobs:
       run: |
         tox -e $TOX_ENV -- pip install coveralls
         tox -e $TOX_ENV -- coveralls $COVERALLS_OPTION
-```

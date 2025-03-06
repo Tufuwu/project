@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -28,4 +27,3 @@ jobs:
       run: find . -type f -name '*study.txt' | sort | xargs python idr-utils/pyidr/study_parser.py -v
     - name: Run travis-check.py
       run: python idr-utils/scripts/travis-check.py
-```

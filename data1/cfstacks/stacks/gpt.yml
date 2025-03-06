@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on:
@@ -44,4 +43,3 @@ jobs:
       with:
         files: stacks_py*_linux.pex
         token: ${{ secrets.GITHUB_TOKEN }}
-```

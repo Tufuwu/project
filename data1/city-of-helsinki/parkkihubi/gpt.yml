@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -43,4 +42,3 @@ jobs:
       run: |
         pip install -r requirements-cov.txt
         codecov
-```

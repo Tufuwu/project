@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on:
@@ -60,4 +59,3 @@ jobs:
     - name: Report coverage
       if: success()
       run: coveralls
-```

@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -20,4 +19,3 @@ jobs:
 
       - name: Run tests
         run: docker run -it ultisnips:${{ matrix.VIM_VERSION }}_${{ matrix.PYTHON_IMAGE.replace('-', '_') }} docker/run_tests.sh
-```

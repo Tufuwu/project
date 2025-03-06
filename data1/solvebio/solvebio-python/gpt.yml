@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -28,4 +27,3 @@ jobs:
         nosetests -e test_solvebio_auth -e recipes
         pytest recipes/tests/test_recipes_sync.py
         flake8 solvebio
-```

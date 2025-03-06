@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on:
@@ -37,4 +36,3 @@ jobs:
         python -m pip install twine
         python setup.py sdist
         python -m twine upload dist/*
-```

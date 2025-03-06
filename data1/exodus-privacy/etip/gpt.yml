@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on:
@@ -39,4 +38,3 @@ jobs:
       run: |
         cd etip/
         python manage.py test
-```

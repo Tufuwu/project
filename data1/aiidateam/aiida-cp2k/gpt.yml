@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on:
@@ -55,4 +54,3 @@ jobs:
     - name: Get Docker logs
       run: docker logs $DOCKERID
       if: always()
-```

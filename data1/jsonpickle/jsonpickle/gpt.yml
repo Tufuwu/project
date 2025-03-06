@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -37,4 +36,3 @@ jobs:
         TOXENV: ${{ matrix.toxenv }}
 ```
 
-Note: The above GitHub Actions configuration assumes that the `tox` environment names (`TOXENV`) are compatible with the matrix strategy. If `TOXENV` needs to be dynamically set based on the Python version, additional logic would be required to map Python versions to specific `TOXENV` values.

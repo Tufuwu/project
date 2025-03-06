@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -35,4 +34,3 @@ jobs:
         echo "MINIO_STORAGE_ENDPOINT=localhost:9153" >> $GITHUB_ENV
         echo "MINIO_STORAGE_ACCESS_KEY=weak_access_key" >> $GITHUB_ENV
         echo "MINIO_STORAGE_SECRET_KEY=weak_secret_key" >> $GITHUB_ENV
-```

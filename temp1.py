@@ -2,7 +2,7 @@ from search_exe import get_history,file_operate
 import os
 import time
 import pandas as pd
-from get_migrate_file import add_comments,push_repositories,copy_files
+from migrate_exe import add_comments,push_repositories,copy_files
 
 # 配置
 github_repo_url = "https://github.com/Tufuwu/test2.git"  # GitHub仓库URL
@@ -32,7 +32,7 @@ if "origin" in check_remote.stdout:
 subprocess.run(["git", "remote", "add", "origin", github_repo_url], check=True)
 '''
 # 读取CSV文件，获取文件路径
-count = 704
+count = 705
 
 df = pd.read_csv(csv_file_path)
 for index, row in df.iterrows():

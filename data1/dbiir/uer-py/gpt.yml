@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -75,4 +74,3 @@ jobs:
       run: |
         python finetune/run_cmrc.py --pretrained_model_path models/bert_model.bin --vocab_path models/google_zh_vocab.txt --config_path models/bert/mini_config.json --output_model_path models/cmrc_model.bin --train_path datasets/test_data/cmrc_test/train.json --dev_path datasets/test_data/cmrc_test/dev.json --epochs_num 2 --batch_size 2 --embedding word_pos_seg --encoder transformer --mask fully_visible --seq_length 128
         python inference/run_cmrc_infer.py --load_model_path models/cmrc_model.bin --vocab_path models/google_zh_vocab.txt --config_path models/bert/mini_config.json --test_path datasets/test_data/cmrc_test/test.json --prediction_path datasets/test_data/cmrc_test/prediction.json --embedding word_pos_seg --encoder transformer --mask fully_visible --seq_length 128
-```

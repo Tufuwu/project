@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on:
@@ -45,4 +44,3 @@ jobs:
 
     - name: Deploy addon
       run: submit-addon -r repo-scripts -b matrix --push-branch service.libraryautoupdate
-```

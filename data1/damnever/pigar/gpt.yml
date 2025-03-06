@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -22,4 +21,3 @@ jobs:
         if [[ ${{ matrix.python-version }} == 3.* ]]; then pip install -r py3_requirements.txt; fi
     - name: Test with make
       run: make test
-```

@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -79,4 +78,3 @@ jobs:
 
     - name: Lint code
       run: make lint
-```

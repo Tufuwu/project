@@ -1,4 +1,3 @@
-```yaml
 name: Publish package to PyPi
 
 on:
@@ -32,4 +31,3 @@ jobs:
         with:
           user: edx
           password: ${{ secrets.PYPI_UPLOAD_TOKEN }}
-```

@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -30,4 +29,3 @@ jobs:
         mkdir -p ./test && cd ./test
         pip show -f eoxmagmod
         python -c 'import eoxmagmod' && python -m unittest discover -p '[a-z]*.py' -v eoxmagmod
-```

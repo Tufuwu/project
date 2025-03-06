@@ -1,4 +1,3 @@
-```yaml
 name: CI/CD Pipeline
 
 on:
@@ -64,4 +63,3 @@ jobs:
           asset_path: ./dist/${{ matrix.os }}_pysoar.zip
           asset_name: ${{ matrix.os }}_pysoar.zip
           asset_content_type: application/zip
-```

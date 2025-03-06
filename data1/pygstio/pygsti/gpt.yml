@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -75,4 +74,3 @@ jobs:
         NOSE_WHERE: "test/test_packages/"
         NOSE_NOPATH: ${{ matrix.test-package == 'mpi' ? '' : '1' }}
       run: nosetests test/test_packages/${{ matrix.test-package }}
-```

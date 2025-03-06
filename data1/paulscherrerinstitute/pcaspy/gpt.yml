@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on:
@@ -79,4 +78,3 @@ jobs:
         if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
           twine upload -r mypypi --skip-existing $HOME/miniconda/conda-bld/macos-64/pcaspy-*.whl
         fi
-```

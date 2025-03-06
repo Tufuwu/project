@@ -1,4 +1,3 @@
-```yaml
 name: Ruby CI with Webhook Notification
 
 on:
@@ -28,4 +27,3 @@ jobs:
         fi
       env:
         RTD_TOKEN: ${{ secrets.RTD_TOKEN }}
-```

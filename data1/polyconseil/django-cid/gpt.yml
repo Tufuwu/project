@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -36,4 +35,3 @@ jobs:
         DJANGO: ${{ matrix.djangoproject }}
         TOXENV: ${{ matrix.toxenv }}
       if: matrix.toxenv != ''
-```

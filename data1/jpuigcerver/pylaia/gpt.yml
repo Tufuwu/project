@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -29,4 +28,3 @@ jobs:
       run: pre-commit run --all-files
     - name: Run tests
       run: pytest --cov=laia tests
-```

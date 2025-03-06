@@ -1,4 +1,3 @@
-```yaml
 name: CI/CD
 
 on:
@@ -51,4 +50,3 @@ jobs:
       run: |
         make dist
         twine upload --skip-existing dist/*
-```

@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -30,4 +29,3 @@ jobs:
       run: doc8 --max-line-length 999 index.rst developer/ migration/ user/ -v
     - name: Fail if there are misspelled words
       run: if [[ -s "_build/spelling/output.txt" ]]; then false; fi
-```

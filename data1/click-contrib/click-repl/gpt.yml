@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -25,4 +24,3 @@ jobs:
     - name: Run linters
       run: tox -e linters
       if: matrix.python-version == '3.9'
-```

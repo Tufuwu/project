@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -28,4 +27,3 @@ jobs:
           -e PYTHONPATH=/ALF \
           -it horizonrobotics/alf:0.1.0 \
           /ALF/.ci-cd/build.sh ${{ matrix.job }}
-```

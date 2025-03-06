@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -37,4 +36,3 @@ jobs:
         file: ./coverage.xml
         flags: unittests
         name: python-${{ matrix.python-version }}-${{ matrix.os }}
-```

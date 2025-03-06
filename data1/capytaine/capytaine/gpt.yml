@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -35,4 +34,3 @@ jobs:
 
     - name: Check NumPy version
       run: python -c 'import numpy; print(numpy.__version__)'
-```

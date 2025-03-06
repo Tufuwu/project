@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -49,4 +48,3 @@ jobs:
       run: |
         .tox/${{ matrix.python-version }}/bin/coverage xml
         .tox/${{ matrix.python-version }}/bin/codecov -e TOXENV
-```

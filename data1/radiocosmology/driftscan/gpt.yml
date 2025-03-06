@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -30,4 +29,3 @@ jobs:
       run: pydocstyle --convention=numpy tests/test_simplepolarizationtelescope.py
     - name: Run pytest
       run: cd tests/ && pytest -svv
-```

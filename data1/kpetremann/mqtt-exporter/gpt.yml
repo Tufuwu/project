@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -28,4 +27,3 @@ jobs:
       run: black . --check --diff
     - name: Run isort --check --diff
       run: isort . --check --diff
-```

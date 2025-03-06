@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on:
@@ -30,4 +29,3 @@ jobs:
         if [ "${{ matrix.task }}" = "tests" ]; then python setup.py test; fi
         if [ "${{ matrix.task }}" = "isort" ]; then isort --diff --check-only; fi
         if [ "${{ matrix.task }}" = "flake8" ]; then flake8; fi
-```

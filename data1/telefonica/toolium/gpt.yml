@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -22,4 +21,3 @@ jobs:
         pip install tox setuptools setuptools_scm
     - name: Run tox
       run: tox -e py${{ matrix.python-version }}
-```

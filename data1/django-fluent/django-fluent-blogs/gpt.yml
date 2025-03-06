@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on:
@@ -30,4 +29,3 @@ jobs:
       run: coverage run --rcfile=.coveragerc runtests.py
     - name: Upload coverage to Codecov
       run: codecov
-```

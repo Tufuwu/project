@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -28,4 +27,3 @@ jobs:
         flake8
         mypy quantumflow
         sphinx-build -M html docs docs/_build
-```

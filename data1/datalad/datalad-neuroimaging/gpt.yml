@@ -1,4 +1,3 @@
-```yaml
 name: crippled-filesystems
 
 on: [pull_request]
@@ -51,4 +50,3 @@ jobs:
         mount
         echo "<< mount =="
         python -m nose -s -v --with-doctest --with-coverage --cover-package datalad_neuroimaging datalad_neuroimaging
-```

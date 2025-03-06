@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -27,4 +26,3 @@ jobs:
         pip install pdftotext docutils pygments pytesseract pillow jq
     - name: Test with pytest
       run: pytest -v
-```

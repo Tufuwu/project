@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -26,4 +25,3 @@ jobs:
       run: createdb --encoding=utf-8 scancodeio
     - name: Run tests
       run: ./manage.py test --settings=scancodeio.settings.base --verbosity=2 --noinput
-```

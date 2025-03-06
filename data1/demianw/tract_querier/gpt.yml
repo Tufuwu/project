@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -29,4 +28,3 @@ jobs:
         nosetests -v --with-coverage
     - name: Upload coverage to Codecov
       run: codecov -t 08147902-b78a-44fc-bb10-9b5ee0b2ad7b
-```

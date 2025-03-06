@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -69,4 +68,3 @@ jobs:
       run: tox -e lint
       env:
         TOXENV: lint
-```

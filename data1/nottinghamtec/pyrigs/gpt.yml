@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -48,4 +47,3 @@ jobs:
       run: coveralls
     - name: Send coverage to CodeClimate
       run: codeclimate-test-reporter
-```

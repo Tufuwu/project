@@ -2,7 +2,7 @@ import os
 import subprocess
 import shutil
 import pandas as pd
-from get_migrate_file.utils import add_comments,push_repositories
+from migrate_exe.utils import add_comments,push_repositories
 
 # 配置
 github_repo_url = "https://github.com/Tufuwu/experiment_running.git"  # GitHub仓库URL

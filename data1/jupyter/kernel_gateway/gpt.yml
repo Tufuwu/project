@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -29,4 +28,3 @@ jobs:
         jupyter kernelgateway --help
         nosetests -x --process-restartworker --with-coverage --cover-package=kernel_gateway
         pip uninstall -y jupyter_kernel_gateway
-```

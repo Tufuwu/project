@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -29,4 +28,3 @@ jobs:
     - name: Build and test with Docker
       run: |
         docker run -v $PWD:/root/build/ fedora:rawhide /bin/sh -c "dnf install --nogpgcheck -y checkpolicy policycoreutils-devel make m4 findutils ; cd /root/build/selinux-policy; make policy -j \$(nproc)"
-```

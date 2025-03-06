@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -26,4 +25,3 @@ jobs:
       run: flake8 . --ignore=E501 --select=B,C,E,F,W,T4,B9 --exclude=docs,build
     - name: Test with pytest
       run: pytest
-```

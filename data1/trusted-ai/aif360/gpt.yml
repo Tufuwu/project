@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -68,4 +67,3 @@ jobs:
         pip install pandas -q
     - name: Install R package
       run: R CMD INSTALL .
-```

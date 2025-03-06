@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -32,4 +31,3 @@ jobs:
       run: tox -e py${{ matrix.python-version.replace('.', '') }}-django${{ matrix.djangoproject-version.replace('.', '') }}
       env:
         DJANGO: ${{ matrix.djangoproject-version }}
-```

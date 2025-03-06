@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -32,4 +31,3 @@ jobs:
     - name: Run tests
       run: |
         docker run rospy_message_converter_${{ matrix.ros_distro }} /bin/bash -c "source devel/setup.bash && CTEST_OUTPUT_ON_FAILURE=1 catkin_make test && roscd rospy_message_converter && python${{ matrix.python_version }} src/rospy_message_converter/json_message_converter.py && python${{ matrix.python_version }} src/rospy_message_converter/message_converter.py"
-```

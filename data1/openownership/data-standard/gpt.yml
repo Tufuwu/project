@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -35,4 +34,3 @@ jobs:
         pytest
 ```
 
-Please note that the `BASEDIR` environment variable should be set in the repository settings or as a secret if it contains sensitive information.

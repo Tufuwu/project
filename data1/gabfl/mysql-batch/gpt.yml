@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -45,4 +44,3 @@ jobs:
       uses: codecov/codecov-action@v2
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-```

@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on:
@@ -91,4 +90,3 @@ This GitHub Actions configuration file replicates the functionality of the provi
 - Docker is used to start RabbitMQ and copy SSL certificates.
 - Toxiproxy is installed and configured.
 - Dependencies are installed, including `libenchant-dev`.
-- The `deploy` job is configured to deploy to PyPI when a tag is pushed.

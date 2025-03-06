@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -28,4 +27,3 @@ jobs:
         wget https://www.eclipse.org/downloads/download.php?file=/eclipse/downloads/drops4/R-4.5.2-201602121500/ecj-4.5.2.jar -O $JDT
     - name: Run script
       run: ./mx --strict-compliance gate --strict-mode
-```

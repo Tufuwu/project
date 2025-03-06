@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -22,4 +21,3 @@ jobs:
         pip install tox-travis
     - name: Run tests
       run: tox
-```

@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on:
@@ -84,4 +83,3 @@ jobs:
           - SHA256SUM
           - SHA1SUM
           - MD5SUM
-```

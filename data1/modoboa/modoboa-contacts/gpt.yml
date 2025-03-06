@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on:
@@ -63,4 +62,3 @@ jobs:
         cd ..
         python setup.py sdist bdist_wheel
         twine upload dist/*
-```

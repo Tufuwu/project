@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -35,4 +34,3 @@ jobs:
         flask run & sleep 5 && curl http://localhost:5000 | grep -q 'https://cdn.example.com/static/css/app-d41d8cd98f00b204e9800998ecf8427e.css' && (echo 'Stylesheet is md5 tagged test: pass' && exit 0) || (echo 'Stylesheet is md5 tagged test: fail' && exit 1)
         flask digest clean && ls -laR example/static/ | wc -l | grep -q "26" && (echo "File count after cleaning test: pass" && exit 0) || (echo "File count after cleaning test: fail" && exit 1)
         flask run -p 5001 & sleep 5 && curl http://localhost:5001 | grep -q 'https://cdn.example.com/static/js/app.js' && (echo 'Javascript is not md5 tagged test: pass' && exit 0) || (echo 'Javascript is not md5 tagged test: fail' && exit 1)
-```

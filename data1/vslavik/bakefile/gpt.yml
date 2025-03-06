@@ -1,4 +1,3 @@
-```yaml
 # .github/workflows/ci.yml
 name: CI
 
@@ -24,4 +23,3 @@ jobs:
         pip install Sphinx pytest clint
     - name: Run tests
       run: make test
-```

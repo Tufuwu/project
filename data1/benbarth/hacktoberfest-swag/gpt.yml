@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push]
@@ -37,4 +36,3 @@ jobs:
     - name: Run Python script
       if: matrix.language == 'python'
       run: python validate-alphabetical.py README.md
-```

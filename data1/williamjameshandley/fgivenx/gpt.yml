@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -27,4 +26,3 @@ jobs:
       run: python -m pytest --cov=fgivenx
     - name: Upload coverage to Codecov
       run: codecov
-```

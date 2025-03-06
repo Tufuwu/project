@@ -1,4 +1,3 @@
-```yaml
 name: tests
 
 on:
@@ -36,4 +35,3 @@ jobs:
 
       - name: Test with tox and upload coverage results
         run: tox -- --codecov --codecov-token=${{ secrets.CODECOV_TOKEN }}
-```

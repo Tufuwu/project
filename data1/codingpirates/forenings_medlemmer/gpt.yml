@@ -1,4 +1,3 @@
-```yaml
 name: Prepare Deploy
 
 on:
@@ -39,4 +38,3 @@ jobs:
         run: docker-compose run web coveralls
         env:
           repo_token: ${{ secrets.repo_token }}
-```

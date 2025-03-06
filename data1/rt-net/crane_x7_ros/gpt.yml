@@ -1,4 +1,3 @@
-```yaml
 name: CI
 
 on: [push, pull_request]
@@ -42,4 +41,3 @@ jobs:
         OS_NAME: ubuntu
         OS_CODE_NAME: ${{ matrix.os_code_name }}
       run: source .ci_config/travis.sh
-```
