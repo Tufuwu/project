@@ -65,3 +65,11 @@ def copy_files(source_dir, target_dir):
         with open(source_file, 'r', encoding='utf-8') as sf, open(target_file, 'w', encoding='utf-8') as tf:
             tf.write(sf.read())
         print(f"已复制  到 {target_dir}")
+
+
+def prompt_constructor(*args):
+    prompt = ""
+    for arg in args:
+        with open(os.path.abspath(f'prompt/{arg}'), 'r') as file:
+            prompt += file.read().strip()
+    return prompt

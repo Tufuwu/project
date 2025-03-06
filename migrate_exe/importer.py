@@ -1,6 +1,5 @@
 import os
 from search_exe.utils import get_history,file_operate
-import os
 import time
 import pandas as pd
 from utils import add_comments,push_repositories,copy_files
