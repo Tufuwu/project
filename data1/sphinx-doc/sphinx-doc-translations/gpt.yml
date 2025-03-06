@@ -1,0 +1,59 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip setuptools
+        pip install -r ./requirements.txt
+
+    - name: Decrypt SSH key
+      run: |
+        openssl aes-256-cbc -K ${{ secrets.ENCRYPTED_KEY }} -iv ${{ secrets.ENCRYPTED_IV }} -in .secrets/key.enc -out ~/.ssh/id_rsa -d
+        chmod 600 ~/.ssh/id_rsa
+        echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+
+    - name: Update locales
+      run: sh ./locale/update.sh
+
+    - name: Commit and push changes
+      if: success()
+      run: |
+        git config --global user.email "sphinx-auto-update"
+        git config --global user.name "sphinx-auto-update"
+        git add .
+        git commit -m "[skip ci] by GitHub Actions (JOB $GITHUB_RUN_ID)
+        https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        git remote add github git@github.com:sphinx-doc/sphinx-doc-translations.git
+        git push github master
+```

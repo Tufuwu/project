@@ -1,0 +1,27 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: pip install tox
+    - name: Run tox
+      run: tox -e "${TOXENV:-py${{ matrix.python-version }}" --skip-missing-interpreters false
+      env:
+        TOXENV: ${{ matrix.toxenv }}
+```
+
+Note: The above configuration assumes that you have tox environments configured for each Python version specified in the matrix. If you need to run specific tox environments (like `flake8` or `docs`), you can add additional matrix variables or conditions to handle those cases.

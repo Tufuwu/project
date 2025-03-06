@@ -1,0 +1,85 @@
+```yaml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  release:
+    types: [published]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install ./dist/${{ env.PYTHON_PKG_NAME }}*linux_x86_64.whl
+        pytest -s python_transport/tests
+
+    - name: Run pre-install scripts
+      run: |
+        ./.ci/requirements.sh
+        ./.ci/style-check.sh
+        ./.ci/build-images.sh
+        ./.ci/service-tests.sh
+        ./.ci/fetch-artifacts.sh
+
+    - name: Run script
+      run: |
+        ./.ci/releases.sh
+        source releases.env
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' || github.ref == 'refs/heads/master'
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Deploy to GitHub Releases
+      if: github.event_name == 'release'
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        GH_RELEASE_DRAFT: ${{ env.GH_RELEASE_DRAFT }}
+        GH_RELEASE_NAME: ${{ env.GH_RELEASE_NAME }}
+        GH_RELEASE_BODY: ${{ env.GH_RELEASE_BODY }}
+        GH_RELEASE_CANDIDATE: ${{ env.GH_RELEASE_CANDIDATE }}
+      run: |
+        bash .ci/deploy-pypi.sh dist/${{ env.PYTHON_PKG_NAME }}*
+        bash .ci/deploy-docker.sh
+
+    - name: Deploy to PyPI and Docker
+      if: github.ref == 'refs/heads/master'
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      run: |
+        bash .ci/deploy-pypi.sh dist/${{ env.PYTHON_PKG_NAME }}*
+        bash .ci/deploy-docker.sh
+
+env:
+  global:
+    - PIPENV_VENV_IN_PROJECT=1
+    - PIPENV_IGNORE_VIRTUALENVS=1
+    - PYTHON_PKG_PATH=python_transport
+    - PYTHON_PKG_NAME=wirepas_gateway
+```

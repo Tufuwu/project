@@ -1,0 +1,75 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip setuptools
+        pip install -r requirements.txt
+        pip install flake8 coveralls bandit pylint execnet
+        gem install github-linguist
+        wget https://github.com/fossology/fossology/releases/download/3.8.1/FOSSology-3.8.0-debian9stretch.tar.gz
+        tar -xzf FOSSology-3.8.0-debian9stretch.tar.gz
+        sudo apt-get update -y
+        sudo apt-get -y install ./packages/fossology-common_3.8.1-1_amd64.deb ./packages/fossology-nomos_3.8.1-1_amd64.deb
+        sudo apt-get install cloc
+        eval "$(gimme stable)"
+
+    - name: Install package
+      run: ./setup.py install
+
+    - name: Prepare exec directory
+      run: mkdir exec
+
+    - name: Install scc
+      run: |
+        cd exec
+        go get -u github.com/boyter/scc/
+        cd ..
+
+    - name: Clone and setup scancode-toolkit
+      run: |
+        cd exec
+        git clone https://github.com/nexB/scancode-toolkit.git
+        cd scancode-toolkit
+        git checkout -b test_scancli 96069fd84066c97549d54f66bd2fe8c7813c6b52
+        ./scancode --help
+        cd ..
+
+    - name: Download jadolint
+      run: |
+        cd exec
+        wget https://github.com/crossminer/crossJadolint/releases/download/Pre-releasev2/jadolint.jar
+        cd ..
+
+    - name: Run flake8
+      run: flake8 . --exclude=exec
+
+    - name: Run tests
+      run: |
+        cd tests
+        coverage run --source=graal run_tests.py
+
+    - name: Coveralls
+      if: success()
+      uses: coveralls/coveralls-action@v2
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+```

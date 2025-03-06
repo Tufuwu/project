@@ -1,0 +1,31 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        job: [check_style, test]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Run build script
+      run: |
+        docker run \
+          -v $PWD:/ALF \
+          -w /ALF/ \
+          -e PYTHONPATH=/ALF \
+          -it horizonrobotics/alf:0.1.0 \
+          /ALF/.ci-cd/build.sh ${{ matrix.job }}
+```

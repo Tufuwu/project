@@ -1,0 +1,56 @@
+```yaml
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libproj-dev proj-bin proj-data libgeos-dev libblas-dev liblapack-dev libatlas-base-dev gfortran imagemagick
+        pip install --upgrade pip
+    - name: Download and install libproj
+      run: |
+        wget http://us.archive.ubuntu.com/ubuntu/pool/universe/p/proj/libproj9_4.9.2-2_amd64.deb 
+        sudo dpkg -i libproj9_4.9.2-2_amd64.deb 
+        wget http://us.archive.ubuntu.com/ubuntu/pool/universe/p/proj/libproj-dev_4.9.2-2_amd64.deb
+        sudo dpkg -i libproj-dev_4.9.2-2_amd64.deb
+    - name: Create configuration directory
+      run: mkdir -p $HOME/.CreateCloudMap
+    - name: Generate configuration file
+      run: sh ./tests/create_cfg.sh
+    - name: Build package
+      run: |
+        python setup.py sdist --format=gztar
+        ls dist/CreateCloudMap-*.tar.gz
+        export PKG=$(ls dist/CreateCloudMap-*.tar.gz)
+        pip install $PKG
+    - name: Run tests
+      run: |
+        create_map -h
+        create_map --version
+        create_map -m 23
+        identify xplanet/images/clouds_2048.jpg
+        rm xplanet/images/clouds_2048.jpg
+        pip install cython pyproj==1.9.6 ${PKG}[debug_cartopy]
+        pip uninstall matplotlib -y
+        pip install matplotlib 
+        pip install git+https://github.com/matplotlib/basemap
+        pip install ${PKG}[debug_pyresample]
+        create_map -d -m 23
+        identify xplanet/images/clouds_2048.jpg
+        rm xplanet/images/clouds_2048.jpg
+```

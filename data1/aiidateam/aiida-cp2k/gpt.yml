@@ -1,0 +1,58 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run pre-commit checks
+      run: |
+        pre-commit run --all-files
+
+    - name: Build Docker image
+      run: docker build -t aiida_cp2k_test .
+
+    - name: Run Docker container
+      run: |
+        export DOCKERID=$(docker run -d aiida_cp2k_test)
+        echo "Docker container ID: $DOCKERID" >> $GITHUB_ENV
+
+    - name: Wait for services
+      run: docker exec --tty $DOCKERID wait-for-services
+
+    - name: Run tests
+      run: |
+        docker exec -it --user aiida $DOCKERID /bin/bash -l -c 'cd /opt/aiida-cp2k/ && py.test --cov aiida_cp2k --cov-append .'
+
+    - name: Build documentation
+      run: |
+        docker exec -it --user aiida $DOCKERID /bin/bash -l -c 'cd /opt/aiida-cp2k/docs && make'
+
+    - name: Coveralls report
+      run: |
+        docker exec -e TRAVIS=$TRAVIS -e TRAVIS_JOB_ID=$TRAVIS_JOB_ID -e TRAVIS_BRANCH=$TRAVIS_BRANCH -it --user aiida $DOCKERID /bin/bash -l -c 'cd /opt/aiida-cp2k/ && coveralls'
+
+    - name: Get Docker logs
+      run: docker logs $DOCKERID
+      if: always()
+```

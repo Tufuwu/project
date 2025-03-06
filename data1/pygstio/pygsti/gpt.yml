@@ -1,0 +1,78 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -qq -y
+        sudo apt-get install -qq -y gfortran libblas-dev liblapack-dev openmpi-bin openmpi-common openssh-client openssh-server libopenmpi1.10 libopenmpi-dev libsuitesparse-dev
+        pip install "numpy>=1.16.0" cython .[testing]
+
+    - name: Run tests
+      env:
+        SKIP_DEAP: 1
+        NOSE_VERBOSE: 2
+        NOSE_WITH_TIMER: 1
+        NOSE_WITH_ID: 1
+        NOSE_REDNOSE: 1
+        NOSE_WITH_COVERAGE: 1
+        NOSE_COVER_PACKAGE: "pygsti"
+        NOSE_PROCESSES: -1
+        NOSE_NOPATH: 1
+        NOSE_PROCESS_TIMEOUT: 2400
+      run: |
+        python -Ic "import pygsti; print(pygsti.__version__); print(pygsti.__path__)"
+        nosetests test/unit/
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: Install flake8
+      run: pip install flake8
+    - name: Run PEP8 linting
+      run: python -m flake8 --statistics pygsti
+    - name: Run comprehensive linting
+      run: python -m flake8 --config=.flake8-critical --statistics pygsti
+
+  test-extra:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+        test-package: [algorithms, report, drivers, objects, tools, iotest, optimize, construction, extras, mpi]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: pip install "numpy>=1.16.0" cython .[testing]
+    - name: Run extra tests
+      env:
+        NOSE_WHERE: "test/test_packages/"
+        NOSE_NOPATH: ${{ matrix.test-package == 'mpi' ? '' : '1' }}
+      run: nosetests test/test_packages/${{ matrix.test-package }}
+```

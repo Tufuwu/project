@@ -1,0 +1,99 @@
+```yaml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+
+    services:
+      memcached:
+        image: memcached:latest
+        ports:
+          - 11211:11211
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: django_prometheus_1
+        ports:
+          - 3306:3306
+      postgres:
+        image: postgres:9.5
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgis
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          pip install tox-travis coverage coveralls codacy-coverage
+          apt-get update && apt-get install -y postgresql-9.5-postgis-2.4 gdal-bin
+
+      - name: Create MySQL database
+        run: mysql -uroot -proot -e 'create database django_prometheus_1;'
+
+      - name: Create PostgreSQL database and extension
+        run: |
+          psql -U postgres -c 'CREATE DATABASE postgis;'
+          psql -U postgres postgis -c 'CREATE EXTENSION IF NOT EXISTS postgis;'
+
+      - name: Run tests
+        run: tox
+
+      - name: Combine coverage reports
+        run: coverage combine .coverage django_prometheus/tests/end2end/.coverage
+
+      - name: Upload coverage to Coveralls
+        run: coveralls
+
+      - name: Generate coverage XML
+        run: coverage xml
+
+      - name: Upload coverage to Codacy
+        run: python-codacy-coverage -r coverage.xml
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Update version from git
+        run: python update_version_from_git.py
+
+      - name: Deploy to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          skip_existing: true
+```

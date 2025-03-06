@@ -1,0 +1,29 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  flake8:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: pip install flake8
+      - name: Run Flake8
+        run: flake8
+
+  dockerfile-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run Dockerfile lint
+        run: docker run -i hadolint/hadolint:v1.19.0-45-gef91156-alpine < Dockerfile
+```

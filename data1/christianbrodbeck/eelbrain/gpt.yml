@@ -1,0 +1,53 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+        python-version: [3.9, 3.10]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Xvfb on Linux
+      run: |
+        if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+          /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1400x900x24 -ac +extension GLX +render -noreset;
+        fi;
+
+    - name: Install Miniforge
+      run: |
+        wget -q https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-${{ matrix.os }}-x86_64.sh -O miniconda.sh
+        bash miniconda.sh -b -p $HOME/miniconda
+        source "$HOME/miniconda/etc/profile.d/conda.sh"
+        hash -r
+
+    - name: Create and update Conda environment
+      run: |
+        mamba create -y -q -n condaenv python=${{ matrix.python-version }}
+        mamba env update -q -n condaenv --file env-dev.yml --prune
+        conda activate condaenv
+
+    - name: Install MNE data (if needed)
+      run: |
+        if [ "${{ matrix.os }}" == "macos-latest" ] && [ "${{ matrix.python-version }}" == "3.9" ]; then
+          python -c "import mne; mne.datasets.testing.data_path()";
+        fi;
+
+    - name: Install dependencies
+      run: |
+        python -m pip install -e .
+
+    - name: Run tests
+      run: |
+        if [ "${{ matrix.os }}" == "macos-latest" ]; then
+          make testw;
+        else
+          make test;
+        fi;
+```

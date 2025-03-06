@@ -1,0 +1,38 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Docker
+      run: sudo apt-get update && sudo apt-get install -y docker.io
+
+    - name: Download installation scripts
+      run: |
+        wget https://raw.githubusercontent.com/tue-robotics/tue-env/master/ci/install-package.sh
+        wget https://raw.githubusercontent.com/tue-robotics/tue-env/master/ci/build-package.sh
+        wget https://raw.githubusercontent.com/tue-robotics/tue-env/master/ci/test-package.sh
+
+    - name: Set package name
+      run: echo "PACKAGE=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
+
+    - name: Install package
+      run: bash install-package.sh --package=$PACKAGE --branch=${GITHUB_REF#refs/heads/} --commit=${GITHUB_SHA} --pullrequest=${{ github.event.pull_request.number }}
+
+    - name: Build package
+      run: bash build-package.sh --package=$PACKAGE
+
+    - name: Test package
+      run: bash test-package.sh --package=$PACKAGE
+```

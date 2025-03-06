@@ -1,0 +1,54 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
+
+    - name: Update apt-get repository sources
+      run: sudo apt-get update -qq
+
+    - name: Install Blender
+      run: sudo apt-get install blender
+
+    - name: Create temp directory
+      run: mkdir tmp && cd tmp
+
+    - name: Download Blender
+      run: wget https://mirrors.ocf.berkeley.edu/blender/release/Blender3.2/blender-3.2.0-linux-x64.tar.xz
+
+    - name: Extract Blender archive
+      run: tar -xf blender-3.2.0-linux-x64.tar.xz
+
+    - name: Rename extracted folder
+      run: mv blender-3.2.0-linux-x64 blender
+
+    - name: Remove archive
+      run: rm blender-3.2.0-linux-x64
+
+    - name: Go back to root directory
+      run: cd ..
+
+    - name: Install addon using setup.py
+      run: python ${PWD}/setup.py -t ${PWD}/tmp/blender/3.2/scripts/addons/phobos -b ${PWD}/tmp/blender
+
+    - name: List addon directory
+      run: ls ${PWD}/tmp/blender/3.2/scripts/addons/phobos
+
+    - name: Run test runner
+      run: python test/testrunner.py ./tmp/blender/blender
+```

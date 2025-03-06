@@ -1,0 +1,48 @@
+```yaml
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: my_db
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pycodestyle codecov
+        python setup.py install
+    - name: Create database
+      run: mysql -uroot -proot -e 'CREATE DATABASE IF NOT EXISTS my_db;'
+    - name: Run pycodestyle
+      run: pycodestyle --exclude=venv --ignore=E501 .
+    - name: Run tests
+      run: coverage run --source=. -m pytest
+    - name: Generate coverage report
+      run: coverage report -m
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v2
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+```

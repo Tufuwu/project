@@ -1,0 +1,57 @@
+```yaml
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged --name dind
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Docker Compose
+      run: |
+        sudo curl -L "https://github.com/docker/compose/releases/download/1.11.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
+
+    - name: Install dependencies
+      run: |
+        pip install coveralls
+
+    - name: Build Docker images
+      run: docker-compose build
+
+    - name: Start Docker containers
+      run: docker-compose up -d
+      continue-on-error: true
+
+    - name: Run tests
+      run: |
+        docker-compose exec roadwarrior /bin/sh -c "cd /strongMan; ./runtests.py"
+        docker-compose exec roadwarrior /bin/sh -c "cd /strongMan; python manage.py test strongMan.tests.integration_tests --settings=strongMan.settings.local;"
+
+    - name: Collect coverage
+      run: |
+        docker-compose exec roadwarrior cat /strongMan/.coverage > .coverage
+        sed -i "s/\"\/strongMan/\"$(echo $GITHUB_WORKSPACE | sed 's/\//\\\//g')/g" .coverage
+
+    - name: Upload coverage to Coveralls
+      run: coveralls
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+```

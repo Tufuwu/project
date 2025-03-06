@@ -1,0 +1,82 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Miniconda
+      run: |
+        if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          curl https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -o miniconda.sh;
+        else
+          curl https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o miniconda.sh;
+        fi
+        bash miniconda.sh -b -p $HOME/miniconda
+        source $HOME/miniconda/bin/activate
+        conda config --set always_yes yes --set changeps1 no
+        conda update -q --all
+        conda config --add channels defaults
+        conda install conda-build pip anaconda-client
+        conda info
+
+    - name: Build on Linux
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        mkdir -m 0777 -p $HOME/miniconda/conda-bld/linux-64
+        ./conda_build_in_docker.sh `pwd` $HOME/miniconda/conda-bld/linux-64 ${MY_CONDA_CHANNEL}
+
+    - name: Build on macOS
+      if: matrix.os == 'macos-latest'
+      run: |
+        [[ -e /opt/MacOSX10.9.sdk ]] || sudo ln -s $(xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk /opt/MacOSX10.9.sdk
+        printf "CONDA_BUILD_SYSROOT:
+          - $(xcode-select -p)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+        " >> conda-recipe/conda_build_config.yaml
+        conda build -c ${MY_CONDA_CHANNEL} conda-recipe
+
+    - name: List build artifacts
+      run: ls $HOME/miniconda/conda-bld/${{ matrix.os }}-64
+
+    - name: Upload to Anaconda Cloud
+      if: github.event_name == 'push' && contains(github.ref, 'tags/')
+      run: |
+        anaconda -t ${{ secrets.CONDA_TOKEN }} upload --force $HOME/miniconda/conda-bld/${{ matrix.os }}-64/*.tar.bz2
+
+    - name: Setup PyPI credentials
+      if: github.event_name == 'push' && contains(github.ref, 'tags/')
+      run: |
+        echo "[distutils]" > ~/.pypirc
+        echo "index-servers = mypypi" >> ~/.pypirc
+        echo "[mypypi]" >> ~/.pypirc
+        echo "repository=${{ secrets.PYPI_URL }}" >> ~/.pypirc
+        echo "username=${{ secrets.PYPI_USER }}" >> ~/.pypirc
+        echo "password=${{ secrets.PYPI_PASSWORD }}" >> ~/.pypirc
+
+    - name: Install Twine
+      if: github.event_name == 'push' && contains(github.ref, 'tags/')
+      run: pip install twine
+
+    - name: Upload to PyPI
+      if: github.event_name == 'push' && contains(github.ref, 'tags/')
+      run: |
+        if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+          twine upload -r mypypi --skip-existing $HOME/miniconda/conda-bld/linux-64/pcaspy-*.tar.gz
+          twine upload -r mypypi --skip-existing $HOME/miniconda/conda-bld/linux-64/pcaspy-*.egg
+        fi
+        if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          twine upload -r mypypi --skip-existing $HOME/miniconda/conda-bld/macos-64/pcaspy-*.whl
+        fi
+```

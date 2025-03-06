@@ -1,0 +1,59 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+        toxenv: [py39-aiohttp-3, py39-aiohttp-master, py310-aiohttp-3, py310-aiohttp-master, py311-aiohttp-3, py311-aiohttp-master]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox codecov
+    - name: Run tox
+      run: tox -e ${{ matrix.toxenv }}
+    - name: Upload coverage
+      if: matrix.toxenv != 'py35-aiohttp-master' && matrix.toxenv != 'py36-aiohttp-master'
+      run: codecov
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push' && contains(github.ref, 'tags')
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install setuptools wheel twine
+    - name: Build and publish
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        python setup.py sdist bdist_wheel
+        twine upload dist/*
+```

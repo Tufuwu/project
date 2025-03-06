@@ -1,0 +1,39 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: [3.9, 3.10, 3.11]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip codecov
+        if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          pip install 'pip>=19.2,<20.2'
+          brew update
+          brew install bash fish
+        fi
+    - name: Install package
+      run: |
+        python setup.py bdist_rpm
+        make install
+    - name: Run tests
+      run: make test
+    - name: Upload coverage to Codecov
+      if: success()
+      run: bash <(curl -s https://codecov.io/bash)
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+```

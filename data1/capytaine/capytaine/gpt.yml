@@ -1,0 +1,38 @@
+```yaml
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      CONDA_PY: 3.9
+      CONDA_NPY: 1.19
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Miniconda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-activate-base: false
+        python-version: ${{ env.CONDA_PY }}
+        channels: defaults
+
+    - name: Install dependencies
+      run: |
+        conda install -q numpy=${{ env.CONDA_NPY }} conda-build
+        conda config --set always_yes yes
+        conda config --set anaconda_upload no
+
+    - name: Build package
+      run: conda build --python=${{ env.CONDA_PY }} --numpy=${{ env.CONDA_NPY }} .
+
+    - name: Check Python version
+      run: python --version
+
+    - name: Check NumPy version
+      run: python -c 'import numpy; print(numpy.__version__)'
+```

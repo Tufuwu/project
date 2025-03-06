@@ -1,0 +1,71 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+        mode: [flake8, flake8-strict, docs]
+        django-version: [dj22, dj30, dj31, dj32, djdev]
+        include:
+          - python-version: 3.9
+            mode: flake8-docs
+          - python-version: 3.9
+            django-version: djdev
+          - python-version: 3.9
+            mode: flake8-strict
+        exclude:
+          - python-version: 3.9
+            mode: flake8
+          - python-version: 3.9
+            mode: flake8-strict
+          - python-version: 3.9
+            mode: flake8-docs
+          - python-version: 3.9
+            django-version: dj30
+          - python-version: 3.9
+            django-version: dj31
+          - python-version: 3.9
+            django-version: dj32
+          - python-version: 3.9
+            django-version: djdev
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 762E3157
+          sudo apt-get update
+          sudo apt-get install -y binutils libproj-dev gdal-bin libsqlite3-mod-spatialite
+          pip install -U pip wheel virtualenv tox coveralls
+
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Run tests
+        run: |
+          coverage erase
+          tox -e py${{ matrix.python-version }}-${{ matrix.djangoproject-version }}${{ matrix.mode }}
+
+      - name: Coveralls
+        if: success()
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+```

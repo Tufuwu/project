@@ -1,0 +1,54 @@
+```yaml
+name: crippled-filesystems
+
+on: [pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set up system
+      shell: bash
+      run: |
+        bash <(wget -q -O- http://neuro.debian.net/_files/neurodebian-travis.sh)
+        sudo apt-get update -qq
+        sudo apt-get install -y eatmydata git-annex-standalone dosfstools
+        sudo dd if=/dev/zero of=/crippledfs.img count=500 bs=1M
+        sudo mkfs.vfat /crippledfs.img
+        sudo mkdir /crippledfs
+        sudo mount -o "uid=$(id -u),gid=$(id -g)" /crippledfs.img /crippledfs
+
+    - name: Set up environment
+      run: |
+        git config --global user.email "test@github.land"
+        git config --global user.name "GitHub Almighty"
+
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements-devel.txt
+
+    - name: Installation
+      run: |
+        pip install .
+
+    - name: Run tests
+      env:
+        TMPDIR: /crippledfs
+      run: |
+        mkdir -p __testhome__
+        cd __testhome__
+        datalad wtf
+        echo "== mount >>"
+        mount
+        echo "<< mount =="
+        python -m nose -s -v --with-doctest --with-coverage --cover-package datalad_neuroimaging datalad_neuroimaging
+```

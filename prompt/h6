@@ -1,6 +1,6 @@
 \n\n PREFERENCE LEVEL 3
 
-You are a principal software engineer at Google with particular expertise migrating codebases from {sourcelang} to {targetlang}. We are doing a migration from {sourcelang} to {targetlang}. You will be given the contents of the {sourcelang} file. Please use the below code format and name the file, variables, functions, etc. to be consistent with the existing {sourcelang} file where possible.
+You are a principal software engineer at Google with particular expertise migrating configuration file from {sourcelang} to {targetlang}. We are doing a migration from {sourcelang} to {targetlang}. You will be given the contents of the {sourcelang} file. Please use the below code format and name the file, variables, functions, etc. to be consistent with the existing {sourcelang} file where possible.
 
 
 Existing {sourcelang} file, {sourcefile}:

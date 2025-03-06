@@ -1,0 +1,76 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+        django-version: [2.2, 3.0, 3.1, 3.2]
+        include:
+          - python-version: 3.9
+            django-version: master
+            tox-env: lint
+          - python-version: 3.9
+            django-version: master
+            tox-env: docs
+          - python-version: 3.9
+            django-version: master
+            tox-env: functional
+          - python-version: 3.9
+            django-version: master
+            tox-env: functional-mongodb
+        exclude:
+          - python-version: 3.9
+            django-version: 2.2
+            tox-env: functional-mongodb
+          - python-version: 3.9
+            django-version: 3.0
+            tox-env: functional-mongodb
+          - python-version: 3.9
+            django-version: master
+            tox-env: functional-mongodb
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        pip install virtualenv tox
+    - name: Setup databases
+      run: |
+        mysql -e 'CREATE DATABASE test;'
+        psql -c 'CREATE DATABASE test;' -U postgres
+      if: matrix.tox-env == 'functional' || matrix.tox-env == 'functional-mongodb'
+    - name: Run tox
+      env:
+        TOX_ENV: py${{ matrix.python-version }}-django${{ matrix.djangoproject-version }}
+      run: tox -e $TOX_ENV
+    - name: Run linting
+      if: matrix.tox-env == 'lint'
+      run: tox -e $TOX_ENV
+    - name: Generate documentation
+      if: matrix.tox-env == 'docs'
+      run: tox -e $TOX_ENV
+    - name: Run functional tests
+      if: matrix.tox-env == 'functional'
+      run: |
+        tox -e $TOX_ENV
+        DB_ENGINE=django.db.backends.mysql DB_USER=travis DB_HOST=localhost DB_NAME=test tox -e $TOX_ENV
+        DB_ENGINE=django.db.backends.postgresql DB_USER=postgres DB_HOST=localhost DB_NAME=test tox -e $TOX_ENV
+        CONNECTOR=dbbackup.db.postgresql.PgDumpBinaryConnector DB_ENGINE=django.db.backends.postgresql DB_USER=postgres DB_HOST=localhost DB_NAME=test tox -e $TOX_ENV
+    - name: Run MongoDB functional tests
+      if: matrix.tox-env == 'functional-mongodb'
+      run: DB_ENGINE=djongo DB_NAME=test tox -e $TOX_ENV
+    - name: Publish coverage report
+      if: matrix.tox-env != 'lint' && matrix.tox-env != 'docs'
+      run: |
+        tox -e $TOX_ENV -- pip install coveralls
+        tox -e $TOX_ENV -- coveralls $COVERALLS_OPTION
+```

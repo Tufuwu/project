@@ -1,0 +1,82 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+
+    env:
+      JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
+      HADOOP_VERSION: 2.7
+      SPARK_DIRECTORY: ../
+      SPARK_HOME: ../spark/
+      ARROW_PRE_0_15_IPC_FORMAT: 1
+      SPARK_LOCAL_IP: 127.0.0.1
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        pip install -r requirements.txt
+        pip install -r requirements_test.txt
+
+    - name: Install Spark
+      run: |
+        if [ "${{ matrix.python-version }}" = "3.9" ]; then
+          export SPARK_VERSION=3.0.1
+        else
+          export SPARK_VERSION=2.4.7
+        fi
+        make install-spark-ci
+
+    - name: Install package
+      run: |
+        python setup.py sdist bdist_wheel
+        twine check dist/*
+        make install
+
+    - name: Run tests
+      run: |
+        pytest -m "not spark_test" tests/
+        pytest -m spark_test tests/
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        pip install -r requirements.txt
+
+    - name: Lint code
+      run: make lint
+```

@@ -1,0 +1,39 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        django: [2.2, 3.0, master]
+        python-version: [3.9, 3.10, 3.11]
+        include:
+          - django: 2.2
+            python-version: 3.8
+          - django: master
+            python-version: 3.8
+          - python-version: 3.7
+            toxenv: docs
+          - python-version: 3.7
+            toxenv: quality
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox tox-venv
+    - name: Run tox
+      run: tox
+      env:
+        DJANGO: ${{ matrix.djangoproject }}
+        TOXENV: ${{ matrix.toxenv }}
+      if: matrix.toxenv != ''
+```

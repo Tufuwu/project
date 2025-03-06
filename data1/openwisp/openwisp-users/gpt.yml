@@ -1,0 +1,48 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+        django-version: ["django~=2.2", "django~=3.0", "django~=3.1"]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements-test.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Install dependencies
+      run: |
+        pip install -U -r requirements-test.txt
+        npm install -g jshint
+        pip install ${{ matrix.djangoproject }}
+        pip install -e .[rest]
+    - name: Run QA checks
+      run: ./run-qa-checks
+    - name: Run tests
+      run: |
+        coverage run --source=openwisp_users runtests.py
+        SAMPLE_APP=1 coverage run --append --source=openwisp_users runtests.py
+        NO_SOCIAL_APP=1 ./tests/manage.py test testapp.tests.test_admin.TestUsersAdmin --parallel
+    - name: Publish coverage
+      if: success()
+      uses: coveralls/coveralls-action@v2
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+```

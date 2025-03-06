@@ -1,0 +1,49 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - stable
+  pull_request:
+    branches:
+      - main
+      - stable
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install conda
+        conda config --set always_yes yes
+        conda config --add channels conda-forge
+        conda update -q conda
+        sed -i -E "s/(python=)(.*)/\1${{ matrix.python-version }}/" ./environment.yml
+        conda env create -f environment.yml
+        source activate mixsea
+
+    - name: Install package
+      run: python setup.py install
+
+    - name: Run tests
+      run: |
+        python --version
+        pytest
+        black --check mixsea/
+```

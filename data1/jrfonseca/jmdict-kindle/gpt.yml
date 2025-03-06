@@ -1,0 +1,52 @@
+```yaml
+name: CI/CD
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Cache directories
+      uses: actions/cache@v2
+      with:
+        path: cache
+        key: ${{ runner.os }}-cache
+        restore-keys: |
+          ${{ runner.os }}-cache
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -qq -y --no-install-recommends python3-cairo python3-pil python3-htmlmin p7zip
+
+    - name: Verify Python version
+      run: |
+        python3 --version
+
+    - name: Build project
+      run: make
+
+    - name: Create archive
+      run: 7zr a dictionaries-"${GITHUB_SHA}".7z jmdict.mobi jmnedict.mobi combined.mobi
+
+    - name: Deploy to GitHub Releases
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Release ${{ github.ref }}
+        files: dictionaries-*.7z
+        token: ${{ secrets.GITHUB_TOKEN }}
+      if: github.event_name == 'push' && github.ref_type == 'tag'
+```

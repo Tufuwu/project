@@ -1,0 +1,62 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+        database: [mysql, postgresql]
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test_atomdb
+        ports:
+          - 3306:3306
+      postgresql:
+        image: postgres:12
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_atomdb
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -U atom motor aiomysql aiopg 'sqlalchemy<1.4' codecov pytest pytest-coverage pytest-asyncio faker mypy isort black
+
+    - name: Install package
+      run: python setup.py develop
+
+    - name: Run tests
+      env:
+        DATABASE_URL: ${{ matrix.database == 'mysql' ? 'mysql://root:@localhost:3306/test_atomdb' : 'postgres://postgres:@localhost:5432/test_atomdb' }}
+      run: |
+        pytest -v tests --cov atomdb --cov-report xml
+        mypy atomdb --ignore-missing-imports
+        black atomdb --check --diff
+        isort atomdb --check --diff
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v2
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./coverage.xml
+```

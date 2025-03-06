@@ -1,0 +1,35 @@
+```yaml
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ros_distro: [kinetic, melodic, noetic]
+        python_version: [3.9, 3.10]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python_version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python_version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker.io
+        sudo systemctl start docker
+        sudo systemctl enable docker
+
+    - name: Build Docker image
+      run: docker build -t rospy_message_converter_${{ matrix.ros_distro }} -f Dockerfile-${{ matrix.ros_distro }} .
+
+    - name: Run tests
+      run: docker run rospy_message_converter_${{ matrix.ros_distro }} /bin/bash -c "source devel/setup.bash && CTEST_OUTPUT_ON_FAILURE=1 catkin_make test && roscd rospy_message_converter && python${{ matrix.python_version }} src/rospy_message_converter/json_message_converter.py && python${{ matrix.python_version }} src/rospy_message_converter/message_converter.py"
+```

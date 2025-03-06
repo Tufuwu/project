@@ -1,0 +1,88 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        compiler: [gcc, clang]
+        include:
+          - os: ubuntu-latest
+            compiler: gcc
+            gn_args: 'gcc_cc="gcc-6" gcc_cxx="g++-6" is_clang=false'
+            packages: g++-6
+          - os: ubuntu-latest
+            compiler: gcc
+            gn_args: 'gcc_cc="gcc-6" gcc_cxx="g++-6" is_clang=false is_debug=false'
+            packages: g++-6
+          - os: ubuntu-latest
+            compiler: gcc
+            gn_args: 'gcc_cc="gcc-6" gcc_cxx="g++-6" is_clang=false is_official_build=true'
+            packages: g++-6
+          - os: ubuntu-latest
+            compiler: clang
+            gn_args: 'clang_cc="clang-3.8" clang_cxx="clang++-3.8" is_clang=true'
+            packages: clang-3.8
+          - os: ubuntu-latest
+            compiler: clang
+            gn_args: 'clang_cc="clang-3.8" clang_cxx="clang++-3.8" is_clang=true is_debug=false'
+            packages: clang-3.8
+          - os: ubuntu-latest
+            compiler: clang
+            gn_args: 'clang_cc="clang-3.8" clang_cxx="clang++-3.8" is_clang=true is_official_build=true'
+            packages: clang-3.8
+          - os: macos-latest
+            compiler: clang
+            gn_args: 'is_clang=true is_official_build=true'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            sudo apt-get update
+            sudo apt-get install -y ${{ matrix.packages }}
+          fi
+
+      - name: Download and install Ninja
+        run: |
+          wget --no-check-certificate --quiet -O ninja.zip ${{ matrix.ninja_zip }}
+          unzip ninja.zip
+          chmod +x ninja
+
+      - name: Download and install GN
+        run: |
+          wget --no-check-certificate --quiet -O gn.tgz ${{ matrix.gn_url }}
+          tar xvf gn.tgz
+          chmod +x gn
+
+      - name: Run gn_helpers unittests
+        run: python3 gn_helpers_unittest.py
+
+      - name: Setup test project
+        run: |
+          git clone --branch=testsrc --depth=1 https://github.com/timniederhausen/gn-build.git testsrc
+          mkdir testsrc/build
+          mv config testsrc/build/
+          mv toolchain testsrc/build/
+          echo 'script_executable = "python3"' >> testsrc/.gn
+
+      - name: Generate build files
+        run: ./gn gen out --args="${{ matrix.gn_args }}" --root=testsrc
+
+      - name: Build the project
+        run: ./ninja -C out
+
+      - name: Run the built binary
+        run: cd out && ./hello
+```

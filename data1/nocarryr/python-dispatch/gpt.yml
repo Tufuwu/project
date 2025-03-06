@@ -1,0 +1,66 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+        aio_available: [false, true]
+        include:
+          - python-version: 3.9
+            aio_available: false
+            coveragerc: ".coveragerc-py39"
+          - python-version: 3.10
+            aio_available: false
+            coveragerc: ".coveragerc-py310"
+          - python-version: 3.11
+            aio_available: true
+            coveragerc: ".coveragerc"
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        pip install -U pytest pytest-cov coveralls
+        if [ "${{ matrix.aio_available }}" = "true" ]; then pip install -U pytest-asyncio; fi
+        pip install -e .
+    - name: Run tests
+      run: |
+        pytest --cov-config ${{ matrix.coveragerc }} --cov=pydispatch
+    - name: Upload coverage to Coveralls
+      if: success()
+      run: coveralls --rcfile="${{ matrix.coveragerc }}"
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.python-version == 3.9
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        pip install -U twine
+    - name: Build and publish
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      run: |
+        python setup.py sdist bdist_wheel
+        twine upload dist/*
+```
