@@ -1,6 +1,7 @@
 import yaml
 import ast
 import json
+from itertools import chain
 
 # 解析 YAML 为 Python 对象
 def parse_yaml(yaml_content):
@@ -24,48 +25,43 @@ def obj_to_ast(obj):
     else:
         raise TypeError(f"Unsupported type: {type(obj)}")
 
-# 读取 YAML 文件
-def read_yaml_file(file_path):
-    with open(file_path, 'r', encoding='utf-8') as f:
-        return f.read()
+def pad_sequence(
+    sequence,
+    n,
+    pad_left=False,
+    pad_right=False,
+    left_pad_symbol=None,
+    right_pad_symbol=None,
+):
+    sequence = iter(sequence)
+    if pad_left:
+        sequence = chain((left_pad_symbol,) * (n - 1), sequence)
+    if pad_right:
+        sequence = chain(sequence, (right_pad_symbol,) * (n - 1))
+    return sequence
 
-# 主函数
-def main():
-    yaml_content = """
-    name: CI
-    on: [push, pull_request]
-
-    jobs:
-      build:
-        runs-on: ubuntu-latest
-
-        strategy:
-          matrix:
-            python-version: [3.9, 3.10]
-
-        steps:
-        - uses: actions/checkout@v2
-        - name: Set up Python ${{ matrix.python-version }}
-          uses: actions/setup-python@v2
-          with:
-            python-version: ${{ matrix.python-version }}
-        - name: Install dependencies
-          run: |
-            python -m pip install --upgrade pip
-            pip install pipenv
-            pipenv install --dev --system
-        - name: Lint with flake8
-          run: |
-            flake8 .
-            flake8 . --exit-zero --select=C,E,F,W
-        - name: Test with pytest
-          run: pytest
-    """
+def ngrams(
+    sequence,
+    n,
+    pad_left=False,
+    pad_right=False,
+    left_pad_symbol=None,
+    right_pad_symbol=None,
+):
     
-    yaml_obj = parse_yaml(yaml_content)
-    ast_tree = obj_to_ast(yaml_obj)
-    
-    print(ast.dump(ast_tree, indent=2))
+    sequence = pad_sequence(sequence, n, pad_left, pad_right, left_pad_symbol, right_pad_symbol)
 
-if __name__ == "__main__":
-    main()
+    history = []
+    while n > 1:
+        # PEP 479, prevent RuntimeError from being raised when StopIteration bubbles out of generator
+        try:
+            next_item = next(sequence)
+        except StopIteration:
+            # no more data, terminate the generator
+            return
+        history.append(next_item)
+        n -= 1
+    for item in sequence:
+        history.append(item)
+        yield tuple(history)
+        del history[0]
