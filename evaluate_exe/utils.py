@@ -65,3 +65,21 @@ def ngrams(
         history.append(item)
         yield tuple(history)
         del history[0]
+
+def remove_comments_and_docstrings(source):
+    result = []
+    for i in source:
+        h = i.find('#')
+        if h == -1:
+            result.append(i)
+        else:
+            if h ==0:
+                continue
+            else:
+                for k in range(0,h):
+                    if i[k] != '':
+                        temp = i[:h]
+                        temp += '\n'
+                        result.append(temp)
+                        break
+    return result

@@ -1,7 +1,7 @@
 import math
 from collections import Counter
 
-from .utils import ngrams
+from utils import ngrams
 
 def sentence_bleu(
     references,
@@ -10,10 +10,10 @@ def sentence_bleu(
     smoothing_function=None,
     auto_reweigh=False,
 ):
-    return corpus_bleu([references], [hypothesis], weights, smoothing_function, auto_reweigh)
+    return corpus_bleu_1(references, hypothesis, weights, smoothing_function, auto_reweigh)
 
 
-def corpus_bleu(
+def corpus_bleu_1(
     references,
     hypotheses,
     weights=(0.25, 0.25, 0.25, 0.25),

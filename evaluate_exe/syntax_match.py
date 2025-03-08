@@ -1,30 +1,26 @@
-from tree_sitter import Parser
-import tree_sitter_yaml
-from .parser import dfg_yaml,remove_comments_and_docstrings
+from tree_sitter import Language, Parser
 
+Language.build_library("build/my-languages.so", ["tree-sitter-yaml"])
+YAML_LANGUAGE = Language("build/my-languages.so", "yaml")
 
 def calc_syntax_match(references, candidate):
-    return corpus_syntax_match([references], [candidate])
+    return corpus_syntax_match(references, candidate)
 
 
-def corpus_syntax_match(references, candidates):
+def corpus_syntax_match(reference, candidate):
 
+    #with open(".github/workflows/ci.yml", "r") as f:
+    #    yaml_code = f.read()
 
     parser = Parser()
-    parser.language = tree_sitter_yaml
+    parser.set_language(YAML_LANGUAGE)
+    #tree = parser.parse(yaml_code.encode("utf8"))
     match_count = 0
     match_count_candidate_to_reference = 0
     total_count = 0
 
 
-    try:
-        candidate = remove_comments_and_docstrings(candidate)
-    except Exception:
-        pass
-    try:
-        reference = remove_comments_and_docstrings(reference)
-    except Exception:
-        pass
+
 
     candidate_tree = parser.parse(bytes(candidate, "utf8")).root_node
 
