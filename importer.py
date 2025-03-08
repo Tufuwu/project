@@ -16,21 +16,6 @@ parent_dir = 'D:/vscode/3/project/data1'
 fo =file_operate()
 gh = get_history()
 
-# 确保Git仓库初始化
-'''
-
-# 检查当前是否为Git仓库，如果没有则初始化
-if not os.path.isdir(".git"):
-    subprocess.run(["git", "init"], check=True)
-    print("Initialized a new git repository.")
-
-check_remote = subprocess.run(["git", "remote"], capture_output=True, text=True)
-if "origin" in check_remote.stdout:
-    print("Remote 'origin' already exists. Removing it...")
-    subprocess.run(["git", "remote", "remove", "origin"], check=True)
-# 设置远程仓库
-subprocess.run(["git", "remote", "add", "origin", github_repo_url], check=True)
-'''
 # 读取CSV文件，获取文件路径
 count = 705
 
