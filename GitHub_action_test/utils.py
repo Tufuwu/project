@@ -7,7 +7,7 @@ def delet_file(local_directory):
     for item in os.listdir(local_directory):
         item_path = os.path.join(local_directory, item)
 
-        if item == ".git":
+        if item == ".git" or ".github":
             continue  # 保留 .git 目录
 
         if os.path.isdir(item_path):
@@ -21,6 +21,9 @@ def delet_file(local_directory):
 
 def write_repo_in(repo_path,local_directory):
     for item in os.listdir(repo_path):
+        # 如果是 .github，直接跳过
+        if item == ".github":
+            continue
         item_path = os.path.join(repo_path, item)
         destination_item_path = os.path.join(local_directory, item)
 
@@ -46,24 +49,26 @@ def upload_repo_test(repo_full_name,base_download_path,local_directory):
     file_path = f"D:/vscode/3/project/data1/{repo_full_name}"
     repo_path = os.path.join(base_download_path, repo_full_name)
     delet_file(local_directory)
-    write_repo_in(repo_path)
-    workflow_path = os.path.join(repo_path,'.github/workflows')
+    
+    write_repo_in(repo_path,local_directory)
 
+    workflow_path = f"D:/vscode/1/experiment_running/.github/workflows"
+    test_file_path = 'D:/vscode/1/experiment_running/.github/workflows/test.yml'
     delet_file(workflow_path)
-    action_file_path = os.path.join(file_path,'action.yml')
-    write_file_in(action_file_path,workflow_path)
+    action_file_path = f"D:/vscode/3/project/data1/{repo_full_name}/action.yml"
+    write_file_in(action_file_path,test_file_path)
     push_repositories(f'{repo_full_name}{count}')
     count +=1
 
     delet_file(workflow_path)
-    importer_file_path = os.path.join(file_path,'importer.yml')
-    write_file_in(importer_file_path,workflow_path)
+    importer_file_path =f"D:/vscode/3/project/data1/{repo_full_name}/importer.yml"
+    write_file_in(importer_file_path,test_file_path)
     push_repositories(f'{repo_full_name}{count}')
     count +=1
 
     delet_file(workflow_path)
-    gpt_file_path = os.path.join(file_path,'gpt.yml')
-    write_file_in(gpt_file_path,workflow_path)
+    gpt_file_path = f"D:/vscode/3/project/data1/{repo_full_name}/gpt.yml"
+    write_file_in(gpt_file_path,test_file_path)
     push_repositories(f'{repo_full_name}{count}')
 
 def inital_repo(local_directory,github_repo_url):

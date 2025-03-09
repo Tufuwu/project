@@ -19,7 +19,7 @@ for index, row in df.iterrows():
     print(f"正在克隆仓库: {api_url} 到 {output_path}")
     result = subprocess.run(["git", "clone", api_url, output_path])
     if result.returncode == 0:
-        csv_repositiries = 'D:/vscode/3/project/python-csv/repositiries.csv'
+        csv_repositiries = 'D:/vscode/3/project/python-csv/123.csv'
         fo.write_file_in(csv_repositiries,new_data)
 
 print("所有仓库克隆完成！")
