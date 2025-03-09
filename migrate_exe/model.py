@@ -1,7 +1,6 @@
 from openai import OpenAI
-from utils import prompt_constructor
 import os
-import pandas as pd
+
 
 
 def create_model(model_tag,api_token,prompt):
@@ -20,8 +19,6 @@ def create_model(model_tag,api_token,prompt):
     return completion.choices[0].message
 
 
-
-
 def read_file(file_path):
     try:
         with open(file_path,"r",encoding= 'utf-8') as file:
@@ -33,10 +30,6 @@ def read_file(file_path):
         print(f"An error occurred: {e}")
 
 
-
-
-
-
 def write_file_in(file_name,repo_full_name,reponse):
 
     file_name = f"gpt.yml"
@@ -46,3 +39,9 @@ def write_file_in(file_name,repo_full_name,reponse):
         f.write(reponse)
     print(f"Saved diff to {output_dir}")
     
+def prompt_constructor(*args):
+    prompt = ""
+    for arg in args:
+        with open(os.path.abspath(f'prompt/{arg}'), 'r') as file:
+            prompt += file.read().strip()
+    return prompt

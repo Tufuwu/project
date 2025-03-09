@@ -1,7 +1,28 @@
-from tree_sitter import Language, Parser
+import yaml
 
-Language.build_library("build/my-languages.so", ["tree-sitter-yaml"])
-YAML_LANGUAGE = Language("build/my-languages.so", "yaml")
+class TreeNode:
+    def __init__(self, name, children=None):
+        self.name = name
+        self.children = children if children else []
+
+    def __str__(self):
+        """将子树转换成 S-表达式"""
+        if not self.children:
+            return self.name
+        return f"({self.name} {' '.join(str(child) for child in self.children)})"
+    
+def yaml_to_tree(data, name="root"):
+    """递归解析 YAML 数据，构建语法树"""
+    if isinstance(data, dict):
+        children = [yaml_to_tree(v, k) for k, v in data.items()]
+        return TreeNode(name, children)
+    elif isinstance(data, list):
+        children = [yaml_to_tree(v, f"list_item_{i}") for i, v in enumerate(data)]
+        return TreeNode(name, children)
+    else:
+        return TreeNode(f"{name}: {str(data)}")
+    
+
 
 def calc_syntax_match(references, candidate):
     return corpus_syntax_match(references, candidate)
@@ -12,8 +33,7 @@ def corpus_syntax_match(reference, candidate):
     #with open(".github/workflows/ci.yml", "r") as f:
     #    yaml_code = f.read()
 
-    parser = Parser()
-    parser.set_language(YAML_LANGUAGE)
+
     #tree = parser.parse(yaml_code.encode("utf8"))
     match_count = 0
     match_count_candidate_to_reference = 0
@@ -22,22 +42,21 @@ def corpus_syntax_match(reference, candidate):
 
 
 
-    candidate_tree = parser.parse(bytes(candidate, "utf8")).root_node
+    candidate_tree = yaml_to_tree(candidate)
 
-    reference_tree = parser.parse(bytes(reference, "utf8")).root_node
+    reference_tree = yaml_to_tree(reference)
 
     def get_all_sub_trees(root_node):
-        node_stack = []
+        node_stack = [(root_node, 1)]  # (节点, 深度)
         sub_tree_sexp_list = []
-        depth = 1
-        node_stack.append([root_node, depth])
-        while len(node_stack) != 0:
+
+        while node_stack:
             cur_node, cur_depth = node_stack.pop()
-            sub_tree_sexp_list.append([str(cur_node), cur_depth])
+            sub_tree_sexp_list.append((str(cur_node), cur_depth))
+
             for child_node in cur_node.children:
-                if len(child_node.children) != 0:
-                    depth = cur_depth + 1
-                    node_stack.append([child_node, depth])
+                node_stack.append((child_node, cur_depth + 1))
+
         return sub_tree_sexp_list
 
     cand_sexps = [x[0] for x in get_all_sub_trees(candidate_tree)]

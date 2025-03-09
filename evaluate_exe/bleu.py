@@ -9,7 +9,7 @@ def sentence_bleu(
     smoothing_function=None,
     auto_reweigh=False,
 ):
-     return corpus_bleu(references, hypothesis, weights, smoothing_function, auto_reweigh)
+     return corpus_bleu([references], [hypothesis], weights, smoothing_function, auto_reweigh)
 
 def corpus_bleu(
     references,

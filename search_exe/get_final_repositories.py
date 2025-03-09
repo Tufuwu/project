@@ -5,7 +5,7 @@ from utils import file_operate
 
 # 读取 CSV 文件
 fo = file_operate()
-csv_file = "D:/vscode/3/project/python-csv/final.csv"  # 请替换为你的 CSV 文件路径
+csv_file = "D:/vscode/3/project/python-csv/final.csv"  
 df = pd.read_csv(csv_file)
 base_download_path = "D:/vscode/3/project/repositories"
 for index, row in df.iterrows():
