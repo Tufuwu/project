@@ -1,6 +1,7 @@
 import subprocess
 import os
 import shutil
+import re
 
 def delet_file(local_directory):
     # 清空当前仓库中的文件和文件夹（保留 .git）
@@ -38,18 +39,41 @@ def write_repo_in(repo_path,local_directory):
 
     print("✅ 所有文件和文件夹复制完成！")
 
+def fix_file(lines):
+    result = []
+    line_index = 0
+    while line_index <len(lines):
+        if re.search('concurrency:',lines[line_index]):
+            line_index += 1
+        elif re.search('python-version',lines[line_index]):
+            temp = re.sub(r'\[.*\]','\'3.9\'',lines[line_index])
+            result.append(temp)
+            line_index += 1
+        elif re.search('python:',lines[line_index]):
+            result.append(lines[line_index])
+            line_index += 1
+            temp = re.sub(r'- \'3.[0-9]\'','- \'3.9\'',lines[line_index])
+            result.append(temp)
+            while re.search(r'- \'3.[0-9]\'',lines[line_index]):
+                line_index += 1
+        else:
+            result.append(lines[line_index])
+            line_index += 1
+    return result
+            
 def write_file_in(file_path,target_directory):
     with open(file_path, "r", encoding="utf-8") as f:
         lines = f.readlines()
+    temp = fix_file(lines)
     with open(target_directory, "w", encoding="utf-8") as f:
-        f.writelines(lines)
+        f.writelines(temp)
 
 def upload_repo_test(repo_full_name,base_download_path,local_directory):
     count = 0
     file_path = f"D:/vscode/3/project/data1/{repo_full_name}"
     repo_path = os.path.join(base_download_path, repo_full_name)
     delet_file(local_directory)
-    
+
     write_repo_in(repo_path,local_directory)
 
     workflow_path = f"D:/vscode/1/experiment_running/.github/workflows"
