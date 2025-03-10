@@ -28,7 +28,7 @@ api_token = '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'
 df = pd.read_csv(csv_file_path)
 for index, row in df.iterrows():
     repo_full_name = row['full_name']
-    
+
     try:
         inital_repo(local_directory,github_repo_url)
         upload_repo_test(repo_full_name,base_repo_path,local_directory)

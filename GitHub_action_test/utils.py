@@ -46,8 +46,12 @@ def fix_file(lines):
             line_index += 1
         elif re.search(r'actions/upload-artifact@v\d',lines[line_index]):
             s = re.sub(r'actions/upload-artifact@v\d','actions/upload-artifact@v4',lines[line_index])
-            result.append(temp)
-            line_index += 1            
+            result.append(s)
+            line_index += 1   
+        elif re.search(r'actions/cache@v\d',lines[line_index]):
+            s = re.sub(r'actions/cache@v1','actions/cache@v4',lines[line_index])
+            result.append(s)
+            line_index += 1           
 
         elif re.search('python-version:',lines[line_index]):
             if re.search(r'\[.*\]',lines[line_index]):
@@ -55,7 +59,7 @@ def fix_file(lines):
                 result.append(temp)
                 line_index +=1
             elif re.search(r'python-version:\n',lines[line_index]):
-                temp  = re.sub(r'python-version:','python-version; ["3.9", "3.10", "3.11"]',lines[line_index])
+                temp  = re.sub(r'python-version:','python-version: ["3.9", "3.10", "3.11"]',lines[line_index])
                 result.append(temp)
                 line_index += 1
                 while re.search(r'-',lines[line_index]):
@@ -63,7 +67,7 @@ def fix_file(lines):
                     if line_index >=len(lines):
                         return result            
             else:
-                temp = re.sub(r'\d.\d','3.9',lines[line_index])
+                temp = re.sub(r'\d.\d+\n','3.9\n',lines[line_index])
                 result.append(temp)
                 line_index += 1
         elif re.search('python:',lines[line_index]):
@@ -72,7 +76,7 @@ def fix_file(lines):
                 result.append(temp)
                 line_index +=1
             elif re.search(r'python:\n',lines[line_index]):
-                temp  = re.sub(r'python:','python; ["3.9", "3.10", "3.11"]',lines[line_index])
+                temp  = re.sub(r'python:','python: ["3.9", "3.10", "3.11"]',lines[line_index])
                 result.append(temp)
                 line_index += 1
                 while re.search(r'-',lines[line_index]):
@@ -80,7 +84,7 @@ def fix_file(lines):
                     if line_index >=len(lines):
                         return result            
             else:
-                temp = re.sub(r'\d.\d','3.9',lines[line_index])
+                temp = re.sub(r'\d.\d+\n','3.9\n',lines[line_index])
                 result.append(temp)
                 line_index += 1
 
