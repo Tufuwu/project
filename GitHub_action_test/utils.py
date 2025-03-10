@@ -2,13 +2,13 @@ import subprocess
 import os
 import shutil
 import re
-
+import time
 def delet_file(local_directory):
     # 清空当前仓库中的文件和文件夹（保留 .git）
     for item in os.listdir(local_directory):
         item_path = os.path.join(local_directory, item)
 
-        if item == ".git" or ".github":
+        if item == ".git" :
             continue  # 保留 .git 目录
 
         if os.path.isdir(item_path):
@@ -20,22 +20,21 @@ def delet_file(local_directory):
 
     print("✅ Repository cleaned (except .git).")
 
-def write_repo_in(repo_path,local_directory):
+def write_repo_in(repo_path, local_directory):
     for item in os.listdir(repo_path):
-        # 如果是 .github，直接跳过
-        if item == ".github":
-            continue
+        if item == ".git":  # 明确忽略 .git 文件夹
+            continue  
         item_path = os.path.join(repo_path, item)
         destination_item_path = os.path.join(local_directory, item)
 
         if os.path.isdir(item_path):  
             # 复制整个文件夹
-            shutil.copytree(repo_path, destination_item_path, ignore=shutil.ignore_patterns('.git'), dirs_exist_ok=True)
+            shutil.copytree(item_path, destination_item_path, ignore=shutil.ignore_patterns('.git'), dirs_exist_ok=True)
             print(f"📁 Copied folder: {item_path} → {destination_item_path}")
         else:  
             # 复制文件
-            shutil.copy(item_path, local_directory)
-            print(f"📄 Copied file: {item_path} → {local_directory}")
+            shutil.copy(item_path, destination_item_path)
+            print(f"📄 Copied file: {item_path} → {destination_item_path}")
 
     print("✅ 所有文件和文件夹复制完成！")
 
@@ -45,17 +44,46 @@ def fix_file(lines):
     while line_index <len(lines):
         if re.search('concurrency:',lines[line_index]):
             line_index += 1
-        elif re.search('python-version',lines[line_index]):
-            temp = re.sub(r'\[.*\]','\'3.9\'',lines[line_index])
+        elif re.search(r'actions/upload-artifact@v\d',lines[line_index]):
+            s = re.sub(r'actions/upload-artifact@v\d','actions/upload-artifact@v4',lines[line_index])
             result.append(temp)
-            line_index += 1
-        elif re.search('python:',lines[line_index]):
-            result.append(lines[line_index])
-            line_index += 1
-            temp = re.sub(r'- \'3.[0-9]\'','- \'3.9\'',lines[line_index])
-            result.append(temp)
-            while re.search(r'- \'3.[0-9]\'',lines[line_index]):
+            line_index += 1            
+
+        elif re.search('python-version:',lines[line_index]):
+            if re.search(r'\[.*\]',lines[line_index]):
+                temp = re.sub(r'\[.*\]','["3.9", "3.10", "3.11"]',lines[line_index])
+                result.append(temp)
+                line_index +=1
+            elif re.search(r'python-version:\n',lines[line_index]):
+                temp  = re.sub(r'python-version:','python-version; ["3.9", "3.10", "3.11"]',lines[line_index])
+                result.append(temp)
                 line_index += 1
+                while re.search(r'-',lines[line_index]):
+                    line_index += 1
+                    if line_index >=len(lines):
+                        return result            
+            else:
+                temp = re.sub(r'\d.\d','3.9',lines[line_index])
+                result.append(temp)
+                line_index += 1
+        elif re.search('python:',lines[line_index]):
+            if re.search(r'\[.*\]',lines[line_index]):
+                temp = re.sub(r'\[.*\]','["3.9", "3.10", "3.11"]',lines[line_index])
+                result.append(temp)
+                line_index +=1
+            elif re.search(r'python:\n',lines[line_index]):
+                temp  = re.sub(r'python:','python; ["3.9", "3.10", "3.11"]',lines[line_index])
+                result.append(temp)
+                line_index += 1
+                while re.search(r'-',lines[line_index]):
+                    line_index += 1
+                    if line_index >=len(lines):
+                        return result            
+            else:
+                temp = re.sub(r'\d.\d','3.9',lines[line_index])
+                result.append(temp)
+                line_index += 1
+
         else:
             result.append(lines[line_index])
             line_index += 1
@@ -67,6 +95,12 @@ def write_file_in(file_path,target_directory):
     temp = fix_file(lines)
     with open(target_directory, "w", encoding="utf-8") as f:
         f.writelines(temp)
+
+def write_gpt_in(file_path,target_directory):
+    with open(file_path, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+    with open(target_directory, "w", encoding="utf-8") as f:
+        f.writelines(lines)
 
 def upload_repo_test(repo_full_name,base_download_path,local_directory):
     count = 0
@@ -81,20 +115,22 @@ def upload_repo_test(repo_full_name,base_download_path,local_directory):
     delet_file(workflow_path)
     action_file_path = f"D:/vscode/3/project/data1/{repo_full_name}/action.yml"
     write_file_in(action_file_path,test_file_path)
+
     push_repositories(f'{repo_full_name}{count}')
     count +=1
-
+    time.sleep(30)
+    return
     delet_file(workflow_path)
     importer_file_path =f"D:/vscode/3/project/data1/{repo_full_name}/importer.yml"
     write_file_in(importer_file_path,test_file_path)
     push_repositories(f'{repo_full_name}{count}')
     count +=1
-
+    time.sleep(30)
     delet_file(workflow_path)
     gpt_file_path = f"D:/vscode/3/project/data1/{repo_full_name}/gpt.yml"
-    write_file_in(gpt_file_path,test_file_path)
+    write_gpt_in(gpt_file_path,test_file_path)
     push_repositories(f'{repo_full_name}{count}')
-
+    time.sleep(30)
 def inital_repo(local_directory,github_repo_url):
     # 确保Git仓库初始化
     os.chdir(local_directory)

@@ -1,4 +1,4 @@
 import re
-h = "111  - '3.4'"
-s = re.sub(r'- \'3.[0-9]\'','- \'3.9\'',h)
+h = "actions/upload-artifact@v3"
+s = re.sub(r'actions/upload-artifact@v\d','actions/upload-artifact@v4',h)
 print(s)
