@@ -199,8 +199,8 @@ def upload_repo_test(repo_full_name,base_download_path,local_directory):
 
     write_repo_in(repo_path,local_directory)
 
-    workflow_path = f"D:/vscode/1/test3/.github/workflows"
-    test_file_path = 'D:/vscode/1/test3/.github/workflows/test.yml'
+    workflow_path = f"D:/vscode/1/test4/.github/workflows"
+    test_file_path = 'D:/vscode/1/test4/.github/workflows/test.yml'
     delet_file(workflow_path)
     action_file_path = f"D:/vscode/3/project/data1/{repo_full_name}/action.yml"
     write_action_in(action_file_path,test_file_path)
@@ -208,7 +208,7 @@ def upload_repo_test(repo_full_name,base_download_path,local_directory):
     push_repositories(f'{repo_full_name}{count}')
     count +=1
     time.sleep(30)
-
+    return
     delet_file(workflow_path)
     importer_file_path =f"D:/vscode/3/project/data1/{repo_full_name}/importer.yml"
     write_importer_in(importer_file_path,test_file_path)
