@@ -38,12 +38,74 @@ def write_repo_in(repo_path, local_directory):
 
     print("✅ 所有文件和文件夹复制完成！")
 
-def fix_file(lines):
+def fix_action_file(lines):
+    result = []
+    line_index = 0
+    while line_index <len(lines):
+
+        if re.search(r'actions/upload-artifact@v\d',lines[line_index]):
+            s = re.sub(r'actions/upload-artifact@v\d','actions/upload-artifact@v4',lines[line_index])
+            result.append(s)
+            line_index += 1
+        elif re.search(r'ubuntu-\d+\.\d+',lines[line_index]):
+            run = re.sub(r'ubuntu-\d+\.\d+','ubuntu-latest',lines[line_index])
+            result.append(run)
+            line_index += 1  
+        elif re.search(r'actions/cache@v\d',lines[line_index]):
+            s = re.sub(r'actions/cache@v\d','actions/cache@v4',lines[line_index])
+            result.append(s)
+            line_index += 1           
+
+        elif re.search('python-version:',lines[line_index]):
+            if re.search(r'\[.*\]',lines[line_index]):
+                temp = re.sub(r'\[.*\]','["3.9", "3.10", "3.11"]',lines[line_index])
+                result.append(temp)
+                line_index +=1
+            elif re.search(r'python-version:\n',lines[line_index]):
+                temp  = re.sub(r'python-version:','python-version: ["3.9", "3.10", "3.11"]',lines[line_index])
+                result.append(temp)
+                line_index += 1
+                while re.search(r'- ',lines[line_index]):
+                    line_index += 1
+                    if line_index >=len(lines):
+                        return result            
+            else:
+                if re.search(r'\d.\d+\n',lines[line_index]):
+                    temp = re.sub(r'\d.\d+\n','3.9\n',lines[line_index])
+                else:
+                    temp = re.sub(r'\d.\d+','3.9',lines[line_index])
+                result.append(temp)
+                line_index += 1
+        elif re.search('python:',lines[line_index]):
+            if re.search(r'\[.*\]',lines[line_index]):
+                temp = re.sub(r'\[.*\]','["3.9", "3.10", "3.11"]',lines[line_index])
+                result.append(temp)
+                line_index +=1
+            elif re.search(r'python:\n',lines[line_index]):
+                temp  = re.sub(r'python:','python: ["3.9", "3.10", "3.11"]',lines[line_index])
+                result.append(temp)
+                line_index += 1
+                while re.search(r'- ',lines[line_index]):
+                    line_index += 1
+                    if line_index >=len(lines):
+                        return result            
+            else:
+                if re.search(r'\d.\d+\n',lines[line_index]):
+                    temp = re.sub(r'\d.\d+\n','3.9\n',lines[line_index])
+                else:
+                    temp = re.sub(r'\d.\d+','3.9',lines[line_index])
+                result.append(temp)
+                line_index += 1
+
+        else:
+            result.append(lines[line_index])
+            line_index += 1
+    return result
+def fix_importer_file(lines):
     result = []
     line_index = 0
     while line_index <len(lines):
         if re.search('concurrency:',lines[line_index]):
-            result.append(lines[line_index])
             line_index += 1
         elif re.search(r'actions/upload-artifact@v\d',lines[line_index]):
             s = re.sub(r'actions/upload-artifact@v\d','actions/upload-artifact@v4',lines[line_index])
@@ -103,11 +165,18 @@ def fix_file(lines):
             result.append(lines[line_index])
             line_index += 1
     return result
-            
-def write_file_in(file_path,target_directory):
+          
+def write_action_in(file_path,target_directory):
     with open(file_path, "r", encoding="utf-8") as f:
         lines = f.readlines()
-    temp = fix_file(lines)
+    temp = fix_action_file(lines)
+    with open(target_directory, "w", encoding="utf-8") as f:
+        f.writelines(temp)
+
+def write_importer_in(file_path,target_directory):
+    with open(file_path, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+    temp = fix_importer_file(lines)
     with open(target_directory, "w", encoding="utf-8") as f:
         f.writelines(temp)
 
@@ -129,7 +198,7 @@ def upload_repo_test(repo_full_name,base_download_path,local_directory):
     test_file_path = 'D:/vscode/1/test3/.github/workflows/test.yml'
     delet_file(workflow_path)
     action_file_path = f"D:/vscode/3/project/data1/{repo_full_name}/action.yml"
-    write_file_in(action_file_path,test_file_path)
+    write_action_in(action_file_path,test_file_path)
 
     push_repositories(f'{repo_full_name}{count}')
     count +=1
@@ -137,7 +206,7 @@ def upload_repo_test(repo_full_name,base_download_path,local_directory):
 
     delet_file(workflow_path)
     importer_file_path =f"D:/vscode/3/project/data1/{repo_full_name}/importer.yml"
-    write_file_in(importer_file_path,test_file_path)
+    write_importer_in(importer_file_path,test_file_path)
     push_repositories(f'{repo_full_name}{count}')
     count +=1
     time.sleep(30)
@@ -146,6 +215,7 @@ def upload_repo_test(repo_full_name,base_download_path,local_directory):
     write_gpt_in(gpt_file_path,test_file_path)
     push_repositories(f'{repo_full_name}{count}')
     time.sleep(30)
+
 def inital_repo(local_directory,github_repo_url):
     # 确保Git仓库初始化
     os.chdir(local_directory)

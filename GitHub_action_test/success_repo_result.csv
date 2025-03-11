@@ -1,6 +1,4 @@
 full_name
-scikit-signal/tftb
-cuducos/webassets-elm
 holzhaus/sphinx-multiversion
 beaglecli/beagle
 areski/python-nvd3
@@ -86,3 +84,5 @@ anexia-it/django-rest-multitokenauth
 provinzkraut/cologne_phonetics
 konikvranik/pycec
 nmigen/nmigen-soc
+scikit-signal/tftb
+cuducos/webassets-elm
