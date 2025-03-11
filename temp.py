@@ -1,4 +1,4 @@
 import re
-h = "actions/upload-artifact@v3"
-s = re.sub(r'actions/upload-artifact@v\d','actions/upload-artifact@v4',h)
+h = "runs-on: ubuntu-18.04'\n"
+s = re.sub(r'ubuntu-\d+\.\d+','ubuntu-latest',h)
 print(s)

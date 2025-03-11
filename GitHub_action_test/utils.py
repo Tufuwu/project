@@ -43,13 +43,18 @@ def fix_file(lines):
     line_index = 0
     while line_index <len(lines):
         if re.search('concurrency:',lines[line_index]):
+            result.append(lines[line_index])
             line_index += 1
         elif re.search(r'actions/upload-artifact@v\d',lines[line_index]):
             s = re.sub(r'actions/upload-artifact@v\d','actions/upload-artifact@v4',lines[line_index])
             result.append(s)
-            line_index += 1   
+            line_index += 1
+        elif re.search(r'ubuntu-\d+\.\d+',lines[line_index]):
+            run = re.sub(r'ubuntu-\d+\.\d+','ubuntu-latest',lines[line_index])
+            result.append(run)
+            line_index += 1  
         elif re.search(r'actions/cache@v\d',lines[line_index]):
-            s = re.sub(r'actions/cache@v1','actions/cache@v4',lines[line_index])
+            s = re.sub(r'actions/cache@v\d','actions/cache@v4',lines[line_index])
             result.append(s)
             line_index += 1           
 
@@ -62,12 +67,15 @@ def fix_file(lines):
                 temp  = re.sub(r'python-version:','python-version: ["3.9", "3.10", "3.11"]',lines[line_index])
                 result.append(temp)
                 line_index += 1
-                while re.search(r'-',lines[line_index]):
+                while re.search(r'- ',lines[line_index]):
                     line_index += 1
                     if line_index >=len(lines):
                         return result            
             else:
-                temp = re.sub(r'\d.\d+\n','3.9\n',lines[line_index])
+                if re.search(r'\d.\d+\n',lines[line_index]):
+                    temp = re.sub(r'\d.\d+\n','3.9\n',lines[line_index])
+                else:
+                    temp = re.sub(r'\d.\d+','3.9',lines[line_index])
                 result.append(temp)
                 line_index += 1
         elif re.search('python:',lines[line_index]):
@@ -79,12 +87,15 @@ def fix_file(lines):
                 temp  = re.sub(r'python:','python: ["3.9", "3.10", "3.11"]',lines[line_index])
                 result.append(temp)
                 line_index += 1
-                while re.search(r'-',lines[line_index]):
+                while re.search(r'- ',lines[line_index]):
                     line_index += 1
                     if line_index >=len(lines):
                         return result            
             else:
-                temp = re.sub(r'\d.\d+\n','3.9\n',lines[line_index])
+                if re.search(r'\d.\d+\n',lines[line_index]):
+                    temp = re.sub(r'\d.\d+\n','3.9\n',lines[line_index])
+                else:
+                    temp = re.sub(r'\d.\d+','3.9',lines[line_index])
                 result.append(temp)
                 line_index += 1
 
@@ -114,8 +125,8 @@ def upload_repo_test(repo_full_name,base_download_path,local_directory):
 
     write_repo_in(repo_path,local_directory)
 
-    workflow_path = f"D:/vscode/1/experiment_running/.github/workflows"
-    test_file_path = 'D:/vscode/1/experiment_running/.github/workflows/test.yml'
+    workflow_path = f"D:/vscode/1/test1/.github/workflows"
+    test_file_path = 'D:/vscode/1/test1/.github/workflows/test.yml'
     delet_file(workflow_path)
     action_file_path = f"D:/vscode/3/project/data1/{repo_full_name}/action.yml"
     write_file_in(action_file_path,test_file_path)
