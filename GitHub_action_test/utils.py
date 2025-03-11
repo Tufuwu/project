@@ -58,11 +58,11 @@ def fix_action_file(lines):
 
         elif re.search('python-version:',lines[line_index]):
             if re.search(r'\[.*\]',lines[line_index]):
-                temp = re.sub(r'\[.*\]','["3.9", "3.10", "3.11"]',lines[line_index])
+                temp = re.sub(r'\[.*\]','["3.9", "3.10"]',lines[line_index])
                 result.append(temp)
                 line_index +=1
             elif re.search(r'python-version:\n',lines[line_index]):
-                temp  = re.sub(r'python-version:','python-version: ["3.9", "3.10", "3.11"]',lines[line_index])
+                temp  = re.sub(r'python-version:','python-version: ["3.9", "3.10"]',lines[line_index])
                 result.append(temp)
                 line_index += 1
                 while re.search(r'- ',lines[line_index]):
@@ -78,11 +78,11 @@ def fix_action_file(lines):
                 line_index += 1
         elif re.search('python:',lines[line_index]):
             if re.search(r'\[.*\]',lines[line_index]):
-                temp = re.sub(r'\[.*\]','["3.9", "3.10", "3.11"]',lines[line_index])
+                temp = re.sub(r'\[.*\]','["3.9", "3.10"]',lines[line_index])
                 result.append(temp)
                 line_index +=1
             elif re.search(r'python:\n',lines[line_index]):
-                temp  = re.sub(r'python:','python: ["3.9", "3.10", "3.11"]',lines[line_index])
+                temp  = re.sub(r'python:','python: ["3.9", "3.10"]',lines[line_index])
                 result.append(temp)
                 line_index += 1
                 while re.search(r'- ',lines[line_index]):
@@ -106,9 +106,13 @@ def fix_gpt_file(lines):
     result = []
 
     for line in lines:
-        if re.search("\'\'\'"):
+        if re.search("```",line):
             continue
-        result.append(line)
+        elif re.search(r'master',line):
+            temp = re.sub(r'master','main',line)
+            result.append(temp)
+        else:
+            result.append(line)
 
 
     return result
