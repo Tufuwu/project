@@ -1,35 +1,29 @@
-name: CI
+name: Python CI
 
 on: [push, pull_request]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        python-version: [3.9, 3.10, 3.11]
+        python-version: ['3.9', '3.10']
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+    - uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Install dependencies
       run: |
+        python -m pip install --upgrade pip
         npm i -g elm
-        pip install tox
-    - name: Run tox with coverage
-      run: tox -e cover
-      env:
-        TOXENV: cover
-    - name: Run tox with black
-      run: tox -e black
-      env:
-        TOXENV: black
-    - name: Upload coverage to Coveralls
-      if: matrix.python-version == '3.9'
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        coveralls-endpoint: https://coveralls.io
+        pip install tox tox-travis
+
+    - name: Run Tests
+      run: tox
+
+    - name: Upload coverage
+      if: success()
+      run: coveralls

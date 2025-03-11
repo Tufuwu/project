@@ -1,48 +1,44 @@
-name: CI
+name: Python package
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        python-version: [3.9, 3.10, 3.11]
-        ipython-version: ['7.9', '7']
-        pandas-version: ['0.24.2', '1']
+        python-version: ['3.9', '3.10']
 
     steps:
     - uses: actions/checkout@v2
+      
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+        
     - name: Install dependencies
       run: |
-        pip install IPython==${{ matrix.ipython-version }}
-        pip install pandas==${{ matrix.pandas-version }}
+        pip install IPython==7.9
+        pip install pandas==1
         pip install .[test]
-    - name: Test with pytest
+        
+    - name: Run tests
       run: |
         python -c 'import pytorch_memlab'
         pytest test/test_mem_reporter.py
-
-  deploy:
-    needs: build
-    if: github.event_name == 'push' && contains(github.ref, 'tags') && matrix.python-version == '3.11'
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.11'
-    - name: Install dependencies
-      run: |
-        pip install .
-    - name: Publish to PyPI
+        
+    - name: Deploy to PyPI
+      if: ${{ matrix.python-version == '3.10' && github.event_name == 'push' && github.ref == 'refs/tags/*' }}
+      run: echo "Deploying to PyPI"
       env:
         TWINE_USERNAME: yoursky
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        python -m twine upload dist/*
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_KEY }}

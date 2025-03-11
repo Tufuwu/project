@@ -1,92 +1,60 @@
-name: CI/CD
+name: Python package
 
 on:
   push:
     branches:
       - master
   pull_request:
-  release:
-    types: [published]
+    branches:
+      - master
 
 jobs:
-  build-and-test:
+  test:
+    name: Test on ${{ matrix.os }} / Python ${{ matrix.python }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: [3.9, 3.10]
+        python: [3.9, 3.10]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python }}
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: ${{ matrix.python }}
+
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install pre-commit setuptools wheel
-        pip install -r requirements.txt
+        python -m pip install pre-commit setuptools wheel
+        python -m pip install -r requirements.txt
+        python setup.py install
+
     - name: Run pre-commit
       run: pre-commit run --all-files --show-diff-on-failure
-    - name: Run tests
+
+    - name: Run unit tests
       run: python -m unittest --verbose
-    - name: Build documentation
+
+    - name: Build and package
       run: |
         mkdir html
-        git fetch --all
-        python -I -m sphinx_multiversion -W docs html
-    - name: Build package
-      run: python setup.py build sdist bdist_wheel
+        python -m sphinx_multiversion -W docs html
+        python setup.py build sdist bdist_wheel
 
-  deploy-to-pypi:
-    needs: build-and-test
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.event.release.tag_name != '')
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-    - name: Install dependencies
-      run: pip install setuptools wheel twine
-    - name: Build package
-      run: python setup.py sdist bdist_wheel
-    - name: Deploy to PyPI
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-      run: twine upload dist/*
+    - name: Deploy
+      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+      run: |
+        touch html/.nojekyll
+        cp assets/gh-pages-redirect.html html/index.html
 
-  deploy-to-github-releases:
-    needs: build-and-test
-    if: github.event_name == 'release' && github.event.release.tag_name != ''
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Download artifacts
-      uses: actions/download-artifact@v2
-      with:
-        name: dist
-    - name: Create release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.event.release.tag_name }}
-        release_name: Release ${{ github.event.release.tag_name }}
-        draft: false
-        prerelease: false
+        twine upload dist/* --repository pypi --skip-existing
+        release-cli create ${{ github.event.head_ref }}
 
-  deploy-documentation:
-    needs: build-and-test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
     - name: Deploy documentation
+      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}

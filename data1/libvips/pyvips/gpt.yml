@@ -1,61 +1,34 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
-        python-version: [3.9, 3.10, 3.11]
+        python-version: [3.9, 3.10]
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libexpat1-dev gettext liblcms2-dev libmagickwand-dev libopenexr-dev libcfitsio3-dev libfftw3-dev libgif-dev libgs-dev libgsf-1-dev libmatio-dev libopenslide-dev liborc-0.4-dev libpango1.0-dev libpoppler-glib-dev librsvg2-dev libwebp-dev libtiff5-dev libglib2.0-dev
+          bash install-vips.sh --without-python
+          pip install -U setuptools
+          pip install -U .[test]
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          libexpat1-dev \
-          gettext \
-          liblcms2-dev \
-          libmagickwand-dev \
-          libopenexr-dev \
-          libcfitsio3-dev \
-          libfftw3-dev \
-          libgif-dev \
-          libgs-dev \
-          libgsf-1-dev \
-          libmatio-dev \
-          libopenslide-dev \
-          liborc-0.4-dev \
-          libpango1.0-dev \
-          libpoppler-glib-dev \
-          librsvg2-dev \
-          libwebp-dev \
-          libtiff5-dev \
-          libglib2.0-dev
-
-    - name: Cache VIPS
-      uses: actions/cache@v2
-      with:
-        path: $HOME/vips
-        key: ${{ runner.os }}-vips-${{ hashFiles('**/install-vips.sh') }}
-        restore-keys: |
-          ${{ runner.os }}-vips-
-
-    - name: Install VIPS
-      run: bash install-vips.sh --without-python
-
-    - name: Install Python dependencies
-      run: pip install -U setuptools wheel pip
-      run: pip install -U .[test]
-
-    - name: Run tests
-      run: python setup.py test
+      - name: Run tests
+        run: python setup.py test

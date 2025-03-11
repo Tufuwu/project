@@ -1,28 +1,27 @@
-name: CI
-
+name: Python package CI
 on: [push, pull_request]
-
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9, 3.10, 3.11]
-
+        python-version: ['3.9', '3.10']
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install tox-travis coveralls
-    - name: Run tox
-      run: tox
-    - name: Coveralls
-      if: always()
-      run: if [ -e .coverage ]; then coveralls; fi
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox
+          pip install coveralls
+      - name: Run tests
+        run: tox
+      - name: Check coverage and upload to coveralls
+        if: runner.os == 'Linux' && success()
+        run: |
+          if [ -f .coverage ]; then
+            coveralls
+          fi

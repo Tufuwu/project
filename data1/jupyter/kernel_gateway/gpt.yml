@@ -1,4 +1,4 @@
-name: CI
+name: Python CI
 
 on: [push, pull_request]
 
@@ -8,23 +8,27 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.9, 3.10, 3.11]
+        python-version: ['3.9', '3.10']
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip setuptools wheel
-        python setup.py bdist_wheel sdist
-        pip install dist/*.whl coverage
-    - name: Run tests
-      env:
-        ASYNC_TEST_TIMEOUT: 10
-      run: |
-        jupyter kernelgateway --help
-        nosetests -x --process-restartworker --with-coverage --cover-package=kernel_gateway
-        pip uninstall -y jupyter_kernel_gateway
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python setup.py bdist_wheel sdist
+          pip install dist/*.whl coverage
+
+      - name: Check Python version
+        run: python --version
+
+      - name: Run tests
+        run: |
+          jupyter kernelgateway --help
+          nosetests -x --process-restartworker --with-coverage --cover-package=kernel_gateway
+          pip uninstall -y jupyter_kernel_gateway
+```

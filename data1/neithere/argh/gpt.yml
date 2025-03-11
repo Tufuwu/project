@@ -1,31 +1,38 @@
-name: CI
+name: Python CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        python-version: [3.9, 3.10, 3.11]
+        python-version: [3.9, 3.10]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r reqs-dev.txt
-        pip install coveralls
-        pip install pytest>=2.7.3 --upgrade
-    - name: Test with pytest
-      run: |
-        pytest --cov=argh
-    - name: Coveralls
-      if: success()
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          pip install -r reqs-dev.txt
+          pip install coveralls
+          pip install pytest>=2.7.3 --upgrade
+
+      - name: Run tests
+        run: |
+          pytest --cov=argh
+
+      - name: Run coveralls
+        run: coveralls

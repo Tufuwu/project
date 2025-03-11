@@ -1,32 +1,45 @@
-name: CI
+name: Python CI
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
-  unit-tests:
+  test:
     runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.9'
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install tox-travis codecov
-    - name: Run unit tests
-      run: tox
-    - name: Upload coverage report
-      run: codecov
 
-  docker-image-build-test:
-    runs-on: ubuntu-latest
-    services:
-      docker: true
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
     steps:
-    - uses: actions/checkout@v2
-    - name: Set environment variable
-      run: echo "TAG=temp" >> $GITHUB_ENV
-    - name: Build Docker image
-      run: docker-compose build
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox-travis codecov
+
+      - name: Run tests
+        run: tox
+
+      - name: Run codecov
+        run: codecov
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build Docker image
+        run: docker-compose build

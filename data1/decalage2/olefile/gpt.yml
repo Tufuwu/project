@@ -1,40 +1,39 @@
-name: CI
+name: Python CI
 
 on: [push, pull_request]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9, 3.10, 3.11]
+        python-version: [3.9, 3.10]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Cache pip
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-    - name: Install dependencies
-      run: pip install coverage
-    - name: Run tests
-      run: coverage run --source=olefile -m nose tests
-    - name: Coveralls
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        coveralls-endpoint: https://coveralls.io
-    - name: Coverage report
-      run: coverage report
-    - name: Linting
-      run: |
-        pip install pycodestyle pyflakes
-        pyflakes .
-        pycodestyle --statistics --count .
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install coverage
+
+      - name: Run tests
+        run: |
+          coverage run --source=olefile -m nose tests
+
+      - name: After success
+        run: |
+          pip install coveralls
+          coveralls
+
+      - name: After script
+        run: |
+          coverage report
+          pip install pycodestyle pyflakes
+          pyflakes .
+          pycodestyle --statistics --count .

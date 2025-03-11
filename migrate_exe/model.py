@@ -3,20 +3,15 @@ import os
 
 
 
-def create_model(model_tag,api_token,prompt):
-    client = OpenAI(
-    api_key=api_token
-    )
+def create_model(model_tag, api_token, prompt):
+    client = OpenAI(api_key=api_token)
 
     completion = client.chat.completions.create(
-    model=model_tag,
-    store=True,
-    messages=[
-        {"role": "user", "content": prompt}
-    ]
+        model=model_tag,
+        messages=[{"role": "user", "content": prompt}]
     )
 
-    return completion.choices[0].message
+    return completion.choices[0].message.content 
 
 
 def read_file(file_path):
@@ -30,7 +25,7 @@ def read_file(file_path):
         print(f"An error occurred: {e}")
 
 
-def write_file_in(file_name,repo_full_name,reponse):
+def write_file_in(repo_full_name,reponse):
 
     file_name = f"gpt.yml"
     output_dir = f"D:/vscode/3/project/data1/{repo_full_name}"
@@ -41,7 +36,8 @@ def write_file_in(file_name,repo_full_name,reponse):
     
 def prompt_constructor(*args):
     prompt = ""
+    prompt_path = 'D:/vscode/3/project/migrate_exe/prompt'
     for arg in args:
-        with open(os.path.abspath(f'prompt/{arg}'), 'r') as file:
+        with open(os.path.abspath(f'{prompt_path}/{arg}'), 'r') as file:
             prompt += file.read().strip()
     return prompt

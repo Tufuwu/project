@@ -1,3 +1,4 @@
+```yaml
 name: CI
 
 on: [push, pull_request]
@@ -8,29 +9,22 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.9, 3.10]
+        python: [3.9, 3.10, 3.11]
 
     steps:
-    - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python }}
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          pip install -r requirements_test.txt
+          curl -s -S --retry 3 ${{ env.BASEDIR }}/tests/install.sh | bash -
+          sed -i 's|open-contracting/standard/1.1/standard/schema|open-contracting/standard/1__1__4/standard/schema|' ${{ env.VIRTUAL_ENV }}/src/jscc/jscc/testing/json.py
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements_test.txt
-        curl -s -S --retry 3 ${{ env.BASEDIR }}/tests/install.sh | bash -
-
-    - name: Patch json.py
-      run: |
-        sed -i 's|open-contracting/standard/1.1/standard/schema|open-contracting/standard/1__1__4/standard/schema|' $VIRTUAL_ENV/src/jscc/jscc/testing/json.py
-
-    - name: Run tests
-      run: |
-        ./open-contracting_standard-maintenance-scripts_tests_script.sh
-        pytest
+      - name: Run tests
+        run: |
+          ./open-contracting_standard-maintenance-scripts_tests_script.sh
+          python -m pytest
 ```
-

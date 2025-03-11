@@ -1,40 +1,32 @@
-name: CI
+name: Python CI
 
 on: [push, pull_request]
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        python-version: [3.9, 3.10, 3.11]
+        python-version: ['3.9', '3.8', '3.7', '3.6']
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+
+    - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements-tox.txt
-        pip install -U tox coveralls
+        pip install -U tox-travis coveralls
+
     - name: Run tests
       run: make tox
 
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.9'
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements-tox.txt
-        pip install -U tox
-    - name: Run linting
-      run: make tox TOXENV=lint
+    - name: Upload coverage to coveralls
+      run: coveralls

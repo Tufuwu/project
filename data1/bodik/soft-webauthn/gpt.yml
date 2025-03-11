@@ -1,6 +1,10 @@
-name: CI
+name: Python CI
 
-on: [push]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
@@ -9,14 +13,14 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.9, 3.10]
+        python: [3.9, 3.10]
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python ${{ matrix.python }}
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: ${{ matrix.python }}
     - name: Install dependencies
       run: make install-deps
     - name: Run tests

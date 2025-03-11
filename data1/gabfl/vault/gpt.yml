@@ -1,4 +1,4 @@
-name: CI
+name: Python CI
 
 on: [push, pull_request]
 
@@ -13,23 +13,25 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install --yes gcc python3-dev libsqlcipher-dev
         pip install -U pip
         pip install pycodestyle codecov
-    - name: Install package
-      run: python3 setup.py install
-    - name: Lint with pycodestyle
-      run: pycodestyle --exclude=venv --ignore=E501 .
-    - name: Test with pytest and coverage
+        python3 setup.py install
+
+    - name: Run tests
       run: |
+        pycodestyle --exclude=venv --ignore=E501 .
         coverage run --source=. -m pytest
         coverage report -m
-    - name: Upload coverage to Codecov
+
+    - name: Upload coverage report
       run: codecov

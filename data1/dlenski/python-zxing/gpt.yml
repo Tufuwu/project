@@ -1,59 +1,44 @@
-name: CI
+name: Python CI
 
 on:
   push:
-    tags: true
+    branches:
+      - master
   pull_request:
-    branches: [ main ]
+    branches:
+      - master
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        python-version: [3.9, 3.10, 3.11]
+        python-version: ['3.9', '3.10']
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 8
-      uses: actions/setup-java@v2
-      with:
-        java-version: '8'
-        javaPath: jre
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install setuptools wheel twine
-    - name: Install openjdk-8-jre
-      run: sudo apt-get install -qq openjdk-8-jre
-    - name: Test with pytest
-      run: python setup.py test
+      - uses: actions/checkout@v2
 
-  deploy:
-    needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/tags/*'
-    runs-on: ubuntu-latest
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.9'
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install setuptools wheel twine
-    - name: Deploy to PyPI
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        python setup.py sdist bdist_wheel
-        twine upload dist/*
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: |
+          python setup.py test
+
+      - name: Deploy to PyPI
+        if: github.event_name == 'push' && github.ref == 'refs/tags/*'
+        run: |
+          python -m pip install --upgrade setuptools wheel twine
+          python setup.py sdist bdist_wheel
+          python -m twine upload --repository pypi dist/*
+        env:
+          TWINE_USERNAME: moxfyre
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_KEY }}

@@ -12,15 +12,13 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.9, 3.10, 3.11]
+        python-version: [3.9, 3.10]
         zk-version: [3.4.14, 3.5.8]
         include:
           - python-version: 3.9
             tox-env: py39
           - python-version: 3.10
             tox-env: py310
-          - python-version: 3.11
-            tox-env: py311
     steps:
       - name: Handle the code
         uses: actions/checkout@v2
