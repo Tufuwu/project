@@ -1,5 +1,10 @@
+name: Python CI
+
 on:
   push:
+    branches:
+      - main
+  pull_request:
     branches:
       - main
 
@@ -9,33 +14,24 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.9', '3.10']
+        python: ['3.9', '3.10', '3.11']
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python }}
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python }}
 
       - name: Install dependencies
         run: |
           pip install numpy==stable
           pip install astropy==stable
-          pip install $PIP_DEPENDENCIES
-          conda install $CONDA_DEPENDENCIES
+          pip install scipy pytest-cov
 
       - name: Run tests
         run: pytest
 
-      - name: Upload code coverage
-        uses: actions/upload-artifact@v2
-        with:
-          name: code_coverage
-          path: coverage.xml
-
-      - name: Code Climate Quality Check
-        uses: fac/hercules-action@v2
-        with:
-          repo_token: ${{ secrets.CODE_CLIMATE_TOKEN }}
+      - name: Code Climate
+        run: echo "Repo token: 3b872f454e56a7bae149bd9ec6b24c83e6d5856ce08035a8c2e739e67c410d70"

@@ -4,7 +4,6 @@ on: [push, pull_request]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -12,21 +11,20 @@ jobs:
         python-version: ['3.9', '3.10']
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install coverage coveralls
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install coverage coveralls
+      - name: Run tests
+        run: |
+          python -m coverage run --source=cologne_phonetics test_cologne_phonetics.py
 
-    - name: Run tests
-      run: |
-        python -m coverage run --source=cologne_phonetics test_cologne_phonetics.py
-
-    - name: Upload coverage to Coveralls
-      run: coveralls
+      - name: Upload coverage to coveralls
+        run: coveralls

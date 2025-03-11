@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     strategy:
@@ -11,28 +12,37 @@ jobs:
         python-version: ['3.9', '3.10']
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pbr tox tox-travis
-        pip install -r doc/requirements.txt .[test]
-    - name: Run tests
-      run: |
-        case ${{ matrix.BUILD }} in
-          docs|pep8|cover)
-            tox -e ${{ matrix.BUILD }}
-            ;;
-          *)
-            tox
-            ;;
-        esac
-        tox
-    - name: Deploy to PyPI
-      if: github.event_name == 'push' && github.event.ref_type == 'tag'
-      run: |
-        echo "${{ secrets.PYPI_PASSWORD }}" | twine upload --repository pypi dist/*
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox tox-travis
+          pip install -r doc/requirements.txt .[test]
+
+      - name: Run Tests
+        run: |
+          case ${{ env.BUILD }} in
+              docs|pep8|cover)
+                  tox -e ${{ env.BUILD }}
+                  ;;
+              *)
+                  tox
+                  ;;
+          esac
+
+      - name: Deploy
+        if: github.event_name == 'push' && github.event_name == 'pull_request'
+        run: |
+          echo "$PYPI_PASSWORD" > ~/.pypirc
+          python -m pip install --upgrade setuptools wheel twine
+          python setup.py sdist bdist_wheel
+          twine upload dist/*
+        env:
+          PYPI_USERNAME: __token__
+          PYPI_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}

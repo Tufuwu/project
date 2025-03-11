@@ -1,6 +1,12 @@
 name: Python CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -8,32 +14,22 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.9, 3.10]
+        python: ['3.9', '3.10']
 
     steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Install dependencies
-      run: |
-        pip install jeepney cryptography codecov pyflakes mypy
-
-    - name: Clone repository
-      run: |
-        git clone https://gitlab.gnome.org/GNOME/libsecret.git
-
-    - name: Run tests
-      run: |
-        dbus-run-session -- coverage run tests/run_tests.py libsecret/libsecret/mock-service-normal.py
-        dbus-run-session -- coverage run -a tests/run_tests.py libsecret/libsecret/mock-service-only-plain.py
-        dbus-run-session -- coverage run -a tests/run_tests.py libsecret/libsecret/mock-service-lock.py
-        pyflakes secretstorage/ tests/
-        mypy --strict --ignore-missing-imports secretstorage/ tests/
-
-    - name: Upload coverage report
-      run: |
-        codecov
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '${{ matrix.python }}'
+      - name: Install dependencies
+        run: |
+          pip install jeepney cryptography codecov pyflakes mypy
+          git clone https://gitlab.gnome.org/GNOME/libsecret.git
+      - name: Run tests
+        run: |
+          dbus-run-session -- coverage run tests/run_tests.py libsecret/libsecret/mock-service-normal.py
+          dbus-run-session -- coverage run -a tests/run_tests.py libsecret/libsecret/mock-service-only-plain.py
+          dbus-run-session -- coverage run -a tests/run_tests.py libsecret/libsecret/mock-service-lock.py
+          pyflakes secretstorage/ tests/
+          mypy --strict --ignore-missing-imports secretstorage/ tests/
+      - name: Upload coverage
+        run: codecov

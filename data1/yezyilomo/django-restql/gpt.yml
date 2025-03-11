@@ -1,33 +1,31 @@
-name: Python CI
+name: Python package
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [push]
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        python-version: [3.9]
+        python-version: ['3.9', '3.10']
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install tox tox-venv tox-travis
-      - name: Run tests
-        run: tox
+    - uses: actions/checkout@v2
 
-      - name: Notify on failure
-        if: failure()
-        run: echo "Tests failed, please check the logs."
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox tox-venv tox-travis
+
+    - name: Run tests
+      run: tox
+
+    - name: Send notifications
+      if: always()
+      run: echo "Tests complete"

@@ -1,19 +1,14 @@
 name: Python CI
 
-on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+on: [push, pull_request]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        python-version: [3.9, 3.10]
+        python-version: ['3.9', '3.10']
 
     steps:
       - uses: actions/checkout@v2
@@ -31,4 +26,4 @@ jobs:
           pip install setuptools_scm
 
       - name: Run tests
-        run: tox -e py${{ matrix.python-version:2 }}
+        run: tox -e py${{ matrix.python-version }}

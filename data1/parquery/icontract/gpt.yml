@@ -1,14 +1,18 @@
 name: Python CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        python-version: [3.9, 3.10]
+        python-version: ['3.9', '3.10']
 
     steps:
     - uses: actions/checkout@v2
@@ -24,7 +28,8 @@ jobs:
         pip install -e .[dev]
         pip install coveralls
 
-    - name: Run tests
-      run: |
-        python precommit.py
-        coveralls
+    - name: Run precommit script
+      run: python precommit.py
+
+    - name: Run coveralls
+      run: coveralls

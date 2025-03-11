@@ -1,12 +1,6 @@
 name: Python CI
 
-on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+on: [push, pull_request]
 
 jobs:
   build:
@@ -17,28 +11,29 @@ jobs:
         python-version: ['3.9', '3.10']
 
     steps:
-      - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -qq openjdk-8-jre
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+    - name: Run tests
+      run: python setup.py test
 
-      - name: Run tests
-        run: |
-          python setup.py test
+    - name: Deploy to PyPI
+      if: github.event_name == 'push' && github.ref_type == 'tag'
+      run: |
+        echo "${{ secrets.PYPI_PASSWORD }}" | python -m twine login --username moxfyre --password-stdin
+        python -m twine upload --repository pypi dist/*
 
-      - name: Deploy to PyPI
-        if: github.event_name == 'push' && github.ref == 'refs/tags/*'
-        run: |
-          python -m pip install --upgrade setuptools wheel twine
-          python setup.py sdist bdist_wheel
-          python -m twine upload --repository pypi dist/*
-        env:
-          TWINE_USERNAME: moxfyre
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_KEY }}
+      env:
+        TWINE_USERNAME: moxfyre
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        TWINE_REPOSITORY: pypi
+
+      secrets:
+        PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}

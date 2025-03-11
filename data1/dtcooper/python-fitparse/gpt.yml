@@ -4,12 +4,11 @@ on: [push, pull_request]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        python-version: [3.9, 3.10]
+        python-version: ['3.9', '3.10', '3.11']
 
     steps:
     - uses: actions/checkout@v2
@@ -28,3 +27,9 @@ jobs:
       run: |
         python -m unittest discover -s tests
         coverage run run_tests.py && coverage report -m
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v2
+      with:
+        name: coverage
+        path: coverage.xml

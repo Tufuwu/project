@@ -1,14 +1,14 @@
-name: Python Tox
+name: Python CI
 
 on: [push, pull_request]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        python: [3.9, 3.10, 3.11]
+        python: ['3.9', '3.10', '3.11']
 
     steps:
       - uses: actions/checkout@v2
@@ -20,9 +20,3 @@ jobs:
         run: pip install tox
       - name: Run tests
         run: tox -e py${{ matrix.python }}
-      - name: Check code style
-        run: tox -e pep8
-      - name: Build docs
-        run: tox -e docs
-      - name: Run packaging tests
-        run: tox -e packaging

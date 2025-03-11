@@ -1,44 +1,39 @@
 name: Python package
-
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-
+      - develop
+      - release/*
+  
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
-        python-version: ['3.9', '3.10']
-
+        python: ['3.9', '3.10']
     steps:
-    - uses: actions/checkout@v2
-      
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-        
-    - name: Install dependencies
-      run: |
-        pip install IPython==7.9
-        pip install pandas==1
-        pip install .[test]
-        
-    - name: Run tests
-      run: |
-        python -c 'import pytorch_memlab'
-        pytest test/test_mem_reporter.py
-        
-    - name: Deploy to PyPI
-      if: ${{ matrix.python-version == '3.10' && github.event_name == 'push' && github.ref == 'refs/tags/*' }}
-      run: echo "Deploying to PyPI"
-      env:
-        TWINE_USERNAME: yoursky
-        TWINE_PASSWORD: ${{ secrets.PYPI_API_KEY }}
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install IPython==7.9 pandas==0.24.2 .[test]
+      - name: Run tests
+        run: |
+          python -c 'import pytorch_memlab'
+          pytest test/test_mem_reporter.py
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/tags/v*'
+    steps:
+      - name: Deploy to PyPI
+        uses: pypa/gh-action-pypi-publish@release
+        with:
+          user: yoursky
+          password: ${{ secrets.PYPI_API_TOKEN }}

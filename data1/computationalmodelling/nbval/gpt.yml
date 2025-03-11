@@ -4,32 +4,25 @@ on: [push, pull_request]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        python-version: ['3.9', '3.8', '3.7', '3.6']
+        python-version: ['3.9', '3.10', '3.11', 'nightly']
 
     steps:
     - uses: actions/checkout@v2
-
-    - name: Set up Python
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
+        pip install --upgrade pip
         pip install .
         pip install doit
         doit install_test_deps
 
     - name: Run tests
       run: doit test
-
-    strategy:
-      matrix:
-        allow_failures:
-          python: ['3.10']

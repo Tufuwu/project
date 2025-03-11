@@ -1,6 +1,12 @@
-name: Python CI
+name: Python package
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -9,11 +15,12 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11']
+        python-version: ['3.9', '3.10']
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+      
+    - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
@@ -26,7 +33,14 @@ jobs:
     - name: Run tests
       run: tox
 
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v2
+    - name: Upload coverage
+      uses: actions/upload-artifact@v2
       with:
-        token: ${{secrets.CODECOV_TOKEN}}
+        name: coverage
+        path: .tox/reports
+
+    - name: Send status to PR
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        python .github/actions/comment-pr.py

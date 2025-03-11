@@ -101,24 +101,24 @@ def fix_action_file(lines):
             result.append(lines[line_index])
             line_index += 1
     return result
+
+def fix_gpt_file(lines):
+    result = []
+
+    for line in lines:
+        if re.search("\'\'\'"):
+            continue
+        result.append(line)
+
+
+    return result
+
 def fix_importer_file(lines):
     result = []
     line_index = 0
     while line_index <len(lines):
         if re.search('concurrency:',lines[line_index]):
-            line_index += 1
-        elif re.search(r'actions/upload-artifact@v\d',lines[line_index]):
-            s = re.sub(r'actions/upload-artifact@v\d','actions/upload-artifact@v4',lines[line_index])
-            result.append(s)
-            line_index += 1
-        elif re.search(r'ubuntu-\d+\.\d+',lines[line_index]):
-            run = re.sub(r'ubuntu-\d+\.\d+','ubuntu-latest',lines[line_index])
-            result.append(run)
-            line_index += 1  
-        elif re.search(r'actions/cache@v\d',lines[line_index]):
-            s = re.sub(r'actions/cache@v\d','actions/cache@v4',lines[line_index])
-            result.append(s)
-            line_index += 1           
+            line_index += 1       
 
         elif re.search('python-version:',lines[line_index]):
             if re.search(r'\[.*\]',lines[line_index]):
@@ -183,8 +183,9 @@ def write_importer_in(file_path,target_directory):
 def write_gpt_in(file_path,target_directory):
     with open(file_path, "r", encoding="utf-8") as f:
         lines = f.readlines()
+    temp = fix_action_file(lines)
     with open(target_directory, "w", encoding="utf-8") as f:
-        f.writelines(lines)
+        f.writelines(temp)
 
 def upload_repo_test(repo_full_name,base_download_path,local_directory):
     count = 0

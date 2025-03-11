@@ -1,6 +1,12 @@
 name: Python CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -13,6 +19,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -33,6 +40,7 @@ jobs:
         coverage run --source=pycec setup.py test
         coverage run --source=pycec `which py.test`
 
-    - name: Code coverage
-      run: codeclimate-test-reporter
-      run: coveralls
+    - name: Generate reports
+      run: |
+        codeclimate-test-reporter
+        coveralls

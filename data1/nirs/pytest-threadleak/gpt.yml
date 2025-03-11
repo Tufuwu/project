@@ -5,18 +5,18 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
-
+    
     strategy:
       matrix:
-        python-version: [3.9, 3.10]
+        python: ['3.9', '3.10']
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.python }}
 
       - name: Install dependencies
         run: |
@@ -24,4 +24,4 @@ jobs:
           pip install tox
 
       - name: Run tests
-        run: tox -e py${{ matrix.python-version }}
+        run: tox -e py${{ matrix.python }}
