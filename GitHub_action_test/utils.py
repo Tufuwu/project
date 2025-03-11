@@ -187,7 +187,7 @@ def write_importer_in(file_path,target_directory):
 def write_gpt_in(file_path,target_directory):
     with open(file_path, "r", encoding="utf-8") as f:
         lines = f.readlines()
-    temp = fix_action_file(lines)
+    temp = fix_gpt_file(lines)
     with open(target_directory, "w", encoding="utf-8") as f:
         f.writelines(temp)
 
@@ -216,6 +216,7 @@ def upload_repo_test(repo_full_name,base_download_path,local_directory):
     count +=1
     time.sleep(30)
     delet_file(workflow_path)
+    
     gpt_file_path = f"D:/vscode/3/project/data1/{repo_full_name}/gpt.yml"
     write_gpt_in(gpt_file_path,test_file_path)
     push_repositories(f'{repo_full_name}{count}')

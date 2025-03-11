@@ -2,6 +2,7 @@
 import pandas as pd
 from utils import upload_repo_test,inital_repo
 import csv
+import re
 
 def write_file_in(csv_file,new_data):
         # 打开CSV文件并进行操作
@@ -36,4 +37,3 @@ for index, row in df.iterrows():
         csv_file = 'D:/vscode/3/project/GitHub_action_test/1.csv'
         new_data ={'full_name':row['full_name']}
         write_file_in(csv_file,new_data)
-
