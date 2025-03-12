@@ -14,24 +14,39 @@ jobs:
 
     strategy:
       matrix:
-        python: ['3.9', '3.10', '3.11']
+        python-version: ['3.9', '3.10']
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up Python ${{ matrix.python }}
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python }}
+          python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: |
-          pip install numpy==stable
-          pip install astropy==stable
-          pip install scipy pytest-cov
+          python -m pip install --upgrade pip
+          pip install numpy==$NUMPY_VERSION astropy==$ASTROPY_VERSION scipy pytest-cov $PIP_DEPENDENCIES
+          if [ -n "$CONDA_DEPENDENCIES" ]; then
+            conda install $CONDA_DEPENDENCIES
+          fi
 
       - name: Run tests
-        run: pytest
+        run: |
+          py.test
 
       - name: Code Climate
-        run: echo "Repo token: 3b872f454e56a7bae149bd9ec6b24c83e6d5856ce08035a8c2e739e67c410d70"
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CODE_CLIMATE_TOKEN }}
+        run: |
+          ./cc-test-reporter before-build
+          ./cc-test-reporter after-build --exit-code $?
+
+env:
+  global:
+    - NUMPY_VERSION=stable
+    - ASTROPY_VERSION=stable
+    - SETUP_CMD='test'
+    - PIP_DEPENDENCIES=''
+    - CONDA_DEPENDENCIES='scipy pytest-cov'

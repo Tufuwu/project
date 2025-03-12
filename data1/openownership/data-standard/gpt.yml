@@ -1,23 +1,30 @@
 name: Python CI
+
 on: [push, pull_request]
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        python: ['3.9', '3.10', '3.11']
+        python-version: ['3.9', '3.10']
+
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python }}
+
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python }}
+        python-version: ${{ matrix.python-version }}
+
     - name: Install dependencies
       run: |
         pip install -r requirements_test.txt
-        curl -s -S --retry 3 https://raw.githubusercontent.com/open-contracting/standard-maintenance-scripts/d20d4d2e3ade40e4daf6424bccab71bd79a38607/tests/install.sh | bash -
+        curl -s -S --retry 3 ${{ env.BASEDIR }}/tests/install.sh | bash -
         sed -i 's|open-contracting/standard/1.1/standard/schema|open-contracting/standard/1__1__4/standard/schema|' $VIRTUAL_ENV/src/jscc/jscc/testing/json.py
+
     - name: Run tests
       run: |
         ./open-contracting_standard-maintenance-scripts_tests_script.sh
-        py.test
+        pytest

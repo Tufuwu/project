@@ -1,16 +1,9 @@
-name: Python package
+name: Python CI
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+on: [push, pull_request]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -19,28 +12,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      
-    - name: Set up Python
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install tox-travis
-
+        pip install tox
     - name: Run tests
       run: tox
 
-    - name: Upload coverage
-      uses: actions/upload-artifact@v2
-      with:
-        name: coverage
-        path: .tox/reports
-
-    - name: Send status to PR
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        python .github/actions/comment-pr.py
+```

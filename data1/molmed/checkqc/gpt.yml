@@ -1,12 +1,12 @@
-name: Python package
+name: Python package CI
 
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -18,27 +18,26 @@ jobs:
         python-version: ['3.9', '3.10']
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install --upgrade -e . -r ./requirements/dev
-      - name: Run tests
-        run: |
-          export BOTO_CONFIG=/dev/null
-          pytest --cov=checkQC tests/
-      - name: Upload coverage to Codecov 
-        run: codecov
-      - name: Deploy to PyPI
-        if: github.event_name == 'push' && github.ref == 'refs/tags/*'
-        env:
-          USERNAME: __token__
-        run: |
-          echo "${{ secrets.PYPI_TOKEN }}" > ~/.pypirc
-          python -m pip install --upgrade twine
-          python setup.py sdist bdist_wheel
-          python -m twine upload --repository pypi dist/*
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade -e . -r ./requirements/dev
+    - name: Run tests
+      run: |
+        export BOTO_CONFIG=/dev/null
+        pytest --cov=checkQC tests/
+    - name: Upload coverage to Codecov
+      run: codecov
+    - name: Deploy to PyPI
+      if: github.event_name == 'push' && github.ref == 'refs/tags/*'
+      run: |
+        echo "${{ secrets.PYPI_PASSWORD }}" | twine upload --repository pypi dist/*
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+```

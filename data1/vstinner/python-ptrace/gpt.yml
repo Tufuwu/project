@@ -1,40 +1,25 @@
-name: Python CI
+name: Python package CI
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+on: [push, pull_request]
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         python-version: ['3.9', '3.10']
 
-    env:
-      TOXENV: pep8
-
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install tox
-        run: pip install -U tox
-
-      # SYS_PTRACE capability is not available in default containers,
-      # use sudo to work around the issue:
-      # https://github.com/travis-ci/travis-ci/issues/9033
-      - name: Run tox
-        run: |
-          if ${{ matrix.python-version }} == '3.9' || ${{ matrix.python-version }} == '3.10' ; then
-            sudo tox
-          fi
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox
+    - name: Run tests
+      run: tox

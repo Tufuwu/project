@@ -3,6 +3,16 @@ import os
 import shutil
 import re
 import time
+
+
+
+def push_to_main(commit_message="Trigger GitHub Action"):
+    try:
+        subprocess.run(['git', 'commit', '--allow-empty', '-m', commit_message], check=True)
+        subprocess.run(['git', 'push', 'origin', 'main'], check=True)
+        print("GitHub Action triggered successfully!")
+    except subprocess.CalledProcessError as e:
+        print(f"Error: {e}")
 def delet_file(local_directory):
     # 清空当前仓库中的文件和文件夹（保留 .git）
     for item in os.listdir(local_directory):
@@ -199,13 +209,14 @@ def upload_repo_test(repo_full_name,base_download_path,local_directory):
 
     write_repo_in(repo_path,local_directory)
 
-    workflow_path = f"D:/vscode/1/test4/.github/workflows"
-    test_file_path = 'D:/vscode/1/test4/.github/workflows/test.yml'
+    workflow_path = f"D:/vscode/1/test5/.github/workflows"
+    test_file_path = 'D:/vscode/1/test5/.github/workflows/test.yml'
     delet_file(workflow_path)
     action_file_path = f"D:/vscode/3/project/data1/{repo_full_name}/action.yml"
     write_action_in(action_file_path,test_file_path)
 
     push_repositories(f'{repo_full_name}{count}')
+    push_to_main(commit_message="Trigger GitHub Action")
     count +=1
     time.sleep(30)
     return

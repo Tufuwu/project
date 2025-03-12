@@ -11,29 +11,29 @@ jobs:
         python-version: ['3.9', '3.10']
 
     steps:
-    - uses: actions/setup-python@v2
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
       run: |
-        sudo apt-get install -qq openjdk-8-jre
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
     - name: Run tests
-      run: python setup.py test
+      run: |
+        python setup.py test
 
     - name: Deploy to PyPI
-      if: github.event_name == 'push' && github.ref_type == 'tag'
+      if: github.ref == 'refs/tags/*'
       run: |
-        echo "${{ secrets.PYPI_PASSWORD }}" | python -m twine login --username moxfyre --password-stdin
-        python -m twine upload --repository pypi dist/*
-
+        python -m pip install --upgrade pip
+        pip install twine
+        python setup.py sdist bdist_wheel
+        twine upload --repository pypi dist/*
       env:
         TWINE_USERNAME: moxfyre
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        TWINE_REPOSITORY: pypi
-
-      secrets:
-        PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_KEY }}

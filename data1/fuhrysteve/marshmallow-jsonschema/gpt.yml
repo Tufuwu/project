@@ -1,10 +1,6 @@
 name: Python CI
 
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+on: [push, pull_request]
 
 jobs:
   lint:
@@ -23,7 +19,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-tox.txt
           pip install -U tox-travis coveralls
-      - name: Lint code
+      - name: Run linting
         run: make tox
 
   test:
@@ -44,5 +40,5 @@ jobs:
           pip install -U tox-travis coveralls
       - name: Run tests
         run: make tox
-      - name: Coverage report
+      - name: Upload coverage
         run: coveralls

@@ -18,8 +18,8 @@ def write_file_in(csv_file,new_data):
         writer.writerow(new_data)
 
 # 配置
-github_repo_url = "https://github.com/Tufuwu/test4.git"  # GitHub仓库URL
-local_directory = "D:/vscode/1/test4" # 本地目录，Git仓库所在的目录
+github_repo_url = "https://github.com/Tufuwu/test5.git"  # GitHub仓库URL
+local_directory = "D:/vscode/1/test5" # 本地目录，Git仓库所在的目录
 csv_file_path = "D:/vscode/3/project/repositories/temp.csv"  # 存放文件路径的CSV文件路径
 base_repo_path ="D:/vscode/repositories"
 

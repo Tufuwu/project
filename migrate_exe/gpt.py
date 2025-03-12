@@ -1,8 +1,8 @@
 import pandas as pd
-from model import create_model,read_file,prompt_constructor,write_file_in
+from model import create_gpt_model,read_file,prompt_constructor,write_file_in
 import time
 
-api_token="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"
+gpt_api_token="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"
 csv_file = "D:/vscode/3/project/GitHub_action_test/success_repo_result.csv"
 
 df =pd.read_csv(csv_file)
@@ -15,7 +15,7 @@ for index,row in df.iterrows():
 
     prompt =  write_migration_template.format(sourcelang = 'Travis CI',targetlang = 'Github Action',sourcefile_content =s1 )
 
-    reponse = create_model("gpt-3.5-turbo",api_token,prompt)
+    reponse = create_gpt_model("gpt-3.5-turbo",gpt_api_token,prompt)
     print(reponse)
     write_file_in(repo_full_name,reponse)
     time.sleep(10)

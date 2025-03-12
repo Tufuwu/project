@@ -4,7 +4,6 @@ on: [push, pull_request]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -28,12 +27,12 @@ jobs:
       run: |
         coverage run --source=olefile -m nose tests
 
-    - name: Install and run coveralls
+    - name: Upload coverage report
       run: |
         pip install coveralls
         coveralls
 
-    - name: Run additional checks
+    - name: Check code quality
       run: |
         coverage report
         pip install pycodestyle pyflakes

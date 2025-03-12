@@ -1,11 +1,6 @@
-```yaml
 name: Python CI
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -27,7 +22,5 @@ jobs:
         pip install tox codecov
     - name: Run tests
       run: tox
-
-    - name: Upload coverage data
+    - name: Upload coverage to Codecov
       run: codecov
-```

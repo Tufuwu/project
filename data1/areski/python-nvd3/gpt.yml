@@ -1,12 +1,6 @@
-name: Python package CI
+name: Python CI
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+on: [push, pull_request]
 
 jobs:
   build:
@@ -34,6 +28,7 @@ jobs:
 
     - name: Run tests
       run: |
+        # python tests.py
         coverage run --source=nvd3 setup.py test
 
     - name: Run coveralls

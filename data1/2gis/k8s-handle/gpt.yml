@@ -1,32 +1,32 @@
-name: Unit tests
-on: [push, pull_request]
+name: Python application CI
+
+on: [push]
+
 jobs:
   test:
+    name: Unit tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python: ['3.9', '3.10']
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python }}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python }}
       - name: Install dependencies
-        run: pip install tox codecov
+        run: pip install tox-travis codecov
       - name: Run tests
         run: tox
-      - name: Upload coverage
+      - name: Upload coverage to Codecov
         run: codecov
-
-name: Docker image build test
-on: [push, pull_request]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Docker
-        uses: docker/build-push-action@v2
-      - name: Set up Docker Compose
-        run: docker-compose build
+    docker-build:
+      name: Docker image build test
+      runs-on: ubuntu-latest
+      services:
+        docker
+      steps:
+        - uses: actions/checkout@v2
+        - name: Build Docker image
+          run: docker-compose build

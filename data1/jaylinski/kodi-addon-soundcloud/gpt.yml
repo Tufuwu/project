@@ -5,13 +5,14 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         python-version: ['3.9', '3.10']
-    
+
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
@@ -20,7 +21,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install pipenv
         pipenv install --dev
-    - name: Run lint
-      run: pipenv run lint
-    - name: Run tests
-      run: pipenv run test
+    - name: Lint code
+      run: |
+        pipenv run lint
+    - name: Test code
+      run: |
+        pipenv run test

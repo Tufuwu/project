@@ -1,11 +1,7 @@
-
+```yaml
 name: Python CI
 
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -13,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.9', '3.8', '3.7']
+        python-version: ['3.9', '3.10']
 
     steps:
     - uses: actions/checkout@v2
@@ -22,6 +18,9 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
-      run: pip install . -r requirements.txt
+      run: |
+        python -m pip install --upgrade pip
+        pip install . -r requirements.txt
     - name: Run tests
       run: pytest
+```

@@ -1,12 +1,6 @@
 name: Python CI
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+on: [push, pull_request]
 
 jobs:
   build:
@@ -14,21 +8,19 @@ jobs:
 
     strategy:
       matrix:
-        python: ['3.9', '3.10']
+        python-version: ['3.9', '3.10']
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python }}
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install tox
-          pip install codecov
-      - name: Run tests
-        run: tox
-      - name: Upload coverage
-        if: success()
-        run: codecov
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox-travis codecov
+    - name: Run tests
+      run: tox
+    - name: Upload coverage to Codecov
+      run: codecov

@@ -1,6 +1,6 @@
-name: CI
+name: Python CI
 
-on: 
+on:
   push:
     branches:
       - '*'
@@ -33,12 +33,15 @@ jobs:
     - name: Build
       run: make
 
-    - name: Archive files
-      run: 7z a dictionaries-"$GITHUB_REF".7z jmdict.mobi jmnedict.mobi combined.mobi
+    - name: Create archive
+      run: 7zr a dictionaries-"$GITHUB_REF".7z jmdict.mobi jmnedict.mobi combined.mobi
 
     - name: Deploy
-      uses: softprops/action-gh-release@v1
+      uses: actions/upload-release-asset@v1
       with:
-        files: dictionaries-*.7z
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: dictionaries-*.7z
+        asset_name: dictionaries-"$GITHUB_REF".7z
+        asset_content_type: application/x-7z-compressed
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

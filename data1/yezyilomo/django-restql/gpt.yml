@@ -1,22 +1,23 @@
-name: Python package
+name: Python CI
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
-  test:
+  build:
+
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        python-version: ['3.9', '3.10']
+        python: ['3.9', '3.10']
 
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: ${{ matrix.python }}
 
     - name: Install dependencies
       run: |
@@ -26,6 +27,4 @@ jobs:
     - name: Run tests
       run: tox
 
-    - name: Send notifications
-      if: always()
-      run: echo "Tests complete"
+```
