@@ -1,0 +1,60 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - python-version: '3.9'
+          - python-version: '3.10'
+          - python-version: '3.11'
+          - python-version: '3.12'
+          - python-version: '3.13-dev'
+          - python-version: 'pypy-3.9'
+          - python-version: 'pypy-3.10'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-${{ matrix.python-version }}
+
+      - name: Install coverage
+        run: pip install coverage
+
+      - name: Run tests
+        run: coverage run --source=olefile -m nose tests
+
+      - name: Coveralls
+        run: |
+          pip install coveralls
+          coveralls
+
+      - name: Coverage report
+        if: always()
+        run: coverage report
+
+      - name: Install linters
+        if: always()
+        run: pip install pycodestyle pyflakes
+
+      - name: Run pyflakes
+        if: always()
+        run: pyflakes .
+
+      - name: Run pycodestyle
+        if: always()
+        run: pycodestyle --statistics --count .
+```

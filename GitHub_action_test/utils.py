@@ -201,7 +201,7 @@ def write_gpt_in(file_path,target_directory):
     with open(target_directory, "w", encoding="utf-8") as f:
         f.writelines(temp)
 
-def upload_repo_test(repo_full_name,base_download_path,local_directory):
+def upload_repo_test(repo_full_name,base_download_path,local_directory,workflow_path):
     count = 0
     file_path = f"D:/vscode/3/project/data1/{repo_full_name}"
     repo_path = os.path.join(base_download_path, repo_full_name)
@@ -209,17 +209,23 @@ def upload_repo_test(repo_full_name,base_download_path,local_directory):
 
     write_repo_in(repo_path,local_directory)
 
-    workflow_path = f"D:/vscode/1/test5/.github/workflows"
-    test_file_path = 'D:/vscode/1/test5/.github/workflows/test.yml'
+    workflow_path = workflow_path
+    test_file_path = f'{workflow_path}/test.yml'
     delet_file(workflow_path)
     action_file_path = f"D:/vscode/3/project/data1/{repo_full_name}/action.yml"
     write_action_in(action_file_path,test_file_path)
+    
+    gpt_file_path = f"D:/vscode/3/project/data1/{repo_full_name}/gpt-4o.yml"
+    write_gpt_in(gpt_file_path,test_file_path)
+    push_repositories(f'{repo_full_name}/gpt-4o')
+    time.sleep(30)
+    return
 
     push_repositories(f'{repo_full_name}{count}')
     push_to_main(commit_message="Trigger GitHub Action")
     count +=1
     time.sleep(30)
-    return
+
     delet_file(workflow_path)
     importer_file_path =f"D:/vscode/3/project/data1/{repo_full_name}/importer.yml"
     write_importer_in(importer_file_path,test_file_path)

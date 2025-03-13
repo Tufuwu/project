@@ -77,16 +77,16 @@ def get_wrong_message(github_token,repo_full_name,commit_sha):
 
 def get_target_history(repo_full_name,api_token):
     workflow_file_path = '.github/workflows/'
-    repo_name = 'Tufuwu/experiment_running'
+    repo_name = 'Tufuwu/test-1'
     commits = get_workflow_file_history(repo_name, workflow_file_path, api_token)
     for c in commits:
         b = c['commit']['message']
-        if re.search(f"{repo_full_name}1",b) :
-
+        if re.search(f"{repo_full_name}2",b) :
+            print('ssss')
             get_wrong_message(api_token,repo_full_name,c['sha'])
             break
 
 if __name__ =='__main__':
-    repo_full_name = 'ckan/ckanext-archiver'
+    repo_full_name = 'neithere/argh'
     api_token = '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'
     get_target_history(repo_full_name,api_token)

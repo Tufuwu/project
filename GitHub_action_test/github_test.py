@@ -2,7 +2,7 @@
 import pandas as pd
 from utils import upload_repo_test,inital_repo
 import csv
-import re
+
 
 def write_file_in(csv_file,new_data):
         # 打开CSV文件并进行操作
@@ -18,9 +18,10 @@ def write_file_in(csv_file,new_data):
         writer.writerow(new_data)
 
 # 配置
-github_repo_url = "https://github.com/Tufuwu/test5.git"  # GitHub仓库URL
-local_directory = "D:/vscode/1/test5" # 本地目录，Git仓库所在的目录
-csv_file_path = "D:/vscode/3/project/repositories/temp.csv"  # 存放文件路径的CSV文件路径
+github_repo_url = "https://github.com/Tufuwu/test7.git"  # GitHub仓库URL
+local_directory = "D:/vscode/1/test7"                    # 本地目录，Git仓库所在的目录
+workflow_path = f"D:/vscode/1/test7/.github/workflows"
+csv_file_path = "D:/vscode/3/project/GitHub_action_test/success_repo_result.csv"  # 存放文件路径的CSV文件路径
 base_repo_path ="D:/vscode/repositories"
 
 api_token = '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'
@@ -32,7 +33,7 @@ for index, row in df.iterrows():
 
     try:
         inital_repo(local_directory,github_repo_url)
-        upload_repo_test(repo_full_name,base_repo_path,local_directory)
+        upload_repo_test(repo_full_name,base_repo_path,local_directory,workflow_path)
     except:
         csv_file = 'D:/vscode/3/project/GitHub_action_test/1.csv'
         new_data ={'full_name':row['full_name']}

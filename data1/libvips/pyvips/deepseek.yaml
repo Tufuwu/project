@@ -1,0 +1,60 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      VIPS_VERSION_MAJOR: 8
+      VIPS_VERSION_MINOR: 9
+      VIPS_VERSION_MICRO: 0
+      PATH: $HOME/vips/bin:$PATH
+      LD_LIBRARY_PATH: $HOME/vips/lib:$LD_LIBRARY_PATH
+      PKG_CONFIG_PATH: $HOME/vips/lib/pkgconfig:$PKG_CONFIG_PATH
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12', 'pypy-3.9', 'pypy-3.10']
+        include:
+          - python-version: 'pypy-3.9'
+          - python-version: 'pypy-3.10'
+      allow-failures:
+        - python-version: 'pypy-3.9'
+        - python-version: 'pypy-3.10'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install APT dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libexpat1-dev gettext liblcms2-dev libmagickwand-dev libopenexr-dev libcfitsio3-dev libfftw3-dev libgif-dev libgs-dev libgsf-1-dev libmatio-dev libopenslide-dev liborc-0.4-dev libpango1.0-dev libpoppler-glib-dev librsvg2-dev libwebp-dev libtiff5-dev libglib2.0-dev
+
+    - name: Cache VIPS
+      id: cache-vips
+      uses: actions/cache@v3
+      with:
+        path: ~/vips
+        key: ${{ runner.os }}-vips-${{ env.VIPS_VERSION_MAJOR }}-${{ env.VIPS_VERSION_MINOR }}-${{ env.VIPS_VERSION_MICRO }}
+
+    - name: Install VIPS
+      if: steps.cache-vips.outputs.cache-hit != 'true'
+      run: |
+        uname -a
+        bash install-vips.sh --without-python
+
+    - name: Upgrade setuptools
+      run: pip install -U setuptools
+
+    - name: Install dependencies
+      run: pip install -U .[test]
+
+    - name: Run tests
+      run: python setup.py test

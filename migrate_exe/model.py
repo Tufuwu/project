@@ -45,9 +45,9 @@ def read_file(file_path):
         print(f"An error occurred: {e}")
 
 
-def write_file_in(repo_full_name,reponse):
+def write_file_in(repo_full_name,reponse,file_name):
 
-    file_name = f"gpt.yml"
+    file_name = file_name
     output_dir = f"D:/vscode/3/project/data1/{repo_full_name}"
     output_path = os.path.join(output_dir, file_name)
     with open(output_path, 'w') as f:
