@@ -29,7 +29,7 @@ def get_workflow_file_history(repo_full_name, file_path, api_token):
 def get_wrong_message(github_token,repo_full_name,commit_sha):
     # GitHub 配置信息
     GITHUB_TOKEN = github_token  
-    repo_full_name = 'Tufuwu/experiment_running'
+    repo_full_name = repo_full_name
     COMMIT_SHA = commit_sha # 目标 Commit SHA
 
     # API 请求头
@@ -77,16 +77,16 @@ def get_wrong_message(github_token,repo_full_name,commit_sha):
 
 def get_target_history(repo_full_name,api_token):
     workflow_file_path = '.github/workflows/'
-    repo_name = 'Tufuwu/test-1'
+    repo_name = 'Tufuwu/test7'
     commits = get_workflow_file_history(repo_name, workflow_file_path, api_token)
     for c in commits:
         b = c['commit']['message']
-        if re.search(f"{repo_full_name}2",b) :
+        if re.search(f"{repo_full_name}/gpt-4o",b) :
             print('ssss')
-            get_wrong_message(api_token,repo_full_name,c['sha'])
+            get_wrong_message(api_token,repo_name,c['sha'])
             break
 
 if __name__ =='__main__':
-    repo_full_name = 'neithere/argh'
+    repo_full_name = 'dorianbrown/rank_bm25'
     api_token = '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'
     get_target_history(repo_full_name,api_token)
