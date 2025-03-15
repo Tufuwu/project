@@ -1,7 +1,7 @@
 name: unit-tests
 on:
   # Trigger the workflow on push or pull request,
-  # but only for the main/develop branch
+  # but only for the main branch
   push:
     branches:
       - master
@@ -15,25 +15,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: python-{{ cookiecutter.python_version }}
+    - name: python-3.8
       uses: actions/setup-python@v2
       with:
-        python-version: {{ cookiecutter.python_version }}
+        python-version: 3.8
     - name: install-dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest
         pip install -e .
-    - name: flake8
-      run: |
-        config/hooks/pre-commit
     - name: print env
       run: |
         env
-    - name: pytest_and_coverage
+    - name: pytorch-test
       run: |
-        pytest --cov={{cookiecutter.project_slug}}
-    - name: end2end-toyexp
+        ./tests/end2end_pytorch/run.sh
+    - name: tensorflow-test
       run: |
-        cd examples/local
-        sh run.sh
+        ./tests/end2end_tensorflow/run.sh
+    - name: doc-creation-test
+      run: |
+        ./tests/test_docs/run.sh

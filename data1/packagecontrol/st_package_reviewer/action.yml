@@ -17,9 +17,10 @@ jobs:
           python-version: 3.x
 
       - name: Install poetry
-        uses: dschep/install-poetry-action@v1.3
+        uses: snok/install-poetry@v1.1.4
         with:
           version: ${{ env.POETRY_VERSION }}
+          virtualenvs-create: false
 
       # Skip cache because we have few deps
       - name: Install flake8
@@ -33,7 +34,7 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.6', '3.7', '3.8', '3.9']
-    name: Tests on Python ${{ matrix.python-version }}
+    name: pytest (Python ${{ matrix.python-version }})
     steps:
       - uses: actions/checkout@v2
 
@@ -43,10 +44,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install poetry
-        uses: dschep/install-poetry-action@v1.3
+        uses: snok/install-poetry@v1.1.4
         with:
           version: ${{ env.POETRY_VERSION }}
-          create_virtualenvs: true
+          virtualenvs-create: true
 
       - name: Cache poetry virtualenv
         uses: actions/cache@v2
@@ -60,7 +61,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
 
       - name: Run tests
-        run: py.test --cov-report term-missing
+        run: poetry run py.test --cov st_package_reviewer --cov tests --cov-report term-missing
 
       - name: Coveralls
         continue-on-error: true

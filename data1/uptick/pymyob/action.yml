@@ -1,4 +1,4 @@
-name: Test
+name: Lint
 on:
   push:
     branches:
@@ -6,33 +6,40 @@ on:
   pull_request: ~
 
 jobs:
-  lint:
+  flake8:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
       - name: Install Python
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
       - name: Install deps
-        run: pip install isort flake8
-      - name: Lint
+        run: pip install flake8
+      - name: Flake8
         run: flake8
-      - name: Isort
-        run: isort --diff --check-only
 
-  test:
+  isort:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python: ["3.4", "3.5", "3.6", "3.7", "3.8"]
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
       - name: Install Python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python }}
+          python-version: 3.8
       - name: Install deps
-        run: pip install requests-oauthlib
-      - name: Run tests...
-        run: python setup.py test
+        run: pip install isort
+      - name: Isort
+        run: isort --diff --check-only .
+
+  # superlinter:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v2
+  #     - name: Run Superlinter
+  #       uses: docker://github/super-linter:latest
+  #       env:
+  #         VALIDATE_PYTHON: true

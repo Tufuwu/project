@@ -6,6 +6,8 @@ name: Test build and run tests
 on:
   push:
     branches: [ master, dev ]
+  pull_request:
+    branches: [ master, dev ]
 
 jobs:
   tests-py2:
@@ -25,3 +27,7 @@ jobs:
     - name: Test by decompiling a script and building un.rpyc
       run: |
         ./unrpyc.py --clobber testcases/script.rpyc
+        diff -u testcases/script.orig.rpy testcases/script.rpy
+        cd un.rpyc;
+        ./compile.py -p 1
+        cd ..

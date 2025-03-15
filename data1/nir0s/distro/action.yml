@@ -6,30 +6,20 @@ on:
 
 jobs:
   lint:
-    name: ${{ matrix.toxenv }}
+    name: lint
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        include:
-          - python: 2.7
-            toxenv: flake8
-          - python: 3.8
-            toxenv: py3flake8
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up Python ${{ matrix.python }}
+      - name: Set up Python
         uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python }}
 
       - name: Install tox
         run: python -m pip install tox
 
       - name: Run tox
-        run: tox -e ${{ matrix.toxenv }}
+        run: tox -e lint
 
   test:
     name: ${{ matrix.toxenv }}
@@ -48,6 +38,8 @@ jobs:
             toxenv: py37
           - python: 3.8
             toxenv: py38
+          - python: 3.9
+            toxenv: py39
           - python: pypy2
             toxenv: pypy2
           - python: pypy3
@@ -84,7 +76,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: 3.x
 
       - name: Install tox
         run: python -m pip install tox

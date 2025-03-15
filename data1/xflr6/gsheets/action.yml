@@ -1,6 +1,7 @@
 name: Build
 on:
   - push
+  - pull_request
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -8,6 +9,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - python-version: "3.10.0-beta - 3.10"
+            os: ubuntu-latest
           - python-version: 3.9
             os: ubuntu-latest
           - python-version: 3.9

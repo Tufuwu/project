@@ -5,6 +5,13 @@ name: Repostat for Ubuntu 20.04
 
 on:
   push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master, v2.0.x ]
+  schedule:
+    # run every 6 days at 00:27
+    - cron: '27 0 */6 * *'
+
 jobs:
   ubuntu_build:
 
@@ -25,6 +32,20 @@ jobs:
 
     - name: Upgrade pip
       run: python -m pip install --upgrade pip
+
+    - name: Lint with flake8
+      run: |
+        pip install flake8
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82,E225,E231,E251 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Install repostat
+      run: pip install .
+
+    - name: Run repostat
+      run: repostat . /tmp --no-browser --contribution --copy-assets
 
     - name: Check generated report integrity
       run: python tools/check_report_files.py --is-relocatable /tmp

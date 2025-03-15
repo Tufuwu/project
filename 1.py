@@ -48,14 +48,15 @@ def process_repos_from_csv(csv_file, api_token):
                     for file in diffs:
                         if re.search(file_name,file):
                             count += 1
-
+                            file_name = fo.split_new_diffs(diff_content,file_name)
+                            row['file_name'] = file_name
                             new_data['new_commits_sha'] = c['sha']
                             break
                 else:
                     break
             #break
             new_data['commits_times'] = count -1
-            file_path = "D:/vscode/3/project/repositories/fix_time_1.csv"
+            file_path = "D:/vscode/3/project/repositories/fix_time_2.csv"
             fo.write_file_in(file_path,new_data)
 
 

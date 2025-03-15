@@ -1,8 +1,8 @@
 ---
-name: aactivator-ci
+name: build
 on: push
 jobs:
-  tox:
+  make:
     runs-on: ubuntu-18.04
     strategy:
       fail-fast: false

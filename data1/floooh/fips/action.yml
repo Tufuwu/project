@@ -4,8 +4,8 @@ on: [push, pull_request]
 
 jobs:
     fips-test:
-        runs-on: ubunutu-latest
+        runs-on: ubuntu-latest
         steps:
         - uses: actions/checkout@v1
         - name: test
-          run: test-linux.sh
+          run: ./test-linux.sh

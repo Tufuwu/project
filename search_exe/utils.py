@@ -115,6 +115,17 @@ class file_operate(diff_operate):
                 temp = diffs[i].split('/')
                 return temp[-1]
 
+    def split_new_diffs(self,diff_content,file_name):
+        diff_pattern = re.compile(r'(diff --git a/[\S]+ b/[\S]+)')
+        
+        # 根据匹配到的 diff 开头分割 diff 内容
+        diffs = diff_pattern.split(diff_content)
+        diffs = diffs[1:]
+        for i in range(0, len(diffs), 2):
+            if re.search(file_name,diffs[i]):
+                temp = diffs[i].split('/')
+                return temp[-1] 
+
     def split_and_save_diffs(self,diff_content, output_dir):
         # 使用正则表达式来匹配每个 diff 文件的开头
         diff_pattern = re.compile(r'(diff --git a/[\S]+ b/[\S]+)')

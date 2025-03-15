@@ -17,7 +17,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install needed packages
         run: |
@@ -43,8 +43,8 @@ jobs:
         shell: bash
         run: |
           echo "Running Shellcheck..."
-          find . -type f  -name '*' ! -path './ra/old-*' ! -path './test/*' -exec awk ' /^#!.*bash/{print FILENAME} {nextfile}' {} + | xargs shellcheck -s bash && echo "Everything is OK!"
-        continue-on-error: true
+          find ra tools -type f  -name '*' -exec awk ' /^#!.*bash/{print FILENAME} {nextfile}' {} + | xargs shellcheck -a -x -s bash && echo "Everything is OK!"
+        continue-on-error: false
 
       # Runs a perl linter
       - name: Running perl linter
@@ -59,13 +59,14 @@ jobs:
         shell: bash
         run: |
           echo "Running flake8..."
-          find . -type f  -name '*.py' ! -path './test/*' | xargs flake8 --ignore=E501 && echo "Everything is OK!"
-        continue-on-error: true
+          find . -type f  -name '*.py' ! -path './test/*' | xargs flake8 --ignore=E501,E722 && echo "Everything is OK!"
+        continue-on-error: false
 
       # Runs pylint
       - name: Running pylint
         shell: bash
         run: |
           echo "Running pylint..."
-          find . -type f  -name '*.py' ! -path './test/*' | xargs pylint --disable=line-too-long && echo "Everything is OK!"
-        continue-on-error: true
+          find . -type f  -name '*.py' ! -path './test/*' | xargs pylint --disable=duplicate-code && echo "Everything is OK!"
+        continue-on-error: false
+

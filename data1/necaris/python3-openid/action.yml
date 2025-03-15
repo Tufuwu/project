@@ -1,3 +1,4 @@
+---
 name: Tests
 on:
   push:
@@ -64,3 +65,4 @@ jobs:
       - run: pip install -r dev-requirements.txt
       - run: pip install .
       - run: coverage run -m unittest openid.test.test_suite
+      - run: coverage report

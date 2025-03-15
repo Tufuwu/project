@@ -5,6 +5,9 @@ name: CI Testing
 
 on:
   push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
@@ -45,6 +48,9 @@ jobs:
       redis:
         # Docker Hub image
         image: redis
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -74,3 +80,6 @@ jobs:
         flask sql init
         flask redis update
         npm run build
+    - name: Test with pytest
+      run: |
+        pytest

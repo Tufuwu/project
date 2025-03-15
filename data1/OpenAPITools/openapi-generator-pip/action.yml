@@ -18,12 +18,13 @@ jobs:
       run: pipx install poetry
     - uses: actions/setup-python@v5
       with:
-        python-version: '3.13'
+        python-version: 3.x
         cache: poetry
     - name: Setup Poetry to publish
       run: |
         poetry install --no-interaction
+        poetry config repositories.testpypi 'https://test.pypi.org/legacy/'
         poetry config pypi-token.testpypi '${{ secrets.TESTPYPI_API_TOKEN }}'
         poetry config pypi-token.pypi '${{ secrets.PYPI_API_TOKEN }}'
     - name: Publish package
-      run: python publish.py
+      run: poetry run task publish
