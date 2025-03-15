@@ -80,10 +80,6 @@ class diff_operate():
         return updated_content
     
 
-
-
-
-
 class file_operate(diff_operate):
     def __init__(self):
         pass
@@ -108,6 +104,16 @@ class file_operate(diff_operate):
 
         print(f'已将新数据添加到 {csv_file}')
 
+    def split_diffs(self,diff_content):
+        diff_pattern = re.compile(r'(diff --git a/[\S]+ b/[\S]+)')
+        
+        # 根据匹配到的 diff 开头分割 diff 内容
+        diffs = diff_pattern.split(diff_content)
+        diffs = diffs[1:]
+        for i in range(0, len(diffs), 2):
+            if re.search(r'workflow',diffs[i]):
+                temp = diffs[i].split('/')
+                return temp[-1]
 
     def split_and_save_diffs(self,diff_content, output_dir):
         # 使用正则表达式来匹配每个 diff 文件的开头
