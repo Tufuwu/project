@@ -580,7 +580,6 @@ filestack/filestack-python,2020-10-04T10:19:34Z,tests.yml,e5528aeeaa7b68a141e7be
 apache/fluo-muchos,2020-10-02T15:28:39Z,ci.yaml,c46aa98b5f7671bb55ffc0721c3f16197a95444f,c46aa98b5f7671bb55ffc0721c3f16197a95444f,0
 anexia-it/django-rest-multitokenauth,2020-10-02T15:15:27Z,tests.yml,c5c4e5436a3df7c443c1ac70407983ccc301330f,6e747f393090c6e4052b389bc5140ed0d0d69a05,2
 anexia/drf-multitokenauth,2020-10-02T15:15:27Z,tests.yml,c5c4e5436a3df7c443c1ac70407983ccc301330f,6e747f393090c6e4052b389bc5140ed0d0d69a05,2
-zigpy/zigpy-znp,2020-10-01T18:32:19Z,build.yaml,1829b93a0110ebd4b5e0f5a5e786353529ca9623,842b1fe1abd2bd245ee38921eaf529f48cfb078e,1
 provinzkraut/cologne_phonetics,2020-09-30T14:40:04Z,CI.yml,38201727ae77a611b5a76ead81957f0ecffc78cb,27a959adc891a5f8ede5c183f9fe7a423c2054d5,1
 benbarth/hacktoberfest-swag,2020-09-29T23:41:41Z,Validate.yml,d9261ae93cea44f46c6f371697d8eb249f88afa9,9bdb1159a6a86eeaf8dbde67bccf18af17c8a947,3
 konikvranik/pycec,2020-09-27T18:20:25Z,ci.yml,52cfbd2ff958b99918b0e1b80ec374edc23dc329,cf9d2cf22a94b9ecb6603e4105036632351ccf99,1
