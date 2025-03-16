@@ -18,10 +18,10 @@ def write_file_in(csv_file,new_data):
         writer.writerow(new_data)
 
 # 配置
-github_repo_url = "https://github.com/Tufuwu/test7.git"  # GitHub仓库URL
-local_directory = "D:/vscode/1/test7"                    # 本地目录，Git仓库所在的目录
-workflow_path = f"D:/vscode/1/test7/.github/workflows"
-csv_file_path = "D:/vscode/3/project/GitHub_action_test/success_repo_result.csv"  # 存放文件路径的CSV文件路径
+github_repo_url = "https://github.com/Tufuwu/action_test.git"  # GitHub仓库URL
+local_directory = "D:/vscode/1/action_test"                    # 本地目录，Git仓库所在的目录
+workflow_path = f"D:/vscode/1/action_test/.github/workflows"
+csv_file_path = "D:/vscode/3/project/repositories/fix_time_2.csv"  # 存放文件路径的CSV文件路径
 base_repo_path ="D:/vscode/repositories"
 
 api_token = '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'

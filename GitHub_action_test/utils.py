@@ -65,6 +65,9 @@ def fix_action_file(lines):
             s = re.sub(r'actions/cache@v\d','actions/cache@v4',lines[line_index])
             result.append(s)
             line_index += 1           
+        elif re.search(r'master',lines[line_index]):
+            temp = re.sub(r'master','main',lines[line_index])
+            result.append(temp)
 
         elif re.search('python-version:',lines[line_index]):
             if re.search(r'\[.*\]',lines[line_index]):
@@ -202,7 +205,7 @@ def write_gpt_in(file_path,target_directory):
         f.writelines(temp)
 
 def upload_repo_test(repo_full_name,base_download_path,local_directory,workflow_path):
-    count = 0
+
     file_path = f"D:/vscode/3/project/data1/{repo_full_name}"
     repo_path = os.path.join(base_download_path, repo_full_name)
     delet_file(local_directory)
@@ -214,12 +217,15 @@ def upload_repo_test(repo_full_name,base_download_path,local_directory,workflow_
     delet_file(workflow_path)
     action_file_path = f"D:/vscode/3/project/data1/{repo_full_name}/action.yml"
     write_action_in(action_file_path,test_file_path)
+    push_repositories(f'{repo_full_name}/action')
+    time.sleep(30)
+    return
     
     gpt_file_path = f"D:/vscode/3/project/data1/{repo_full_name}/gpt-4o.yml"
     write_gpt_in(gpt_file_path,test_file_path)
     push_repositories(f'{repo_full_name}/gpt-4o')
     time.sleep(30)
-    return
+
 
     push_repositories(f'{repo_full_name}{count}')
     push_to_main(commit_message="Trigger GitHub Action")

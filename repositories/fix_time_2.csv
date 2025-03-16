@@ -1,7 +1,6 @@
 full_name,commits_date,file_name,commit_sha,new_commits_sha,commits_times
 scikit-signal/tftb,2025-01-28T07:22:32Z,python-app.yml,b9347ca5a775eabd41900da272de2a0b12bc5a1b,b9347ca5a775eabd41900da272de2a0b12bc5a1b,0
 jeanralphaviles/comment_parser,2024-12-25T04:43:39Z,test.yml,bd3e1c9cb8d7e52f0a3afd1c86404d3199259f4e,bd3e1c9cb8d7e52f0a3afd1c86404d3199259f4e,0
-georgeyk/belogging,2024-12-18T19:45:25Z,ci.yaml,9fdaec6e78d870768ca539c87fb609e002a2521b,9fdaec6e78d870768ca539c87fb609e002a2521b,0
 OpenAPITools/openapi-generator-pip,2024-12-01T00:56:14Z,publish.yaml,6561d0606f6484873e817ced45c1a879a5590f72,2832d87cbe2d56f518b1afcd885498d0a8ce348d,8
 demianw/tract_querier,2024-11-26T17:18:38Z,test_package.yaml,4549c8e747e617747f5171b79108a157a7a7f3b5,035eebd01cbe920dec8dbe3db402e94544765ff1,1
 christianbrodbeck/eelbrain,2024-11-26T17:12:39Z,python-package-conda.yml,77acc09716ce9802e040f21d712fd5cb7deb4dea,fb6ae9450414323245ba3c6f090af91a97dbb1b1,1
@@ -643,3 +642,4 @@ roclark/sportsipy,2019-09-24T13:27:32Z,exhaustive.yml,22039a5964d014325ee33a7ce5
 siddhantgoel/beancount-ing,2019-09-17T16:55:35Z,main.yml,fe8bcac6686f9f50c10492778f2d06b48c0aba1a,fe8bcac6686f9f50c10492778f2d06b48c0aba1a,0
 siddhantgoel/beancount-dkb,2019-09-17T16:51:43Z,main.yml,05acf9478b640a42647aaa863545fe937390e59d,05acf9478b640a42647aaa863545fe937390e59d,0
 siddhantgoel/flask-filealchemy,2019-09-12T22:40:35Z,main.yml,1d458a065fc12e2032321f629199f17fd78aba8e,1d458a065fc12e2032321f629199f17fd78aba8e,0
+georgeyk/belogging,2024-12-18T19:45:25Z,ci.yaml,9fdaec6e78d870768ca539c87fb609e002a2521b,9fdaec6e78d870768ca539c87fb609e002a2521b,0
