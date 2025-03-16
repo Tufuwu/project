@@ -1,24 +1,21 @@
-name: Tests
+name: Run tests
 on: [push, pull_request]
 
 jobs:
   test:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: 
-          - 3.6
-          - 3.7
-          - 3.8
-          - 3.9
-          - "3.10"
-        with-extension: ["0", "1"]
-
-    runs-on: ubuntu-18.04
-
+        python-version:
+          - '3.8'
+          - '3.9'
+          - '3.10'
+          - '3.11'
+        with-extension: ['0', '1']
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
@@ -35,4 +32,4 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        coveralls
+        coveralls --service=github
