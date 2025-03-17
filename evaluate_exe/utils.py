@@ -84,14 +84,24 @@ def remove_comments_and_docstrings(source):
                         break
     return result
 
-def write_file_in(csv_path,full_name,new_data):
+def write_file_in(csv_path, full_name, new_data):
+    # 读取 CSV 文件
     df = pd.read_csv(csv_path)
+    
+    # 检查 'full_name' 列是否存在
+    if 'full_name' not in df.columns:
+        print("Error: 'full_name' column is missing.")
+        return
+    
+    # 遍历 new_data 并更新相应的列
     for key, value in new_data.items():
         if key not in df.columns:
-            df[key] = None  # 如果不存在，就创建该列并初始化为 None
-            
+            df[key] = None  # 如果列不存在，就创建该列并初始化为 None
+        
+        # 仅更新符合 full_name 的行，而不影响其他数据
         df.loc[df['full_name'] == full_name, key] = value
-
-        df.to_csv('modified_file.csv', index=False)
-
-    print(f'已将新数据添加到 {csv_path}')
+    
+    # 仅在所有更新完成后写入原 CSV 文件
+    df.to_csv(csv_path, index=False)
+    
+    print(f'数据已更新，并写入到原文件: {csv_path}')

@@ -53,5 +53,4 @@ jobs:
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
         tox -e deploy
-```
 

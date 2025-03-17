@@ -1,4 +1,3 @@
-```yaml
 name: Python CI
 
 on: [push, pull_request]
@@ -28,4 +27,3 @@ jobs:
         coverage run jsn.py -i example.jsn -o test.json -I import_dir
     - name: Upload coverage report
       run: codecov
-```

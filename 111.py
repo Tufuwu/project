@@ -25,4 +25,3 @@ for index, row in df.iterrows():
     temp = fix_gpt_file(lines)
     with open(file_path, "w", encoding="utf-8") as f:
         f.writelines(temp)
-    break

@@ -33,9 +33,6 @@ jobs:
         state: started
     - name: Create database
       run: psql -c 'create database bitfield;' -U postgres;
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
     - name: Run linting
       run: make lint
     - name: Run tests

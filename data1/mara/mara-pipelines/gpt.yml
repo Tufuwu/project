@@ -47,5 +47,4 @@ jobs:
       with:
         user: mara-pypi-upload-account
         password: ${{ secrets.PYPI_API_TOKEN }}
-```
 
