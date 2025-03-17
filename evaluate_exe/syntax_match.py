@@ -1,4 +1,6 @@
 import yaml
+from tree_sitter import Parser
+from tree_sitter_languages import get_language
 from utils import remove_comments_and_docstrings
 
 class TreeNode:
@@ -29,12 +31,9 @@ def calc_syntax_match(references, candidate):
     return corpus_syntax_match([references], [candidate])
 
 
-def corpus_syntax_match(references_path, candidates_path):
-
-    with open(references_path, "r") as f:
-        references = yaml.safe_load(f)
-    with open(candidates_path, "r") as f:
-        candidates = yaml.safe_load(f)
+def corpus_syntax_match(references, candidates):
+    parser = Parser()
+    parser.set_language(get_language("yaml"))
 
     #tree = parser.parse(yaml_code.encode("utf8"))
     match_count = 0
@@ -42,23 +41,28 @@ def corpus_syntax_match(references_path, candidates_path):
     total_count = 0
 
 
-    candidate_tree = yaml_to_tree(candidates)
+    reference = references[0]
+    candidate = candidates[0]
 
 
-    reference_tree = yaml_to_tree(references)
+    candidate_tree = parser.parse(bytes(candidate, "utf8")).root_node
+
+    reference_tree = parser.parse(bytes(reference, "utf8")).root_node
+    print(candidate_tree.sexp()) 
     #print(candidate_tree)
     #print(reference_tree)
     def get_all_sub_trees(root_node):
-        node_stack = [(root_node, 1)]  # (节点, 深度)
+        node_stack = []
         sub_tree_sexp_list = []
-
-        while node_stack:
+        depth = 1
+        node_stack.append([root_node, depth])
+        while len(node_stack) != 0:
             cur_node, cur_depth = node_stack.pop()
-            sub_tree_sexp_list.append((str(cur_node), cur_depth))
-
+            sub_tree_sexp_list.append([str(cur_node), cur_depth])
             for child_node in cur_node.children:
-                node_stack.append((child_node, cur_depth + 1))
-
+                if len(child_node.children) != 0:
+                    depth = cur_depth + 1
+                    node_stack.append([child_node, depth])
         return sub_tree_sexp_list
 
     cand_sexps = [x[0] for x in get_all_sub_trees(candidate_tree)]

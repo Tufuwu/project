@@ -6,16 +6,13 @@ from utils import write_file_in
 
 
 def calc_codebleu(
-    references_path:str,
-    predictions_path: str,
+    references:list[str],
+    predictions: list[str],
     keywords_dir: str,
     weights: tuple[float, float, float, float] = (0.4, 0.4, 0.2),
 
 ) -> dict[str, float]:
-    with open(references_path, "r", encoding="utf-8") as f:
-        references = f.readlines()
-    with open(predictions_path, "r", encoding="utf-8") as f:
-        predictions = f.readlines()
+
 
     references = [x.strip() for x in references]
     hypothesis = [x.strip() for x in predictions]
@@ -37,6 +34,7 @@ def calc_codebleu(
             tokenized_refs.append(i)
     tokenized_refs = [[tokenized_refs]]
     tokenized_hyps = [tokenized_hyps]
+
     ngram_match_score = corpus_bleu(tokenized_refs, tokenized_hyps)
     print(ngram_match_score)
 
@@ -55,7 +53,7 @@ def calc_codebleu(
 
 
     syntax_match_score = corpus_syntax_match(
-        references_path, predictions_path
+        references, predictions
     )
 
     print(syntax_match_score)
@@ -72,15 +70,22 @@ def calc_codebleu(
 
 
 if __name__ == "__main__":
-    csv_file = 'D:/vscode/3/project/result/2.csv'
+    csv_file = 'D:/vscode/3/project/result/1.csv'
     df = pd.read_csv(csv_file)
     count = 0
     for index, row in df.iterrows():
         repo_full_name = row['full_name']
         references_path = f"D:/vscode/3/project/data1/{repo_full_name}/action.yml"
-        hypothesis_path  = f"D:/vscode/3/project/data1/{repo_full_name}/importer.yml"
+        hypothesis_path  = f"D:/vscode/3/project/data1/{repo_full_name}/gpt.yml"
+        with open(references_path, "r", encoding="utf-8") as f:
+            references = f.read()
+            references = [references]
+        with open(hypothesis_path, "r", encoding="utf-8") as f:
+            predictions = f.read()
+            predictions = [predictions]
         try:
-            rs1,rs2,rs3,rs4 = calc_codebleu(references_path,hypothesis_path,"D:/vscode/3/project/evaluate_exe/action.txt")
+            rs1,rs2,rs3,rs4 = calc_codebleu(references,predictions,"D:/vscode/3/project/evaluate_exe/action.txt")
+
             new_data = {"codebleu": rs1,"ngram_match_score": rs2,"weighted_ngram_match_score":rs3,"syntax_match_score": rs4}
             print(new_data,repo_full_name)
             write_file_in(csv_file,repo_full_name,new_data)
