@@ -1,0 +1,9 @@
+name
+ on
+ jobs
+ run_on
+ steps
+ uses
+ with
+ run
+ if

@@ -10,11 +10,11 @@ def sentence_bleu(
     smoothing_function=None,
     auto_reweigh=False,
 ):
-    return corpus_bleu_1(references, hypothesis, weights, smoothing_function, auto_reweigh)
+    return corpus_bleu_1([references], [hypothesis], weights, smoothing_function, auto_reweigh)
 
 
 def corpus_bleu_1(
-    references,
+    list_of_references,
     hypotheses,
     weights=(0.25, 0.25, 0.25, 0.25),
     smoothing_function=None,
@@ -24,16 +24,18 @@ def corpus_bleu_1(
     p_denominators = Counter()  # Key = ngram order, and value = no. of ngram in ref.
     hyp_lengths, ref_lengths = 0, 0
 
-    for i, _ in enumerate(weights, start=1):
-        p_i_numerator, p_i_denominator = modified_recall(references, hypotheses, i)
-        p_numerators[i] += p_i_numerator
-        p_denominators[i] += p_i_denominator
+    for references, hypothesis in zip(list_of_references, hypotheses):
+        # For each order of ngram, calculate the numerator and
+        # denominator for the corpus-level modified precision.
+        for i, _ in enumerate(weights, start=1):
+            p_i_numerator, p_i_denominator = modified_recall(references, hypothesis, i)
+            p_numerators[i] += p_i_numerator
+            p_denominators[i] += p_i_denominator
 
-    hyp_lengths =len(hypotheses)
-    ref_lengths =len(references)
-
+        hyp_len = len(hypothesis)
+        hyp_lengths += hyp_len
+        ref_lengths += closest_ref_length(references, hyp_len)
     bp = brevity_penalty(ref_lengths, hyp_lengths)
-
     if auto_reweigh:
         if hyp_lengths < 4 and weights == (0.25, 0.25, 0.25, 0.25):
             weights = (1 / hyp_lengths,) * hyp_lengths
@@ -44,7 +46,7 @@ def corpus_bleu_1(
         return 0
     if not smoothing_function:
         smoothing_function = SmoothingFunction().method1
-    p_n = smoothing_function(p_n, references, hypotheses, hyp_len=hyp_lengths)
+    p_n = smoothing_function(p_n, references=references, hypothesis=hypothesis, hyp_len=hyp_lengths)
     s = (w_i * math.log(p_i[0] / p_i[1]) for w_i, p_i in zip(weights, p_n))
     s = bp * math.exp(math.fsum(s))
     return s
@@ -73,6 +75,11 @@ def modified_recall(references, hypothesis, n):
             numerator += sum(clipped_counts.values())
             denominator += max(1, sum(reference_counts.values()))
     return numerator, denominator
+def closest_ref_length(references, hyp_len):
+    ref_lens = (len(reference) for reference in references)
+    closest_ref_len = min(ref_lens, key=lambda ref_len: (abs(ref_len - hyp_len), ref_len))
+    return closest_ref_len
+
 
 def brevity_penalty(closest_ref_len, hyp_len):
     if hyp_len > closest_ref_len:

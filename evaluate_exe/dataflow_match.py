@@ -1,6 +1,5 @@
 import logging
-from tree_sitter import Parser
-from .parser import dfg_yaml,remove_comments_and_docstrings,index_to_code_token,tree_to_token_index
+
 
 def calc_dataflow_match(references, candidate, lang, langso_so_file):
     return corpus_dataflow_match([references], [candidate], lang, langso_so_file)

@@ -21,7 +21,7 @@ def corpus_bleu(
     p_numerators = Counter()  # Key = ngram order, and value = no. of ngram matches.
     p_denominators = Counter()  # Key = ngram order, and value = no. of ngram in ref.
     hyp_lengths, ref_lengths = 0, 0
-    print(hypotheses)
+
     for references, hypothesis in zip(list_of_references, hypotheses):
         for i, _ in enumerate(weights, start=1):
             p_i_numerator, p_i_denominator = modified_precision(references, hypothesis, i)
