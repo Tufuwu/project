@@ -44,20 +44,21 @@ def corpus_syntax_match(references_path, candidates_path):
 
     candidate_tree = yaml_to_tree(candidates)
 
+
     reference_tree = yaml_to_tree(references)
-    #print(candidate_tree)
+    print(candidate_tree)
+    print(reference_tree)
     def get_all_sub_trees(root_node):
-        node_stack = []
+        node_stack = [(root_node, 1)]  # (节点, 深度)
         sub_tree_sexp_list = []
-        depth = 1
-        node_stack.append([root_node, depth])
-        while len(node_stack) != 0:
+
+        while node_stack:
             cur_node, cur_depth = node_stack.pop()
-            sub_tree_sexp_list.append([str(cur_node), cur_depth])
+            sub_tree_sexp_list.append((str(cur_node), cur_depth))
+
             for child_node in cur_node.children:
-                if len(child_node.children) != 0:
-                    depth = cur_depth + 1
-                    node_stack.append([child_node, depth])
+                node_stack.append((child_node, cur_depth + 1))
+
         return sub_tree_sexp_list
 
     cand_sexps = [x[0] for x in get_all_sub_trees(candidate_tree)]
@@ -66,6 +67,7 @@ def corpus_syntax_match(references_path, candidates_path):
 # TODO: fix, now we count number of reference subtrees matching candidate,
 #       but we should count number of candidate subtrees matching reference
 #       See (4) in "3.2 Syntactic AST Match" of https://arxiv.org/pdf/2009.10297.pdf
+
     for sub_tree in ref_sexps:
         if sub_tree in cand_sexps:
             match_count += 1
@@ -76,5 +78,7 @@ def corpus_syntax_match(references_path, candidates_path):
 
     total_count += len(ref_sexps)
     score = match_count / total_count
+
+ #
     return score
     
