@@ -2,7 +2,7 @@
 import pandas as pd
 from utils import upload_repo_test,inital_repo, get_target_history
 import csv
-
+import pandas as pd
 
 def write_file_in(csv_file,new_data):
         # 打开CSV文件并进行操作
@@ -28,6 +28,7 @@ api_token = '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'
 
 # 读取CSV文件，获取文件路径
 df = pd.read_csv(csv_file_path)
+'''
 for index, row in df.iterrows():
     repo_full_name = row['full_name']
 
@@ -38,13 +39,8 @@ for index, row in df.iterrows():
         csv_file = 'D:/vscode/3/project/GitHub_action_test/1.csv'
         new_data ={'full_name':row['full_name']}
         write_file_in(csv_file,new_data)
+'''
 
-for index, row in df.iterrows():
-    repo_full_name = row['full_name']
 
-    try:
-        get_target_history(repo_full_name,api_token)
-    except:
-        csv_file = 'D:/vscode/3/project/GitHub_action_test/1.csv'
-        new_data ={'full_name':row['full_name']}
-        write_file_in(csv_file,new_data)
+get_target_history(api_token)
+

@@ -69,7 +69,7 @@ def fix_action_file(lines):
         elif re.search(r'master',lines[line_index]):
             temp = re.sub(r'master','main',lines[line_index])
             result.append(temp)
-
+            line_index +=1
         elif re.search('python-version:',lines[line_index]):
             if re.search(r'\[.*\]',lines[line_index]):
                 temp = re.sub(r'\[.*\]','["3.9", "3.10"]',lines[line_index])
@@ -280,7 +280,7 @@ def push_repositories(commit_message):
     print("Changes pushed to GitHub, overwriting the remote repository.")
 
 
-def get_workflow_file_history(repo_full_name, file_path, api_token):
+def get_workflow_file_history(repo_full_name, file_path, api_token,repo_name):
     """
     获取 GitHub 仓库中文件的提交历史记录
     :param repo_full_name: 仓库的完整名称（格式为 'owner/repo'）
@@ -288,18 +288,32 @@ def get_workflow_file_history(repo_full_name, file_path, api_token):
     :param api_token: GitHub API 的访问令牌
     :return: 提交历史记录列表
     """
+    page = 1
+
     api_url = f"https://api.github.com/repos/{repo_full_name}/commits"
-    params = {"path": file_path}
+    params = {"path": file_path, "per_page": 100, "page": page}
     headers = {
         "Authorization": f"token {api_token}",
         "Accept": "application/vnd.github.v3+json"
     }
-    response = requests.get(api_url, headers=headers, params=params)
-    
-    if response.status_code == 200:
-        return response.json()  # 返回提交历史记录
-    else:
-        raise Exception(f"错误：{response.status_code}, {response.text}")
+    while True:
+        response = requests.get(api_url, headers=headers, params=params)
+        if response.status_code != 200:
+            print("Error:", response.json())
+            break
+        
+        commits = response.json()
+        if not commits:
+            break  # 没有更多数据了，结束循环
+        
+        for c in commits:
+            b = c['commit']['message']
+            get_wrong_message(api_token,repo_name,c['sha'],b)
+        page += 1  # 请求下一页
+
+    return 
+
+
 def write_file_in(csv_file,new_data):
         # 打开CSV文件并进行操作
     with open(csv_file, mode='a', newline='', encoding='utf-8',errors='ignore') as file:
@@ -340,24 +354,22 @@ def get_wrong_message(github_token,repo_name,commit_sha,repo_full_name):
 
             if conclusion != 'success':
                 print(f"❌ Workflow 运行失败 (ID: {run_id})，获取日志...")
+                return
                 
             else:
-                new_data = {'full_name',repo_full_name}
+                new_data = {'full_name':repo_full_name}
                 csv_path = 'D:/vscode/3/project/GitHub_action_test/can_run_file.csv'
                 write_file_in(csv_path,new_data)
+                return
         else:
-            new_data = {'full_name',repo_full_name}
+            new_data = {'full_name':repo_full_name}
             csv_path = 'D:/vscode/3/project/GitHub_action_test/no_run_file.csv'
             write_file_in(csv_path,new_data)
-
+            return
     else:
         print(f"⚠️ 获取 Workflow 运行信息失败，HTTP 状态码: {response.status_code}")
 
-def get_target_history(repo_full_name,api_token):
+def get_target_history(api_token):
     workflow_file_path = '.github/workflows/'
     repo_name = 'Tufuwu/action_test'
-    commits = get_workflow_file_history(repo_name, workflow_file_path, api_token)
-    for c in commits:
-        b = c['commit']['message']
-        if re.search(f"{repo_full_name}/action",b) :
-            get_wrong_message(api_token,repo_name,c['sha'],repo_full_name)
+    get_workflow_file_history(repo_name, workflow_file_path, api_token,repo_name)
