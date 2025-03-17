@@ -70,7 +70,7 @@ def calc_codebleu(
 
 
 if __name__ == "__main__":
-    csv_file = 'D:/vscode/3/project/result/1.csv'
+    csv_file = "D:/vscode/3/project/result/codebleu_result.csv"
     df = pd.read_csv(csv_file)
     count = 0
     for index, row in df.iterrows():
@@ -86,12 +86,13 @@ if __name__ == "__main__":
         try:
             rs1,rs2,rs3,rs4 = calc_codebleu(references,predictions,"D:/vscode/3/project/evaluate_exe/action.txt")
 
-            new_data = {"codebleu": rs1,"ngram_match_score": rs2,"weighted_ngram_match_score":rs3,"syntax_match_score": rs4}
-            print(new_data,repo_full_name)
+            new_data = {"gpt": rs1}
+            #print(new_data,repo_full_name)
             write_file_in(csv_file,repo_full_name,new_data)
             count += 1
-
+           
         except:
             
             pass
+        break
     print(count)

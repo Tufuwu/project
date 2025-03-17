@@ -24,12 +24,16 @@ def corpus_bleu(
 
     for references, hypothesis in zip(list_of_references, hypotheses):
         for i, _ in enumerate(weights, start=1):
+            #print(references)
+            #print(hypothesis)
+            #break
             p_i_numerator, p_i_denominator = modified_precision(references, hypothesis, i)
             p_numerators[i] += p_i_numerator
             p_denominators[i] += p_i_denominator
-
-        hyp_lengths = len(hypotheses)
-        ref_lengths = len(references)
+            
+        hyp_len = len(hypothesis)
+        hyp_lengths += hyp_len
+        ref_lengths += closest_ref_length(references, hyp_len)
 
     bp = brevity_penalty(ref_lengths, hyp_lengths)
 

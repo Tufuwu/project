@@ -3,29 +3,6 @@ from tree_sitter import Parser
 from tree_sitter_languages import get_language
 from utils import remove_comments_and_docstrings
 
-class TreeNode:
-    def __init__(self, name, children=None):
-        self.name = name
-        self.children = children if children else []
-
-    def __str__(self):
-        """将子树转换成 S-表达式"""
-        if not self.children:
-            return self.name
-        return f"({self.name} {' '.join(str(child) for child in self.children)})"
-    
-def yaml_to_tree(data, name="root"):
-    """递归解析 YAML 数据，构建语法树"""
-    if isinstance(data, dict):
-        children = [yaml_to_tree(v, k) for k, v in data.items()]
-        return TreeNode(name, children)
-    elif isinstance(data, list):
-        children = [yaml_to_tree(v, f"list_item_{i}") for i, v in enumerate(data)]
-        return TreeNode(name, children)
-    else:
-        return TreeNode(f"{name}: {str(data)}")
-    
-
 
 def calc_syntax_match(references, candidate):
     return corpus_syntax_match([references], [candidate])
@@ -48,7 +25,7 @@ def corpus_syntax_match(references, candidates):
     candidate_tree = parser.parse(bytes(candidate, "utf8")).root_node
 
     reference_tree = parser.parse(bytes(reference, "utf8")).root_node
-    print(candidate_tree.sexp()) 
+    #print(candidate_tree.sexp()) 
     #print(candidate_tree)
     #print(reference_tree)
     def get_all_sub_trees(root_node):
