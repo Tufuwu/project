@@ -3,7 +3,8 @@ import os
 import shutil
 import re
 import time
-
+import requests
+import csv
 
 
 def push_to_main(commit_message="Trigger GitHub Action"):
@@ -277,3 +278,86 @@ def push_repositories(commit_message):
 # 强制推送到远程仓库（覆盖原仓库中的内容）
     subprocess.run(["git", "push", "-f", "origin", "main"], check=True)  # 如果主分支是main
     print("Changes pushed to GitHub, overwriting the remote repository.")
+
+
+def get_workflow_file_history(repo_full_name, file_path, api_token):
+    """
+    获取 GitHub 仓库中文件的提交历史记录
+    :param repo_full_name: 仓库的完整名称（格式为 'owner/repo'）
+    :param file_path: 要查询的文件路径
+    :param api_token: GitHub API 的访问令牌
+    :return: 提交历史记录列表
+    """
+    api_url = f"https://api.github.com/repos/{repo_full_name}/commits"
+    params = {"path": file_path}
+    headers = {
+        "Authorization": f"token {api_token}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+    response = requests.get(api_url, headers=headers, params=params)
+    
+    if response.status_code == 200:
+        return response.json()  # 返回提交历史记录
+    else:
+        raise Exception(f"错误：{response.status_code}, {response.text}")
+def write_file_in(csv_file,new_data):
+        # 打开CSV文件并进行操作
+    with open(csv_file, mode='a', newline='', encoding='utf-8',errors='ignore') as file:
+        # 创建一个CSV写入器
+        writer = csv.DictWriter(file, fieldnames=new_data.keys())
+
+        # 如果文件是空的（或者是首次写入），就写入表头
+        if file.tell() == 0:
+            writer.writeheader()
+
+        # 写入新的数据行
+        writer.writerow(new_data)
+
+    print(f'已将新数据添加到 {csv_file}')
+
+def get_wrong_message(github_token,repo_name,commit_sha,repo_full_name):
+    # GitHub 配置信息
+    GITHUB_TOKEN = github_token  
+    repo_name = repo_name
+    COMMIT_SHA = commit_sha # 目标 Commit SHA
+
+    # API 请求头
+    HEADERS = {
+        "Authorization": f"token {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+
+    # 获取 commit 相关的 workflow runs
+    runs_url = f"https://api.github.com/repos/{repo_name}/actions/runs?head_sha={COMMIT_SHA}"
+    response = requests.get(runs_url, headers=HEADERS)
+
+    if response.status_code == 200:
+        runs = response.json().get("workflow_runs", [])
+        if runs:
+            latest_run = runs[0]  # 获取最新的 workflow 运行信息
+            run_id = latest_run["id"]
+            conclusion = latest_run["conclusion"]
+
+            if conclusion != 'success':
+                print(f"❌ Workflow 运行失败 (ID: {run_id})，获取日志...")
+                
+            else:
+                new_data = {'full_name',repo_full_name}
+                csv_path = 'D:/vscode/3/project/GitHub_action_test/can_run_file.csv'
+                write_file_in(csv_path,new_data)
+        else:
+            new_data = {'full_name',repo_full_name}
+            csv_path = 'D:/vscode/3/project/GitHub_action_test/no_run_file.csv'
+            write_file_in(csv_path,new_data)
+
+    else:
+        print(f"⚠️ 获取 Workflow 运行信息失败，HTTP 状态码: {response.status_code}")
+
+def get_target_history(repo_full_name,api_token):
+    workflow_file_path = '.github/workflows/'
+    repo_name = 'Tufuwu/action_test'
+    commits = get_workflow_file_history(repo_name, workflow_file_path, api_token)
+    for c in commits:
+        b = c['commit']['message']
+        if re.search(f"{repo_full_name}/action",b) :
+            get_wrong_message(api_token,repo_name,c['sha'],repo_full_name)

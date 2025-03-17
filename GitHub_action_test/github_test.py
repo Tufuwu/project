@@ -1,6 +1,6 @@
 
 import pandas as pd
-from utils import upload_repo_test,inital_repo
+from utils import upload_repo_test,inital_repo, get_target_history
 import csv
 
 
@@ -34,6 +34,16 @@ for index, row in df.iterrows():
     try:
         inital_repo(local_directory,github_repo_url)
         upload_repo_test(repo_full_name,base_repo_path,local_directory,workflow_path)
+    except:
+        csv_file = 'D:/vscode/3/project/GitHub_action_test/1.csv'
+        new_data ={'full_name':row['full_name']}
+        write_file_in(csv_file,new_data)
+
+for index, row in df.iterrows():
+    repo_full_name = row['full_name']
+
+    try:
+        get_target_history(repo_full_name,api_token)
     except:
         csv_file = 'D:/vscode/3/project/GitHub_action_test/1.csv'
         new_data ={'full_name':row['full_name']}

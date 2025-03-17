@@ -19,11 +19,22 @@ def calc_codebleu(
 
     def tokenizer(s):
         return s.split()
+    
+    tokenized_hyps = []
+    tokenized_refs = []
+    for x in hypothesis:
+        temp = tokenizer(x) 
+        for i in temp:
+            tokenized_hyps.append(i)
+    for x in references:
+        temp = tokenizer(x) 
+        for i in temp:
+            tokenized_refs.append(i)
+    tokenized_refs = [tokenized_refs]
 
-    tokenized_hyps = [tokenizer(x) for x in hypothesis]
-    tokenized_refs = [tokenizer(x) for x in references] 
-    #ngram_match_score = corpus_bleu(tokenized_refs, tokenized_hyps)
-
+    ngram_match_score = corpus_bleu(tokenized_refs, tokenized_hyps)
+    print(ngram_match_score)
+    return 
     with open(keywords_dir, "r", encoding="utf-8") as f:
         keywords = [x.strip() for x in f.readlines()]
     def make_weights(reference_tokens, key_word_list):
