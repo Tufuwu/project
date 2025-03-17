@@ -46,8 +46,8 @@ def corpus_syntax_match(references_path, candidates_path):
 
 
     reference_tree = yaml_to_tree(references)
-    print(candidate_tree)
-    print(reference_tree)
+    #print(candidate_tree)
+    #print(reference_tree)
     def get_all_sub_trees(root_node):
         node_stack = [(root_node, 1)]  # (节点, 深度)
         sub_tree_sexp_list = []

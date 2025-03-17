@@ -1,14 +1,15 @@
 from bleu import corpus_bleu
 from syntax_match import corpus_syntax_match
 from weighted_ngram_match import corpus_bleu_1
-import os
+import pandas as pd
+from utils import write_file_in
 
 
 def calc_codebleu(
     references_path:str,
-    keywords_dir: str,
     predictions_path: str,
-    weights: tuple[float, float, float, float] = (0.2, 0.2, 0.6),
+    keywords_dir: str,
+    weights: tuple[float, float, float, float] = (0.4, 0.4, 0.2),
 
 ) -> dict[str, float]:
     with open(references_path, "r", encoding="utf-8") as f:
@@ -67,21 +68,18 @@ def calc_codebleu(
 
     )
 
-    return {
-        "codebleu": code_bleu_score,
-        "ngram_match_score": ngram_match_score,
-        "weighted_ngram_match_score": weighted_ngram_match_score,
-        "syntax_match_score": syntax_match_score,
+    return code_bleu_score,ngram_match_score,weighted_ngram_match_score,syntax_match_score
 
-    }
 
-repo_full_name = '3yourmind/django-migration-linter'
-file_path = f"D:/vscode/3/project/data1/{repo_full_name}"
-references_path = os.path.join(file_path, 'action.yml')
-hypothesis_path = os.path.join(file_path, 'gpt.yml')
-with open(references_path, "r", encoding="utf-8") as f:
-    references = f.readlines()
-with open(hypothesis_path, "r", encoding="utf-8") as f:
-    hypothesis = f.readlines()
-
-calc_codebleu(references_path,"D:/vscode/3/project/evaluate_exe/action.txt",hypothesis_path)
+if __name__ == "__main__":
+    csv_file = 'D:/vscode/3/project/result/1.csv'
+    df = pd.read_csv(csv_file)
+    for index, row in df.iterrows():
+        repo_full_name = row['full_name']
+        references_path = f"D:/vscode/3/project/data1/{repo_full_name}/action.yml"
+        hypothesis_path  = f"D:/vscode/3/project/data1/{repo_full_name}/gpt.yml"
+        rs1,rs2,rs3,rs4 = calc_codebleu(references_path,hypothesis_path,"D:/vscode/3/project/evaluate_exe/action.txt")
+        new_data = {"codebleu": rs1,"ngram_match_score": rs2,"weighted_ngram_match_score":rs3,"syntax_match_score": rs4}
+        print(new_data)
+        write_file_in(csv_file,repo_full_name,new_data)
+        break

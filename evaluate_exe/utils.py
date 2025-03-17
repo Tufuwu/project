@@ -1,6 +1,6 @@
 import yaml
 import ast
-import json
+import pandas as pd
 from itertools import chain
 
 # 解析 YAML 为 Python 对象
@@ -83,3 +83,15 @@ def remove_comments_and_docstrings(source):
                         result.append(temp)
                         break
     return result
+
+def write_file_in(csv_path,full_name,new_data):
+    df = pd.read_csv(csv_path)
+    for key, value in new_data.items():
+        if key not in df.columns:
+            df[key] = None  # 如果不存在，就创建该列并初始化为 None
+            
+        df.loc[df['full_name'] == full_name, key] = value
+
+        df.to_csv('modified_file.csv', index=False)
+
+    print(f'已将新数据添加到 {csv_path}')
