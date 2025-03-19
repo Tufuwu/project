@@ -1,0 +1,94 @@
+name: Python CI
+
+on:
+  push:
+    branches:
+      - develop
+      - 'releases/*'
+
+jobs:
+  style_check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.9', '3.10']
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install dependencies
+        run: |
+          pip install --upgrade -r requirements.txt
+          pip install --upgrade black
+          python setup.py install
+          python setup.py build_ext --inplace
+          pip list
+      - name: Style check
+        run: |
+          black --diff --check .
+          flake8
+
+  unit_tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.9', '3.10']
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install dependencies
+        run: |
+          pip install --upgrade -r requirements.txt
+          python setup.py install
+          python setup.py build_ext --inplace
+          pip list
+      - name: Run unit tests
+        run: |
+          PYTHONPATH=. coverage run $(which pytest)
+          cd $GITHUB_WORKSPACE
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          echo "PWD: $PWD"
+          git clone https://github.com/LLNL/Caliper.git
+          cd Caliper
+          mkdir build && mkdir install
+          cd build
+          cmake -DCMAKE_INSTALL_PREFIX=../install ../
+          make VERBOSE=1
+          make install
+          export PATH=$PWD/../install/bin:$PATH
+          echo "PATH: $PATH"
+          cd ../../
+          echo "PWD: $PWD"
+          which cali-query
+          if [ $(echo ${{ matrix.python }} | sed 's/\.//g') -ge 39 ]; then
+            pip install --upgrade scikit-build
+            pip install --upgrade --no-cache-dir --no-deps -v timemory==3.2.0.dev4 --install-option=--disable-{c,gotcha,tools}
+          fi
+          PYTHONPATH=. coverage run $(which pytest)
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          pip install codecov
+      - name: Upload coverage report
+        run: codecov --env PYTHON_VERSION --required --flags "${TEST_SUITE}${{ runner.os }}"
+
+notifications:
+  email:
+    recipients:
+      - bhatele@cs.umd.edu
+      - brink2@llnl.gov
+    on_success: change
+    on_failure: always

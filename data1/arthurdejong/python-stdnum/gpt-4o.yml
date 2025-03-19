@@ -10,25 +10,28 @@ on:
       - main
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ['3.9', '3.10', '3.11']
-        env:
-          - TOXENV=py39
-          - TOXENV=py310
-          - TOXENV=py311
-          - TOXENV=flake8
-          - TOXENV=docs
+        include:
+          - python-version: '3.9'
+            env: TOXENV=flake8
+          - python-version: '3.9'
+            env: TOXENV=docs
+
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Install dependencies
       run: pip install tox
+
     - name: Run tests
-      run: tox -e ${{ matrix.env }} --skip-missing-interpreters false
+      run: tox -e "${{ matrix.env.TOXENV || 'py' + matrix.python-version.replace('.', '') }}"
 ```

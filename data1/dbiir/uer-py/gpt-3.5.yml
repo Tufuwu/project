@@ -1,0 +1,40 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run pretrain
+      run: |
+        python preprocess.py --corpus_path corpora/book_review_bert.txt --vocab_path models/google_zh_vocab.txt --dataset_path bert_dataset.pt --processes_num 8 --target bert --seq_length 64
+        python pretrain.py --dataset_path bert_dataset.pt --vocab_path models/google_zh_vocab.txt --output_model_path models/bert_model.bin --config_path models/bert/mini_config.json --embedding word_pos_seg --encoder transformer --mask fully_visible --target bert --total_steps 10 --save_checkpoint_steps 10 --report_steps 2 --batch_size 2
+        mv models/bert_model.bin-10 models/bert_model.bin
+
+        # Add more pretrain and finetune steps here as needed
+
+    - name: Run tests
+      run: |
+        # Add test commands here
+
+    - name: Cleanup
+      run: |
+        # Add cleanup commands here

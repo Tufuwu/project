@@ -1,0 +1,42 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get install ethtool
+        sudo apt-get remove python-scapy
+        git clone https://github.com/p4lang/scapy-vxlan.git && cd scapy-vxlan && sudo python setup.py install && cd ..
+        bash CI/travis/install-nanomsg.sh
+        sudo ldconfig
+        bash CI/travis/install-nnpy.sh
+        sudo pip3 install nose2
+
+    - name: Install package
+      run: sudo python setup.py install
+
+    - name: Setup before script
+      run: cd ptf_nn/; sudo ./veth_setup.sh; cd ..
+
+    - name: Run tests
+      run: |
+        python CI/travis/check-nnpy.py
+        ./CI/travis/run_tests.sh
+        sudo python3 /usr/local/bin/nose2 utests.tests

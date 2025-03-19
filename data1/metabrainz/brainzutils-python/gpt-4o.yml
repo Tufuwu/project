@@ -1,0 +1,41 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+      musicbrainz_db:
+        image: your-musicbrainz-db-image
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Build Docker Compose
+      run: docker-compose -f test/docker-compose.yml -p brainzutils_test build
+
+    - name: Run Tests
+      run: |
+        docker-compose -f test/docker-compose.yml -p brainzutils_test up -d redis musicbrainz_db
+        docker-compose -f test/docker-compose.yml -p brainzutils_test run --rm test
+        docker-compose -f test/docker-compose.yml -p brainzutils_test down
+```

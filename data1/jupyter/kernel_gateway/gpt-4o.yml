@@ -1,5 +1,5 @@
 ```yaml
-name: CI
+name: Python package
 
 on:
   push:
@@ -15,10 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.9', '3.10']
-
-    env:
-      ASYNC_TEST_TIMEOUT: 10
+        python-version: ['3.9', '3.10', '3.11']
 
     steps:
     - uses: actions/checkout@v2
@@ -30,12 +27,14 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install --upgrade setuptools pip
+        python -m pip install --upgrade setuptools pip
         python setup.py bdist_wheel sdist
         pip install dist/*.whl coverage
         pip freeze
 
     - name: Run tests
+      env:
+        ASYNC_TEST_TIMEOUT: 10
       run: |
         jupyter kernelgateway --help
         nosetests -x --process-restartworker --with-coverage --cover-package=kernel_gateway

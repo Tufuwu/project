@@ -11,20 +11,22 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     strategy:
-      fail-fast: false
       matrix:
-        python-version: ['3.9', '3.10', '3.11', 'pypy-3.7']
-
-    env:
-      VIPS_VERSION_MAJOR: 8
-      VIPS_VERSION_MINOR: 9
-      VIPS_VERSION_MICRO: 0
-      PATH: ${{ github.workspace }}/vips/bin:${{ env.PATH }}
-      LD_LIBRARY_PATH: ${{ github.workspace }}/vips/lib:${{ env.LD_LIBRARY_PATH }}
-      PKG_CONFIG_PATH: ${{ github.workspace }}/vips/lib/pkgconfig:${{ env.PKG_CONFIG_PATH }}
+        python-version: ['3.9', '3.10', '3.11', '3.12', 'pypy3']
+        include:
+          - python-version: '3.9'
+            allow_failure: true
+          - python-version: '3.10'
+            allow_failure: true
+          - python-version: '3.11'
+            allow_failure: true
+          - python-version: '3.12'
+            allow_failure: true
+          - python-version: 'pypy3'
+            allow_failure: true
 
     steps:
     - uses: actions/checkout@v2
@@ -34,7 +36,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install system dependencies
+    - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y \
@@ -58,19 +60,13 @@ jobs:
           libtiff5-dev \
           libglib2.0-dev
 
-    - name: Cache VIPS
-      uses: actions/cache@v2
-      with:
-        path: ${{ github.workspace }}/vips
-        key: ${{ runner.os }}-vips
-
     - name: Install VIPS
       run: bash install-vips.sh --without-python
 
     - name: Upgrade setuptools
       run: pip install -U setuptools
 
-    - name: Install dependencies
+    - name: Install Python dependencies
       run: pip install -U .[test]
 
     - name: Run tests

@@ -1,5 +1,5 @@
 ```yaml
-name: Python package
+name: Python application
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12', 'pypy-3.9']
+        python-version: ['3.9', '3.10', '3.11']
 
     steps:
     - uses: actions/checkout@v3
@@ -26,7 +26,8 @@ jobs:
     - name: Install dependencies
       run: pip install -r requirements-test.txt
     - name: Run tests
-      run: python -m unittest discover -s tests
-    - name: Run coverage
-      run: coverage run run_tests.py && coverage report -m
+      run: |
+        python -m unittest discover -s tests
+        coverage run run_tests.py
+        coverage report -m
 ```

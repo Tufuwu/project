@@ -14,9 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.9', '3.10']
+        python-version: ['3.9', '3.10', '3.11']
         flavour: [signxml, legacy, legacy-defusedxml, lxml, lxml-defusedxml]
-        include:
+        exclude:
           - python-version: '3.9'
             flavour: legacy
           - python-version: '3.9'
@@ -25,27 +25,62 @@ jobs:
             flavour: lxml
           - python-version: '3.9'
             flavour: lxml-defusedxml
-          - python-version: '3.9'
-            flavour: flake8
-            toxenv: flake8
-          - python-version: '3.9'
-            flavour: docs
-            toxenv: docs
-
+          - python-version: '3.10'
+            flavour: legacy
+          - python-version: '3.10'
+            flavour: legacy-defusedxml
+          - python-version: '3.10'
+            flavour: lxml
+          - python-version: '3.10'
+            flavour: lxml-defusedxml
+          - python-version: '3.11'
+            flavour: legacy
+          - python-version: '3.11'
+            flavour: legacy-defusedxml
+          - python-version: '3.11'
+            flavour: lxml
+          - python-version: '3.11'
+            flavour: lxml-defusedxml
     steps:
     - uses: actions/checkout@v2
-
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-
     - name: Install dependencies
       run: pip install tox
-
     - name: Run tests
       env:
-        TOXENV: ${{ matrix.toxenv }}
-        FLAVOUR: ${{ matrix.flavour }}
-      run: tox -e "${{ matrix.toxenv || 'py' + matrix.python-version.replace('.', '') + '-' + matrix.flavour }}" --skip-missing-interpreters false
+        TOXENV: ${{ matrix.flavour }}
+      run: tox -e "py${{ matrix.python-version }}-${{ matrix.flavour }}" --skip-missing-interpreters false
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python '3.9'
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - name: Install dependencies
+      run: pip install tox
+    - name: Run flake8
+      env:
+        TOXENV: flake8
+      run: tox -e flake8 --skip-missing-interpreters false
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python '3.9'
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - name: Install dependencies
+      run: pip install tox
+    - name: Build docs
+      env:
+        TOXENV: docs
+      run: tox -e docs --skip-missing-interpreters false
 ```

@@ -10,7 +10,7 @@ on:
       - main
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -27,7 +27,7 @@ jobs:
         pip install tox
         pip install setuptools
         pip install setuptools_scm
-    - name: Run tests with tox
+    - name: Run tests
       env:
         TOX_ENV: py${{ matrix.python-version }}
       run: tox -e $TOX_ENV

@@ -1,0 +1,40 @@
+name: Python CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -qq -y --no-install-recommends python3-cairo python3-pil python3-htmlmin p7zip
+        python3 --version
+
+    - name: Build
+      run: make
+
+    - name: Create release
+      run: |
+        7zr a dictionaries-"$GITHUB_REF".7z jmdict.mobi jmnedict.mobi combined.mobi
+
+    - name: Deploy
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dictionaries-*.7z
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

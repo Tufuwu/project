@@ -1,0 +1,39 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        django-version: ['django21', 'django22', 'django30', 'django31']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox coverage
+
+    - name: Run tests
+      env:
+        TOX_ENV: py${{ matrix.python-version }}-${{ matrix.django-version }}
+      run: tox -r -e $TOX_ENV
+
+    - name: Upload coverage to Codecov
+      if: success()
+      run: bash <(curl -s https://codecov.io/bash)
+```

@@ -37,17 +37,17 @@ jobs:
         conda update -q conda
         sed -i -E 's/(python=)(.*)/\1'${{ matrix.python-version }}'/' ./environment.yml
         conda env create -f environment.yml
-        source $HOME/miniconda/bin/activate mixsea
+        source activate mixsea
         python setup.py install
 
     - name: Test with pytest
       run: |
-        source $HOME/miniconda/bin/activate mixsea
+        source activate mixsea
         python --version
         pytest
 
     - name: Check code style with black
       run: |
-        source $HOME/miniconda/bin/activate mixsea
+        source activate mixsea
         black --check mixsea/
 ```

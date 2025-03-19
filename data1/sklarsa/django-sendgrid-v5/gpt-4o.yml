@@ -3,11 +3,9 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   build:
@@ -19,7 +17,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
@@ -27,9 +25,9 @@ jobs:
       run: pip install -r dev-requirements.txt
     - name: Lint with flake8
       run: flake8 sendgrid_backend/
-    - name: Check import order with isort
+    - name: Check import sorting with isort
       run: isort -c ./
-    - name: Check code format with black
+    - name: Check code style with black
       run: black --check ./
     - name: Type check with mypy
       run: mypy sendgrid_backend/

@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python: ['3.9', '3.10']
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+          bash miniconda.sh -b -p $HOME/miniconda
+          export PATH="$HOME/miniconda/bin:$PATH"
+          hash -r
+          conda config --set always_yes yes --set changeps1 no
+          conda install pip
+          conda update -q conda
+          conda env create -q --file=ci/environment-docs.yaml --name=dask-ml
+          source activate dask-ml
+          pip install pip --upgrade
+          python -m pip install -e .
+          conda list
+
+      - name: Build and deploy docs
+        run: |
+          set -e
+          cd docs
+          make html
+          cd ..
+          pip install doctr
+          doctr deploy --built-docs docs/build/html .

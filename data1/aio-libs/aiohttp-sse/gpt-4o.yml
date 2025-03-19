@@ -1,0 +1,69 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        toxenv:
+          - py35-aiohttp-3
+          - py35-aiohttp-master
+          - py36-aiohttp-3
+          - py36-aiohttp-master
+          - py37-aiohttp-3
+          - py37-aiohttp-master
+      allow_failures:
+        - toxenv: py35-aiohttp-master
+        - toxenv: py36-aiohttp-master
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox codecov
+      - name: Run tests
+        env:
+          TOXENV: ${{ matrix.toxenv }}
+        run: tox
+
+  after_success:
+    runs-on: ubuntu-20.04
+    needs: test
+    steps:
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+  deploy:
+    runs-on: ubuntu-20.04
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - name: Build and publish
+        env:
+          TWINE_USERNAME: jettify
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+          python -m build
+          twine upload dist/*
+```

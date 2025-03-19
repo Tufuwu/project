@@ -1,0 +1,71 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        env:
+          - TOXENV=flake8
+          - TOXENV=black
+          - TOXENV=mysql
+          - TOXENV=mssql
+          - TOXENV=postgres
+          - TOXENV=mongodb
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox
+        pip install codecov
+
+    - name: Run MySQL setup
+      if: matrix.env.TOXENV == 'mysql'
+      run: |
+        sudo service mysql start
+        mysql -u root -e "DROP DATABASE IF EXISTS app; CREATE DATABASE app DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci"
+        mysql -u root -e "CREATE USER 'mysqluser'@'localhost' IDENTIFIED BY 'mysqluserpassword';"
+        mysql -u root -e "GRANT ALL ON app.* TO 'mysqluser'@'localhost';"
+
+    - name: Run MSSQL setup
+      if: matrix.env.TOXENV == 'mssql'
+      run: |
+        docker pull mcr.microsoft.com/mssql/server:2017-CU8-ubuntu
+        docker run --name mssql -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Password_123" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-CU8-ubuntu
+        sleep 60
+        docker logs -t mssql
+
+    - name: Run PostgreSQL setup
+      if: matrix.env.TOXENV == 'postgres'
+      run: |
+        sudo service postgresql start
+        psql -U postgres -c "CREATE DATABASE app;"
+        psql -U postgres -c "CREATE USER pguser WITH PASSWORD 'pguserpassword';"
+
+    - name: Run Tox
+      env:
+        TOXENV: ${{ matrix.env.TOXENV }}
+      run: tox
+
+    - name: Upload coverage to Codecov
+      if: success()
+      run: codecov
+```

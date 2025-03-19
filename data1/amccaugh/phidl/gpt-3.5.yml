@@ -1,0 +1,33 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -U matplotlib==2.2.3
+        python -m pip install -U scipy==1.1.0
+        python -m pip install -U rectpack
+        python -m pip install -U freetype-py
+        python setup.py install
+
+    - name: Run tests
+      run: |
+        python ./phidl/phidl_tutorial_example.py
+        pytest

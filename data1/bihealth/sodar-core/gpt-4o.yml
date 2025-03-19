@@ -1,0 +1,70 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:9.6
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: sodar_core
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -qq build-essential zlib1g-dev libtiff5-dev libjpeg8-dev libfreetype6-dev
+        sudo apt-get install -qq liblcms2-dev libwebp-dev libpq-dev graphviz-dev
+        utility/install_python_dependencies.sh
+
+    - name: Set up ChromeDriver
+      run: |
+        wget -N http://chromedriver.storage.googleapis.com/87.0.4280.20/chromedriver_linux64.zip -P ~/
+        unzip ~/chromedriver_linux64.zip -d ~/
+        sudo mv -f ~/chromedriver /usr/bin/chromedriver
+        sudo chmod ugo+rx /usr/bin/chromedriver
+
+    - name: Set up database
+      run: |
+        psql -c "CREATE USER sodar_core WITH PASSWORD 'sodar_core';" -U postgres
+        psql -c "GRANT ALL PRIVILEGES ON DATABASE sodar_core to sodar_core;" -U postgres
+        psql -c "ALTER USER sodar_core CREATEDB;" -U postgres
+
+    - name: Run tests
+      env:
+        DATABASE_URL: postgres://sodar_core:sodar_core@localhost:5432/sodar_core
+      run: |
+        python manage.py collectstatic --noinput
+        coverage run --rcfile=.coveragerc manage.py test -v 2 --settings=config.settings.test
+        coverage xml
+        python-codacy-coverage -r coverage.xml
+        flake8 .
+        make black arg=--check
+```

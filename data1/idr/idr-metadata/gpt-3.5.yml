@@ -1,0 +1,28 @@
+name: Python package
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install idr-utils/
+    - name: Run tests
+      run: |
+        find idr* -type f -name '*.screen' -print0 | xargs -0 -n1 python idr-utils/scripts/check_screen.py -v
+        find . -type f -name '*study.txt' | sort | xargs python idr-utils/pyidr/study_parser.py -v
+        python idr-utils/scripts/travis-check.py

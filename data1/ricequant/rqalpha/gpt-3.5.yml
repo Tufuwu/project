@@ -1,0 +1,65 @@
+name: Python CI
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install TA-Lib
+        run: |
+          wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz
+          tar -xzvf ta-lib-0.4.0-src.tar.gz
+          cd ta-lib
+          ./configure --prefix=/usr
+          make
+          sudo make install
+          cd ..
+
+      - name: Install Test Deps
+        run: |
+          pip install -U pip
+          pip install "numpy>=1.15.4"
+          pip install TA-Lib
+          pip install coveralls
+          pip install -U setuptools
+          pip install ipython==5.3.0
+          pip install --prefer-binary .
+
+      - name: Check directories
+        run: |
+          ls -al $HOME/.rqalpha/
+          ls -al $HOME/.rqalpha/bundle/
+
+      - name: Download bundle
+        run: rqalpha download-bundle
+
+      - name: Run tests
+        run: coverage run --source=rqalpha test.py
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            $HOME/.cache/pip
+            $HOME/.rqalpha/bundle
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+
+      - name: Upload coverage to coveralls
+        run: coveralls

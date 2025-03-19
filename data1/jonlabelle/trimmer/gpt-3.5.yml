@@ -1,0 +1,56 @@
+name: Python CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: bash scripts/install.sh
+
+      - name: Run tests
+        run: bash scripts/run_tests.sh
+
+      - name: SonarCloud Scan
+        if: github.event_name != 'pull_request'
+        run: sonar-scanner
+
+      - name: Cache SonarCloud artifacts
+        uses: actions/cache@v2
+        with:
+          path: $HOME/.sonar/cache
+          key: ${{ runner.os }}-sonar
+
+      - name: Finalize SonarCloud analysis
+        if: github.event_name != 'pull_request'
+        run: echo 'SonarCloud analysis completed'
+
+      - name: Notify on failure
+        if: failure()
+        run: echo 'Build failed, please check the logs'
+
+      - name: Notify on success
+        if: success()
+        run: echo 'Build succeeded'
+
+      - name: Cleanup
+        run: echo 'Cleanup completed'

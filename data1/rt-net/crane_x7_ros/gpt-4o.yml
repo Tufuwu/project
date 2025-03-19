@@ -1,0 +1,58 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - ros_distro: kinetic
+            ros_repo: ros
+            upstream_workspace: debian
+            os_name: ubuntu
+            os_code_name: xenial
+          - ros_distro: kinetic
+            ros_repo: ros-shadow-fixed
+            upstream_workspace: debian
+            os_name: ubuntu
+            os_code_name: xenial
+            allow_failure: true
+          - ros_distro: melodic
+            ros_repo: ros
+            upstream_workspace: debian
+            os_name: ubuntu
+            os_code_name: bionic
+          - ros_distro: melodic
+            ros_repo: ros-shadow-fixed
+            upstream_workspace: debian
+            os_name: ubuntu
+            os_code_name: bionic
+            allow_failure: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          git clone https://github.com/roboticsgroup/roboticsgroup_gazebo_plugins.git
+          git clone https://github.com/ros-industrial/industrial_ci.git .ci_config
+
+      - name: Run CI script
+        run: |
+          source .ci_config/travis.sh
+```

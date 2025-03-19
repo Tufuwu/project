@@ -1,0 +1,62 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install Poetry
+      run: curl -sSL https://install.python-poetry.org | python3 -
+
+    - name: Run make doctor
+      run: make doctor
+
+    - name: Install dependencies
+      run: make install
+
+    - name: Run tests
+      run: make test-repeat
+
+    - name: Run checks
+      run: make check
+
+    - name: Build notebooks
+      run: make notebooks
+
+    - name: Build documentation
+      run: make mkdocs
+
+    - name: Install coveralls
+      run: pip install coveralls
+
+    - name: Run coveralls
+      run: coveralls
+```

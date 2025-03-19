@@ -1,0 +1,47 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        task: [tests, isort, flake8]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          if [ "${{ matrix.task }}" == "tests" ]; then
+            pip install requests-oauthlib
+          elif [ "${{ matrix.task }}" == "isort" ]; then
+            pip install isort
+          elif [ "${{ matrix.task }}" == "flake8" ]; then
+            pip install flake8
+          fi
+
+      - name: Run ${{ matrix.task }}
+        run: |
+          if [ "${{ matrix.task }}" == "tests" ]; then
+            python setup.py test
+          elif [ "${{ matrix.task }}" == "isort" ]; then
+            isort --diff --check-only
+          elif [ "${{ matrix.task }}" == "flake8" ]; then
+            flake8
+          fi
+```

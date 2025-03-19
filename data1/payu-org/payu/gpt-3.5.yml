@@ -1,0 +1,32 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+
+    - name: Install dependencies
+      run: |
+        pip install .
+        pip install -r test/requirements_test.txt
+
+    - name: Run tests
+      run: |
+        payu list
+        pylint --extension-pkg-whitelist=netCDF4 -E payu
+        if [[ ${{ matrix.python }} == '3.9' || ${{ matrix.python }} == '3.10' ]]; then PYTHONPATH=. pytest --cov=payu -s test; fi;
+        if [[ ${{ matrix.python }} == '3.9' || ${{ matrix.python }} == '3.10' ]]; then coveralls; fi;
+        cd docs && make html

@@ -1,0 +1,59 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    env:
+      DIRECTOR_HOME: ${{ github.workspace }}/tests/workflows/
+
+    services:
+      postgresql:
+        ports:
+          - 5432:5432
+      redis:
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          pip install black==20.8b1
+          pip install pytest==5.3.5
+          pip install mkdocs==1.0.4
+          pip install mkdocs-material==4.6.3
+
+      - name: Install project dependencies
+        run: python setup.py install
+
+      - name: Run black check
+        run: black --check director
+
+      - name: Build documentation
+        run: cd docs && mkdocs build
+
+      - name: Create and setup database
+        run: |
+          if [ $DB = 'postgres' ]; then
+            psql -c 'DROP DATABASE IF EXISTS tests;' -U postgres
+            psql -c 'CREATE DATABASE tests;' -U postgres
+          fi
+
+      - name: Start Celery worker
+        run: director celery worker -P solo > /dev/null 2>&1 & sleep 5
+
+      - name: Run tests
+        run: pytest tests/ -v

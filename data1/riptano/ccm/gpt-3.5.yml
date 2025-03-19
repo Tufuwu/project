@@ -1,0 +1,35 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        pip install pylint six pyyaml paramiko psutil
+    - name: Lint code
+      run: |
+        pylint --py3k --disable=W1633,W1648,W1662 ccmlib
+        pylint --disable=all --enable=E,F ccmlib
+    - name: Run tests
+      run: |
+        nosetests
+    - name: Install JDK
+      run: |
+        sudo apt-get install -y ant ant-optional
+        sudo apt-get install -y openjdk-11-jdk
+
+env:
+  CASSANDRA_USE_JDK11: true

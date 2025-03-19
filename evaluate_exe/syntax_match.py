@@ -44,7 +44,7 @@ def corpus_syntax_match(references, candidates):
 
     cand_sexps = [x[0] for x in get_all_sub_trees(candidate_tree)]
     ref_sexps = [x[0] for x in get_all_sub_trees(reference_tree)]
-
+    print(cand_sexps)
 # TODO: fix, now we count number of reference subtrees matching candidate,
 #       but we should count number of candidate subtrees matching reference
 #       See (4) in "3.2 Syntactic AST Match" of https://arxiv.org/pdf/2009.10297.pdf

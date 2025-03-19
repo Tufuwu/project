@@ -1,0 +1,40 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+        toxenv: [py39, py310, py311, qa, doc]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip uninstall virtualenv -y
+          python -m pip install --ignore-installed --upgrade setuptools pip tox coveralls
+          sudo apt-get install graphviz
+
+      - name: Run Tox
+        run: tox -e ${{ matrix.toxenv }} -vv
+
+      - name: Run Coveralls
+        if: matrix.toxenv == 'py39'
+        run: coveralls
+```

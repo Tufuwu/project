@@ -1,0 +1,50 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        python-version: ['3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Update apt-get
+      run: sudo apt-get update -qq
+
+    - name: Install Blender
+      run: sudo apt-get install -y blender
+
+    - name: Download Blender
+      run: |
+        mkdir tmp && cd tmp
+        wget https://mirrors.ocf.berkeley.edu/blender/release/Blender3.2/blender-3.2.0-linux-x64.tar.xz
+        tar -xf blender-3.2.0-linux-x64.tar.xz
+        mv blender-3.2.0-linux-x64 blender
+        rm blender-3.2.0-linux-x64
+        cd ..
+
+    - name: Install Addon
+      run: |
+        python setup.py -t ${GITHUB_WORKSPACE}/tmp/blender/3.2/scripts/addons/phobos -b ${GITHUB_WORKSPACE}/tmp/blender
+        ls ${GITHUB_WORKSPACE}/tmp/blender/3.2/scripts/addons/phobos
+
+    - name: Run Tests
+      run: python test/testrunner.py ./tmp/blender/blender
+```

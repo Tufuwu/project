@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          wget https://raw.githubusercontent.com/tue-robotics/tue-env/master/ci/install-package.sh
+          wget https://raw.githubusercontent.com/tue-robotics/tue-env/master/ci/build-package.sh
+          wget https://raw.githubusercontent.com/tue-robotics/tue-env/master/ci/test-package.sh
+          export PACKAGE=${GITHUB_REPOSITORY#*/}
+          bash install-package.sh --package=$PACKAGE --branch=$GITHUB_REF --commit=$GITHUB_SHA --pullrequest=$GITHUB_EVENT_NAME
+
+      - name: Build package
+        run: bash build-package.sh --package=$PACKAGE
+
+      - name: Test package
+        run: bash test-package.sh --package=$PACKAGE

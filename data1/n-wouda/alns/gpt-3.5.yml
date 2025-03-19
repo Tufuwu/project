@@ -1,0 +1,48 @@
+name: Python package CI
+
+on:
+  push:
+    branches:
+      - master
+      - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install poetry
+        poetry install
+
+    - name: Run tests
+      run: |
+        poetry run pytest
+        poetry run mypy alns
+
+    - name: Publish to PyPI
+      if: github.ref_type == 'tag' && matrix.python-version == '3.9'
+      run: |
+        poetry config http-basic.pypi $PYPI_USER $PYPI_PASS
+        poetry build
+        poetry publish
+
+    - name: Code coverage
+      run: codecov

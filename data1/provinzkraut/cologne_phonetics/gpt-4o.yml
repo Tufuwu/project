@@ -10,7 +10,7 @@ on:
       - main
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
 
     strategy:
@@ -30,8 +30,8 @@ jobs:
     - name: Run tests
       run: |
         python -m coverage run --source=cologne_phonetics test_cologne_phonetics.py
-    - name: Coveralls
-      run: coveralls
+    - name: Upload coverage to Coveralls
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+      run: coveralls
 ```

@@ -1,0 +1,50 @@
+name: Python CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python: ['3.9', '3.10']
+
+    env:
+      CODECOV: true
+      PYTEST_FLAGS: "-v --disable-pytest-warnings --durations=20 --low-performance --cov=gromacs"
+      PYTEST_LIST: "tests"
+      MAIN_CMD: "pytest ${PYTEST_LIST}"
+      SETUP_CMD: "${PYTEST_FLAGS}"
+      BUILD_CMD: "pip install -v ."
+      CONDA_DEPENDENCIES: "six scipy matplotlib pandas gromacs"
+      CONDA_CHANNELS: "defaults conda-forge bioconda"
+      CONDA_CHANNEL_PRIORITY: true
+      PIP_DEPENDENCIES: "numkit codecov"
+      NUMPY_VERSION: stable
+      MPLBACKEND: agg
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install dependencies
+        run: |
+          pip install codecov
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: |
+          echo $MAIN_CMD $SETUP_CMD
+          $MAIN_CMD $SETUP_CMD
+
+      - name: Upload coverage to Codecov
+        if: env.CODECOV == 'true'
+        run: codecov

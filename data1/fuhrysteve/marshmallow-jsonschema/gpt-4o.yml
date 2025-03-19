@@ -1,50 +1,42 @@
 ```yaml
-name: CI
+name: Python package
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
-  lint:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.9']
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements-tox.txt
-        pip install tox-travis
-    - name: Run lint
-      env:
-        TOXENV: lint
-      run: make tox
+        python-version: ['3.9', '3.10']
+        include:
+          - python-version: '3.9'
+            env: TOXENV=lint
 
-  test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ['3.9', '3.8', '3.7', '3.6', 'pypy3']
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements-tox.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
+        pip install -U pip
         pip install -r requirements-tox.txt
-        pip install tox-travis coveralls
+        pip install -U tox-travis coveralls
     - name: Run tests
       run: make tox
     - name: Coveralls

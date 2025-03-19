@@ -1,0 +1,48 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -qq build-essential zlib1g-dev libtiff5-dev libjpeg8-dev libfreetype6-dev
+        sudo apt-get install -qq liblcms2-dev libwebp-dev libpq-dev graphviz-dev
+        wget -N http://chromedriver.storage.googleapis.com/87.0.4280.20/chromedriver_linux64.zip -P ~/
+        unzip ~/chromedriver_linux64.zip -d ~/
+        sudo mv -f ~/chromedriver /usr/bin/chromedriver
+        sudo chmod ugo+rx /usr/bin/chromedriver
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Prepare database
+      run: |
+        psql -c "CREATE DATABASE sodar_core;" -U postgres
+        psql -c "CREATE USER sodar_core WITH PASSWORD 'sodar_core';" -U postgres
+        psql -c "GRANT ALL PRIVILEGES ON DATABASE sodar_core to sodar_core;" -U postgres
+        psql -c "ALTER USER sodar_core CREATEDB;" -U postgres
+
+    - name: Run tests
+      run: |
+        python manage.py collectstatic --noinput
+        coverage run --rcfile=.coveragerc manage.py test -v 2 --settings=config.settings.test
+        coverage xml
+        python-codacy-coverage -r coverage.xml
+        flake8 .
+        make black arg=--check

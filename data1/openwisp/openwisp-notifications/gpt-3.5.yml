@@ -1,0 +1,42 @@
+name: Python CI
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install $DJANGO
+        pip install -r requirements-test.txt
+        npm install -g jshint stylelint
+
+    - name: Run QA checks
+      run: ./run-qa-checks
+
+    - name: Run tests
+      run: |
+        SAMPLE_APP=1 coverage run --source=openwisp_notifications runtests.py
+        coverage run -a --source=openwisp_notifications runtests.py
+
+    - name: Upload coverage report
+      run: coveralls

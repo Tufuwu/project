@@ -1,0 +1,46 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Miniconda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-update-conda: true
+        python-version: '3.9'
+        activate-environment: dask-ml
+        environment-file: ci/environment-docs.yaml
+
+    - name: Install dependencies
+      run: |
+        conda install pip
+        pip install pip --upgrade
+        python -m pip install -e .
+        conda list
+
+    - name: Build documentation
+      run: |
+        set -e
+        cd docs
+        make html
+
+    - name: Deploy documentation
+      env:
+        DOCTR_DEPLOY_ENCRYPTION_KEY: ${{ secrets.DOCTR_DEPLOY_ENCRYPTION_KEY }}
+      run: |
+        pip install doctr
+        doctr deploy --built-docs docs/build/html .
+```

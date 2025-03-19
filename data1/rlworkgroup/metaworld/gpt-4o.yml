@@ -1,0 +1,50 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:stable-dind
+        options: --experimental --storage-driver=overlay2 --max-concurrent-downloads=50 --max-concurrent-uploads=50
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install Docker CE
+      run: |
+        sudo apt-get update
+        sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+
+    - name: Pull cached Docker image
+      run: docker pull rlworkgroup/metaworld-ci:latest
+
+    - name: Build Docker image
+      run: |
+        tag="rlworkgroup/metaworld-ci:${{ github.run_number }}"
+        echo "TAG=${tag}" >> $GITHUB_ENV
+        make build-ci
+
+    - name: Set up Codecov environment variables
+      run: echo "ci_env=$(bash <(curl -s https://codecov.io/env))" >> $GITHUB_ENV
+
+    - name: Run CI
+      run: |
+        ADD_ARGS="${{ env.ci_env }}" TAG="${{ env.TAG }}" make run-ci RUN_CMD="make ci-job"
+
+    - name: Deploy
+      if: github.ref == 'refs/heads/master' && env.DEPLOY_FROM_THIS_JOB == 'true'
+      run: TAG="${{ env.TAG }}" make ci-deploy-docker
+```

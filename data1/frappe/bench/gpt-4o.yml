@@ -1,0 +1,81 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    services:
+      mariadb:
+        image: mariadb:10.6
+        env:
+          MYSQL_ROOT_PASSWORD: travis
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        ports:
+          - 3306:3306
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        include:
+          - python-version: '3.9'
+            name: "Python 3.9 Basic Setup"
+            script: python bench/tests/test_init.py TestBenchInit.basic
+          - python-version: '3.10'
+            name: "Python 3.10 Basic Setup"
+            script: python bench/tests/test_init.py TestBenchInit.basic
+          - python-version: '3.9'
+            name: "Python 3.9 Production Setup"
+            script: python bench/tests/test_setup_production.py TestSetupProduction.production
+          - python-version: '3.10'
+            name: "Python 3.10 Production Setup"
+            script: python bench/tests/test_setup_production.py TestSetupProduction.production
+          - python-version: '3.9'
+            name: "Python 3.9 Tests"
+            script: python -m unittest -v bench.tests.test_utils && python -m unittest -v bench.tests.test_init
+          - python-version: '3.10'
+            name: "Python 3.10 Tests"
+            script: python -m unittest -v bench.tests.test_utils && python -m unittest -v bench.tests.test_init
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.focal_amd64.deb
+        sudo apt install ./wkhtmltox_0.12.6-1.focal_amd64.deb
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        nvm install 14
+        nvm use 14
+        mkdir -p ~/.bench
+        cp -r $GITHUB_WORKSPACE/* ~/.bench
+        python -m pip install -U --no-cache-dir --force-reinstall urllib3 pyOpenSSL ndg-httpsclient pyasn1 wheel setuptools pip
+        python -m pip install -U -e ~/.bench
+
+    - name: Configure MariaDB
+      run: |
+        mariadb --host 127.0.0.1 --port 3306 -u root -ptravis -e "SET GLOBAL character_set_server = 'utf8mb4'"
+        mariadb --host 127.0.0.1 --port 3306 -u root -ptravis -e "SET GLOBAL collation_server = 'utf8mb4_unicode_ci'"
+        mariadb --host 127.0.0.1 --port 3306 -u root -ptravis -e "FLUSH PRIVILEGES"
+
+    - name: Run script
+      run: ${{ matrix.script }}
+```

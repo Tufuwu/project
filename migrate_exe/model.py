@@ -20,7 +20,7 @@ def creat_deepseek_model(api_token,prompt):
     client = OpenAI(api_key=api_token, base_url="https://api.deepseek.com")
 
     response = client.chat.completions.create(
-        model="deepseek-reasoner",
+        model="deepseek-chat",
         messages=[
             {"role": "system", "content": "You are a helpful assistant"},
             {"role": "user", "content":prompt},

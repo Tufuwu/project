@@ -1,0 +1,47 @@
+name: Python package CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python --version
+        pip install -U pip
+        pip install pytest
+        pip install pytest-cov
+        pip install codecov
+        pip install .
+    - name: Run tests
+      run: |
+        export NUMBA_DISABLE_JIT="1" && pytest -m "not notebook_tests" --junitxml=pytest-report.xml --cov-config=.coveragerc --cov-report xml --cov
+    - name: Upload coverage to Codecov
+      run: codecov
+    - name: Deploy to PyPI
+      if: github.ref == 'refs/tags/*'
+      run: |
+        echo 'update version according to the tag name'
+        sed -i "/version=/d" setup.py
+        sed -i 's|long_description=readme(),|long_description=readme(),\n      version='"'${GITHUB_REF##*/}'"',|' setup.py
+        cat setup.py | grep version
+        python setup.py sdist bdist_wheel
+        twine upload --repository pypi dist/*

@@ -3,11 +3,9 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   build:
@@ -20,7 +18,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up Python
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
@@ -36,7 +34,7 @@ jobs:
     - name: Lint with pycodestyle
       run: pycodestyle --exclude=venv --ignore=E501 .
 
-    - name: Test with pytest
+    - name: Test with pytest and generate coverage report
       run: |
         coverage run --source=. -m pytest
         coverage report -m

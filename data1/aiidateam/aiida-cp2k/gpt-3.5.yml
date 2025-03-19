@@ -1,0 +1,66 @@
+name: Python CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      docker
+
+    steps:
+      - name: Check if tag exists
+        run: python .ci/check_travis_tag.py
+
+      - name: Build Docker image
+        run: docker build -t aiida_cp2k_test .
+
+      - name: Set up Docker container
+        run: |
+          export DOCKERID=$(docker run -d aiida_cp2k_test)
+
+      - name: Wait for services
+        run: docker exec --tty $DOCKERID wait-for-services
+
+      - name: Run pre-commit checks
+        run: docker exec -it --user aiida $DOCKERID /bin/bash -l -c 'cd /opt/aiida-cp2k/ && pre-commit run --all-files || ( git status --short ; git diff ; exit 1 )'
+
+      - name: Run pytest
+        run: docker exec -it --user aiida $DOCKERID /bin/bash -l -c 'cd /opt/aiida-cp2k/ && py.test --cov aiida_cp2k --cov-append .'
+
+      - name: Generate documentation
+        run: docker exec -it --user aiida $DOCKERID /bin/bash -l -c 'cd /opt/aiida-cp2k/docs && make'
+
+      - name: Run coveralls
+        if: success()
+        run: docker exec -e TRAVIS=$TRAVIS -e TRAVIS_JOB_ID=$GITHUB_RUN_ID -e TRAVIS_BRANCH=$GITHUB_REF -it --user aiida $DOCKERID /bin/bash -l -c 'cd /opt/aiida-cp2k/ && coveralls'
+
+      - name: Display Docker logs
+        run: docker logs $DOCKERID
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 3
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: |
+          pytest
+```

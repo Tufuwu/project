@@ -10,7 +10,7 @@ on:
       - main
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     strategy:
@@ -30,6 +30,5 @@ jobs:
         pip install pytest
         pip install -e .
     - name: Test with pytest
-      run: |
-        pytest
+      run: pytest
 ```

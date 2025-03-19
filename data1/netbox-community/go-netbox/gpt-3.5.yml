@@ -1,0 +1,33 @@
+name: Go CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        go: ['1.x']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go }}
+
+    - name: Install dependencies
+      run: |
+        go get github.com/golang/lint/golint
+        go get github.com/stretchr/testify/assert
+        go get -d ./...
+
+    - name: Run tests
+      run: |
+        ./scripts/licensecheck.sh
+        go build ./...
+        ./scripts/golint.sh
+        go vet ./...
+        go test -v ./...

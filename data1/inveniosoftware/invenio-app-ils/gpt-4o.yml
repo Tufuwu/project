@@ -1,0 +1,78 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+      rabbitmq:
+        image: rabbitmq
+        ports:
+          - 5672:5672
+      postgres:
+        image: postgres:12.4
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        requirements: [release, lowest]
+        elasticsearch-version: [6, 7]
+        test-suite: [acquisition, circulation, document_requests, ill, ils]
+
+    env:
+      ES6_DOWNLOAD_URL: "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.2.0.tar.gz"
+      ES7_DOWNLOAD_URL: "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.3.0-linux-x86_64.tar.gz"
+      EXTRAS_COMMON: all,postgresql
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        mkdir /tmp/elasticsearch
+        wget -O - ${{ matrix.elasticsearch-version == 6 && env.ES6_DOWNLOAD_URL || env.ES7_DOWNLOAD_URL }} | tar xz --directory=/tmp/elasticsearch --strip-components=1
+        /tmp/elasticsearch/bin/elasticsearch --quiet &
+        pip install --upgrade pip setuptools py
+        pip install twine wheel coveralls requirements-builder 'six>=1.12.0'
+        requirements-builder -e ${{ matrix.requirements == 'release' && env.EXTRAS_COMMON + ',elasticsearch' + matrix.elasticsearch-version || env.EXTRAS_COMMON + ',elasticsearch' + matrix.elasticsearch-version }} --level=${{ matrix.requirements }} setup.py > .github-${{ matrix.requirements }}-requirements.txt
+        pip install -r .github-${{ matrix.requirements }}-requirements.txt
+        pip install -e .[${{ matrix.requirements == 'release' && env.EXTRAS_COMMON + ',elasticsearch' + matrix.elasticsearch-version || env.EXTRAS_COMMON + ',elasticsearch' + matrix.elasticsearch-version }}]
+
+    - name: Run style checks
+      run: ./run-style-checks.sh
+
+    - name: Run tests
+      run: ./run-tests.sh ${{ matrix.test-suite }}
+
+    - name: Coveralls
+      if: success()
+      run: coveralls
+```

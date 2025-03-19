@@ -21,12 +21,14 @@ jobs:
       with:
         python-version: '3.9'
 
-    - name: Install dependencies
+    - name: Install Miniconda
       run: |
         wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $HOME/miniconda.sh
         bash $HOME/miniconda.sh -b -u -p $HOME/miniconda
-        export PATH="$HOME/miniconda/bin:$PATH"
-        hash -r
+        echo "$HOME/miniconda/bin" >> $GITHUB_PATH
+
+    - name: Install dependencies
+      run: |
         pip install nose coverage coveralls flake8 scikit-image
         pip install -e .
 

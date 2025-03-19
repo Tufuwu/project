@@ -15,9 +15,11 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.9', '3.10', '3.11']
-        env:
-          - TOXENV=flake8
-          - TOXENV=isort
+        include:
+          - python-version: '3.9'
+            env: TOXENV=flake8
+          - python-version: '3.9'
+            env: TOXENV=isort
 
     steps:
     - uses: actions/checkout@v2
@@ -33,7 +35,7 @@ jobs:
     - name: Run tests
       run: tox
     - name: Upload coverage to Coveralls
-      if: success() && matrix.env == 'TOXENV=flake8'
+      if: success() && matrix.python-version == '3.9'
       run: |
         if [ -e .coverage ]; then coveralls; fi
 ```

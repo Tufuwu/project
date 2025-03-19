@@ -1,0 +1,40 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run tests
+      run: |
+        ./run-tests
+
+    - name: Notify on failure
+      if: failure()
+      run: |
+        echo "Tests failed, sending notification to diego@assencio.com"
+        # Add notification logic here
+
+    - name: Notify on success
+      if: success()
+      run: |
+        echo "Tests passed, sending notification to diego@assencio.com"
+        # Add notification logic here

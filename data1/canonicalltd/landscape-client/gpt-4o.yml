@@ -1,0 +1,67 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check2:
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: sudo apt-get update && make depends2
+      - name: Install landscape-common
+        run: sudo apt-get -y install landscape-common
+      - name: Run check2
+        run: make check2 TRIAL=/usr/bin/trial
+
+  check3-bionic:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get -y upgrade && make depends3
+      - name: Install landscape-common
+        run: sudo apt-get -y install landscape-common
+      - name: Run check3
+        run: make check3 TRIAL=/usr/bin/trial3
+
+  check3-focal:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get -y upgrade && make depends3
+      - name: Install landscape-common
+        run: sudo apt-get -y install landscape-common
+      - name: Run check3
+        run: make check3 TRIAL=/usr/bin/trial3
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install flake8
+        run: sudo apt-get install -y python3-flake8
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y python3-pip python3-flake8
+          python3 -m pip install -U coverage
+          python3 -m pip install -U codecov
+          make depends3
+      - name: Run coverage
+        run: make coverage TRIAL=/usr/bin/trial3
+      - name: Upload coverage
+        run: codecov
+```

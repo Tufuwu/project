@@ -1,5 +1,5 @@
 ```yaml
-name: CI
+name: Python package
 
 on:
   push:
@@ -28,7 +28,7 @@ jobs:
     - name: Run tests
       run: tox
     - name: Upload coverage to Codecov
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       run: codecov
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```

@@ -1,0 +1,53 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox
+        pip install -r requirements.txt
+
+    - name: Create database
+      run: |
+        psql -c "CREATE ROLE gis PASSWORD 'gis' SUPERUSER CREATEDB CREATEROLE INHERIT LOGIN;" -U postgres
+        psql -c 'CREATE DATABASE gis;' -U postgres
+        psql -d gis -c 'CREATE SCHEMA gis;' -U postgres
+        psql -c 'GRANT CREATE ON DATABASE gis TO "gis";' -U postgres
+        psql -d gis -c 'GRANT USAGE,CREATE ON SCHEMA gis TO "gis";' -U postgres
+        psql -d gis -c 'CREATE EXTENSION postgis;' -U postgres
+
+    - name: Run tests
+      run: |
+        flake8 --ignore=W503,W504 geoalchemy2 tests
+        tox -e py${{ matrix.python-version }}-sqla11 --sitepackages -- -v --cov geoalchemy2 --cov-report term-missing
+        tox -e py${{ matrix.python-version }}-sqlalatest --sitepackages -- -v --cov geoalchemy2 --cov-report term-missing
+
+    - name: Report coverage
+      run: |
+        pip install coveralls
+        coveralls
+
+    - name: Deploy to PyPI
+      if: github.ref == 'refs/tags/*'
+      run: |
+        echo "${{ secrets.PYPI_PASSWORD }}" | twine upload --repository pypi dist/*
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}

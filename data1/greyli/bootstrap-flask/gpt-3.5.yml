@@ -1,0 +1,33 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        pip install .
+        pip install coverage coveralls flake8 flask-wtf flask-sqlalchemy pytest pytest-runner
+
+    - name: Run tests
+      run: |
+        coverage run --source=flask_bootstrap setup.py test
+        flake8 flask_bootstrap tests
+
+    - name: Upload coverage to coveralls
+      run: coveralls
