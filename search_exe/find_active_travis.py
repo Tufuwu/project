@@ -13,11 +13,12 @@ def get_travis_build_results(owner,repo,api_token):
     url = f"https://api.travis-ci.com/repo/{owner}%2F{repo}/builds"
 
     #headers = {"Travis-API-Version": "3"} 
-
+    
     headers = {
+        "Travis-API-Version": "3",
         'Authorization': f'token {api_token}'
     }
-
+    
 
     response = requests.get(url, headers=headers)
 
@@ -40,22 +41,26 @@ def get_travis_build_results(owner,repo,api_token):
         print(f"Error: {response.status_code}, {response.text}")
         return None
 
-api_token = 'RM5yL5KSqUspxHi5tN7MnA'
+api_token = 'jBJ-BCBxEo7el5503bFJkA'
 csv_file = 'D:/vscode/3/project/python-csv/travis_and_action.csv' 
 df = pd.read_csv(csv_file)
 for index, row in df.iterrows():
     repo_full_name = row['full_name']
     new_data ={'full_name':row['full_name'],'commits':row['commits'],'releases':row['releases'],'forks':row['forks'],'stargazers':row['stargazers'],'size':row['size'],'createdAt':row['createdAt'],'pushedAt':row['pushedAt'],'updatedAt':row['updatedAt'],'lastCommit':row['lastCommit'],'traviscommit':row['traviscommit']}
-    repo_full_name = 'joanbm/full-offline-backup-for-todoist'
+    #repo_full_name = 'joanbm/full-offline-backup-for-todoist'
+    print(repo_full_name)
     owner,repo= repo_full_name.split('/')
-    build_results = get_travis_build_results(owner,repo,api_token)
-    if build_results:
-        for build in build_results:
-            if build['state'] =='passed':
-                csv_file = 'D:/vscode/3/project/python-csv/active_travis.csv'
+    try:
+        build_results = get_travis_build_results(owner,repo,api_token)
+        if build_results:
+            for build in build_results:
+                if build['state'] =='passed':
+                    csv_file = 'D:/vscode/3/project/python-csv/active_travis.csv'
 
-                # 新的数据行
-                fo = file_operate()
-                fo.write_file_in(csv_file,new_data)
-                break
-
+                    # 新的数据行
+                    fo = file_operate()
+                    fo.write_file_in(csv_file,new_data)
+                    break
+    except:
+        csv_file1 = 'D:/vscode/3/project/search_exe/1.csv'
+        fo.wwrite_file_in(csv_file1,new_data)

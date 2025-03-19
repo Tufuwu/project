@@ -1,9 +1,20 @@
 name
- on
- jobs
- run_on
- steps
- uses
- with
- run
- if
+on
+build
+jobs
+runs_on
+strategy
+matrix
+python-version
+steps
+uses
+with
+run
+if
+architecture
+env
+github-token
+path
+key
+TOXENV
+branches

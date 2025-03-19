@@ -1,6 +1,4 @@
 full_name
-holzhaus/sphinx-multiversion
-beaglecli/beagle
 areski/python-nvd3
 decalage2/olefile
 ricardobranco777/clean_registry
@@ -85,3 +83,5 @@ konikvranik/pycec
 nmigen/nmigen-soc
 scikit-signal/tftb
 cuducos/webassets-elm
+holzhaus/sphinx-multiversion
+beaglecli/beagle

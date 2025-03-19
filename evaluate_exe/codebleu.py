@@ -2,7 +2,7 @@ from bleu import corpus_bleu
 from syntax_match import corpus_syntax_match
 from weighted_ngram_match import corpus_bleu_1
 import pandas as pd
-from utils import write_file_in
+from utils import write_file_in,fix_file
 
 
 def calc_codebleu(
@@ -76,17 +76,17 @@ if __name__ == "__main__":
     for index, row in df.iterrows():
         repo_full_name = row['full_name']
         references_path = f"D:/vscode/3/project/data1/{repo_full_name}/action.yml"
-        hypothesis_path  = f"D:/vscode/3/project/data1/{repo_full_name}/gpt.yml"
+        hypothesis_path  = f"D:/vscode/3/project/data1/{repo_full_name}/importer.yml"
         with open(references_path, "r", encoding="utf-8") as f:
-            references = f.read()
-            references = [references]
+            references = f.readlines()
+            references = [fix_file(references)]
         with open(hypothesis_path, "r", encoding="utf-8") as f:
-            predictions = f.read()
-            predictions = [predictions]
+            predictions = f.readlines()
+            predictions = [fix_file(predictions)]
         try:
             rs1,rs2,rs3,rs4 = calc_codebleu(references,predictions,"D:/vscode/3/project/evaluate_exe/action.txt")
 
-            new_data = {"gpt": rs1}
+            new_data = {"importer": rs1}
             #print(new_data,repo_full_name)
             write_file_in(csv_file,repo_full_name,new_data)
             count += 1
@@ -94,5 +94,5 @@ if __name__ == "__main__":
         except:
             
             pass
-        break
+        #break
     print(count)

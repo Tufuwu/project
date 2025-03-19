@@ -12,7 +12,7 @@ def get_workflow_file_history(repo_full_name, file_path, api_token):
     :return: 提交历史记录列表
     """
     api_url = f"https://api.github.com/repos/{repo_full_name}/commits"
-    params = {"path": file_path}
+    params = {"path": file_path,"per_page": 100, "page": 1}
     headers = {
         "Authorization": f"token {api_token}",
         "Accept": "application/vnd.github.v3+json"
@@ -65,28 +65,29 @@ def get_wrong_message(github_token,repo_full_name,commit_sha):
                                     for line in lines:
                                         decoded_line = line.decode("utf-8").strip()
                                         if "error" in decoded_line.lower() or "fail" in decoded_line.lower():
-                                            print(f"❌ 发现错误: {decoded_line}")
+                                            print(f"发现错误: {decoded_line}")
                 else:
-                    print(f"⚠️ 获取日志失败，HTTP 状态码: {log_response.status_code}")
+                    print(f" 获取日志失败，HTTP 状态码: {log_response.status_code}")
             else:
-                print(f"✅ Workflow 运行成功 (ID: {run_id})")
+                print(f" Workflow 运行成功 (ID: {run_id})")
         else:
-            print("⚠️ 未找到对应 commit 的 Workflow 运行记录")
+            print(" 未找到对应 commit 的 Workflow 运行记录")
     else:
-        print(f"⚠️ 获取 Workflow 运行信息失败，HTTP 状态码: {response.status_code}")
+        print(f" 获取 Workflow 运行信息失败，HTTP 状态码: {response.status_code}")
 
 def get_target_history(repo_full_name,api_token):
     workflow_file_path = '.github/workflows/'
-    repo_name = 'Tufuwu/action_test'
+    repo_name = 'Tufuwu/test7'
     commits = get_workflow_file_history(repo_name, workflow_file_path, api_token)
     for c in commits:
         b = c['commit']['message']
-        if re.search(f"{repo_full_name}/action",b) :
+
+        if re.search(f"{repo_full_name}/gpt-4o",b) :
             print('ssss')
             get_wrong_message(api_token,repo_name,c['sha'])
             break
 
 if __name__ =='__main__':
-    repo_full_name = 'w3c/feedvalidator'
+    repo_full_name = 'aboucaud/pypher'
     api_token = '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'
     get_target_history(repo_full_name,api_token)

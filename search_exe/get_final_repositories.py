@@ -5,12 +5,12 @@ from utils import file_operate
 
 # 读取 CSV 文件
 fo = file_operate()
-csv_file = "D:/vscode/3/project/python-csv/final.csv"  
+csv_file = "D:/vscode/3/project/GitHub_action_test/csv_file/success_repo_result.csv"  
 df = pd.read_csv(csv_file)
 base_download_path = "D:/vscode/3/project/repositories"
 for index, row in df.iterrows():
     repo_full_name = row['full_name']
-    new_data ={'full_name':row['full_name'],'commits':row['commits'],'releases':row['releases'],'forks':row['forks'],'stargazers':row['stargazers'],'size':row['size'],'createdAt':row['createdAt'],'pushedAt':row['pushedAt'],'updatedAt':row['updatedAt'],'lastCommit':row['lastCommit'],'travisredate':row['travisredate']}
+    #new_data ={'full_name':row['full_name'],'commits':row['commits'],'releases':row['releases'],'forks':row['forks'],'stargazers':row['stargazers'],'size':row['size'],'createdAt':row['createdAt'],'pushedAt':row['pushedAt'],'updatedAt':row['updatedAt'],'lastCommit':row['lastCommit'],'travisredate':row['travisredate']}
 # 指定本地存储目录
 
     api_url = f"https://github.com/{repo_full_name}"
@@ -18,8 +18,9 @@ for index, row in df.iterrows():
     os.makedirs(output_path, exist_ok=True)
     print(f"正在克隆仓库: {api_url} 到 {output_path}")
     result = subprocess.run(["git", "clone", api_url, output_path])
+    '''
     if result.returncode == 0:
         csv_repositiries = 'D:/vscode/3/project/python-csv/123.csv'
         fo.write_file_in(csv_repositiries,new_data)
-
+    '''
 print("所有仓库克隆完成！")

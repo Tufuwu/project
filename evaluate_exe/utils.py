@@ -2,6 +2,7 @@ import yaml
 import ast
 import pandas as pd
 from itertools import chain
+import re
 
 # 解析 YAML 为 Python 对象
 def parse_yaml(yaml_content):
@@ -105,3 +106,28 @@ def write_file_in(csv_path, full_name, new_data):
     df.to_csv(csv_path, index=False)
     
     print(f'数据已更新，并写入到原文件: {csv_path}')
+
+def fix_file(file_lines):
+    result = []
+    for line in file_lines:
+        if re.search(r'\S',line):
+            if re.search('name:',line):
+                fix_line = re.sub(r'name:.*\n','name: CI\n',line)
+                result.append(fix_line)
+            elif re.search('```',line):
+                continue
+            elif re.search('#',line):
+                temp = re.sub(r'#.*\n','\n',line)
+                if re.search(r'\S',temp):
+                    result.append(temp)
+            else:
+                result.append(line)
+        
+    return ''.join(result)
+
+if __name__ == "__main__":
+    references_path = "D:/vscode/3/project/data1/20c/rdap/action.yml" 
+    with open(references_path, "r", encoding="utf-8") as f:
+        references = f.readlines()
+        references = fix_file(references)
+    print(references)
