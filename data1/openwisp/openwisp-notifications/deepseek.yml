@@ -1,0 +1,67 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        django: ['django~=2.2', 'django~=3.0', 'django~=3.1']
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y sqlite3 gdal-bin
+
+      - name: Install Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+          sudo systemctl start docker
+          sudo systemctl enable docker
+
+      - name: Install Redis
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y redis-server
+          sudo systemctl start redis-server
+          sudo systemctl enable redis-server
+
+      - name: Upgrade pip and install dependencies
+        run: |
+          python -m pip install --upgrade pip wheel
+          pip install ${{ matrix.django }}
+          pip install -r requirements-test.txt
+          npm install -g jshint stylelint
+
+      - name: Install package
+        run: |
+          python setup.py -q develop
+
+      - name: Run QA checks
+        run: |
+          ./run-qa-checks
+
+      - name: Run tests with coverage
+        run: |
+          SAMPLE_APP=1 coverage run --source=openwisp_notifications runtests.py
+          coverage run -a --source=openwisp_notifications runtests.py
+
+      - name: Upload coverage to Coveralls
+        run: |
+          coveralls
+```

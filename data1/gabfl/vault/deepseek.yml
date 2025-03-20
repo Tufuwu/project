@@ -1,0 +1,39 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install --yes gcc python3-dev libsqlcipher-dev
+    - name: Upgrade pip
+      run: |
+        python -m pip install --upgrade pip
+    - name: Install dependencies
+      run: |
+        pip install pycodestyle codecov pytest pytest-cov
+        python setup.py install
+    - name: Run pycodestyle
+      run: |
+        pycodestyle --exclude=venv --ignore=E501 .
+    - name: Run tests with coverage
+      run: |
+        coverage run --source=. -m pytest
+        coverage report -m
+    - name: Upload coverage to Codecov
+      run: |
+        codecov
+```

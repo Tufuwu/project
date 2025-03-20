@@ -1,0 +1,61 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - VIM_VERSION: "7.4"
+            PYTHON_IMAGE: '3.9-stretch'
+            TAG: vim_74_py39
+          - VIM_VERSION: "8.0"
+            PYTHON_IMAGE: '3.9-stretch'
+            TAG: vim_80_py39
+          - VIM_VERSION: "8.1"
+            PYTHON_IMAGE: '3.9-stretch'
+            TAG: vim_81_py39
+          - VIM_VERSION: "git"
+            PYTHON_IMAGE: '3.9-stretch'
+            TAG: vim_git_py39
+          - VIM_VERSION: "7.4"
+            PYTHON_IMAGE: '3.10-stretch'
+            TAG: vim_74_py310
+          - VIM_VERSION: "8.0"
+            PYTHON_IMAGE: '3.10-stretch'
+            TAG: vim_80_py310
+          - VIM_VERSION: "8.1"
+            PYTHON_IMAGE: '3.10-stretch'
+            TAG: vim_81_py310
+          - VIM_VERSION: "git"
+            PYTHON_IMAGE: '3.10-stretch'
+            TAG: vim_git_py310
+          - VIM_VERSION: "8.1"
+            PYTHON_IMAGE: '3.11-stretch'
+            TAG: vim_81_py311
+          - VIM_VERSION: "git"
+            PYTHON_IMAGE: '3.11-stretch'
+            TAG: vim_git_py311
+          - VIM_VERSION: "8.1"
+            PYTHON_IMAGE: '3.12-buster'
+            TAG: vim_81_py312
+          - VIM_VERSION: "git"
+            PYTHON_IMAGE: '3.12-buster'
+            TAG: vim_git_py312
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build Docker image
+        run: docker build -t ultisnips:${{ matrix.TAG }} --build-arg PYTHON_IMAGE=${{ matrix.PYTHON_IMAGE }} --build-arg VIM_VERSION=${{ matrix.VIM_VERSION }} .
+
+      - name: Run tests
+        run: docker run -it ultisnips:${{ matrix.TAG }} docker/run_tests.sh
+```

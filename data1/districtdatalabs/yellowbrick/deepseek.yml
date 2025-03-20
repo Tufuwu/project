@@ -1,0 +1,61 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        include:
+          - python-version: '3.9'
+            anaconda: '3.9'
+          - python-version: '3.10'
+            anaconda: '3.10'
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+      if: matrix.anaconda == ''
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get build-dep -y python-scipy
+
+    - name: Install dependencies with pip
+      run: |
+        pip install -r tests/requirements.txt
+        pip install -r requirements.txt
+        pip install coveralls
+      if: matrix.anaconda == ''
+
+    - name: Set up Miniconda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        python-version: ${{ matrix.anaconda }}
+        activate-environment: yellowbrick
+        channels: conda-forge
+      if: matrix.anaconda != ''
+
+    - name: Install dependencies with conda
+      run: |
+        conda env update -f tests/requirements.txt -n yellowbrick
+        conda install coveralls
+      if: matrix.anaconda != ''
+
+    - name: Download NLTK data
+      run: python -m nltk.downloader popular
+
+    - name: Run tests
+      run: make test
+
+    - name: Upload coverage to Coveralls
+      run: coveralls
+```

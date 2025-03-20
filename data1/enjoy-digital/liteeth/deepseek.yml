@@ -1,0 +1,33 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        cd ~/
+        wget https://raw.githubusercontent.com/enjoy-digital/litex/master/litex_setup.py
+        python3 litex_setup.py init install
+        cd $GITHUB_WORKSPACE
+        python3 setup.py install
+
+    - name: Run tests
+      run: |
+        cd $GITHUB_WORKSPACE
+        python setup.py test
+```

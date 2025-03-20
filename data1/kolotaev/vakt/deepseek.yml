@@ -1,0 +1,83 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', 'pypy-3.9']
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
+      redis:
+        image: redis:6
+        ports:
+          - 6379:6379
+        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install MongoDB 4.2.1
+        run: |
+          wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-4.2.1.tgz
+          tar zxf mongodb-linux-x86_64-ubuntu1604-4.2.1.tgz
+          export PATH=${PWD}/mongodb-linux-x86_64-ubuntu1604-4.2.1/bin/:${PATH}
+          mongod --version
+          mkdir -p data/db
+          mongod --dbpath=data/db --fork --logpath /dev/null
+          sleep 5
+          mongo vakt_db --eval 'db.createUser({user:"test_user",pwd:"test_password",roles:["readWrite"]});'
+
+      - name: Create MySQL database
+        run: |
+          mysql -h 127.0.0.1 -u root -proot -e 'CREATE DATABASE vakt_db CHARACTER SET utf8 COLLATE utf8_bin;'
+
+      - name: Create PostgreSQL database
+        run: |
+          psql -h 127.0.0.1 -U postgres -c "CREATE DATABASE vakt_db ENCODING='UTF8';"
+
+      - name: Install dependencies
+        run: |
+          make deps
+
+      - name: Run tests with MySQL
+        run: |
+          DATABASE_DSN="mysql+pymysql://root:root@127.0.0.1/vakt_db" make coverage
+
+      - name: Run SQLite integration tests
+        run: |
+          DATABASE_DSN="sqlite:///:memory:" make test-sql-i
+
+      - name: Run PostgreSQL integration tests
+        run: |
+          DATABASE_DSN="postgresql+psycopg2cffi://postgres:postgres@localhost/vakt_db" make test-sql-i
+
+      - name: Run performance tests
+        run: |
+          make bench
+
+      - name: Upload coverage to Codecov
+        run: |
+          bash <(curl -s https://codecov.io/bash)
+```

@@ -1,0 +1,28 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install shellcheck
+          sudo apt-get -qq install libperl-critic-perl
+          sudo apt-get -qq install python-flake8
+          sudo apt-get -qq install flake8
+
+      - name: Run tests
+        run: make test
+```

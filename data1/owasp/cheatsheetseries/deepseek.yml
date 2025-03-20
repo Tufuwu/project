@@ -1,0 +1,37 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: 'node'
+
+    - name: Install Python and dependencies
+      run: |
+        sudo apt-get install python3.9 python3-pip python3-setuptools python3-wheel
+        pip3 install requests feedgen wheel
+
+    - name: Install npm packages
+      run: |
+        npm install -g markdown-link-check
+        npm install -g gitbook-cli
+
+    - name: Make script executable
+      run: chmod +x scripts/Generate_Site.sh
+
+    - name: Generate the offline website
+      run: |
+        cd scripts
+        echo "Try to generate the offline website..."
+        sed -i 's/python/python3\.9/g' Generate_Site.sh
+        bash Generate_Site.sh
+        ls -l ../generated/site/
+```

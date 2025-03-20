@@ -1,0 +1,83 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12', 'pypy3']
+        include:
+          - python-version: '3.9'
+            allow_failure: false
+          - python-version: '3.10'
+            allow_failure: false
+          - python-version: '3.11'
+            allow_failure: false
+          - python-version: '3.12'
+            allow_failure: false
+          - python-version: 'pypy3'
+            allow_failure: true
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          libexpat1-dev \
+          gettext \
+          liblcms2-dev \
+          libmagickwand-dev \
+          libopenexr-dev \
+          libcfitsio3-dev \
+          libfftw3-dev \
+          libgif-dev \
+          libgs-dev \
+          libgsf-1-dev \
+          libmatio-dev \
+          libopenslide-dev \
+          liborc-0.4-dev \
+          libpango1.0-dev \
+          libpoppler-glib-dev \
+          librsvg2-dev \
+          libwebp-dev \
+          libtiff5-dev \
+          libglib2.0-dev
+
+    - name: Install VIPS
+      run: |
+        bash install-vips.sh --without-python
+
+    - name: Set up environment variables
+      run: |
+        echo "VIPS_VERSION_MAJOR=8" >> $GITHUB_ENV
+        echo "VIPS_VERSION_MINOR=9" >> $GITHUB_ENV
+        echo "VIPS_VERSION_MICRO=0" >> $GITHUB_ENV
+        echo "PATH=$HOME/vips/bin:$PATH" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=$HOME/vips/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+        echo "PKG_CONFIG_PATH=$HOME/vips/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+
+    - name: Cache VIPS
+      uses: actions/cache@v3
+      with:
+        path: $HOME/vips
+        key: vips-${{ runner.os }}
+
+    - name: Install Python dependencies
+      run: |
+        pip install -U setuptools
+        pip install -U .[test]
+
+    - name: Run tests
+      run: |
+        python setup.py test
+```

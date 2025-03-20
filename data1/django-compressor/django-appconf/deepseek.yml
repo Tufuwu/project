@@ -1,0 +1,83 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+        toxenv: [
+          py35-dj111, py35-dj20, py35-dj21, py35-dj22,
+          py36-dj111, py36-dj20, py36-dj21, py36-dj22, py36-dj30, py36-djmaster,
+          py37-dj111, py37-dj20, py37-dj21, py37-dj22, py37-dj30, py37-djmaster,
+          py38-dj111, py38-dj20, py38-dj21, py38-dj22, py38-dj30, py38-djmaster
+        ]
+        include:
+          - python-version: '3.9'
+            toxenv: py35-dj111
+          - python-version: '3.9'
+            toxenv: py35-dj20
+          - python-version: '3.9'
+            toxenv: py35-dj21
+          - python-version: '3.9'
+            toxenv: py35-dj22
+          - python-version: '3.9'
+            toxenv: py36-dj111
+          - python-version: '3.9'
+            toxenv: py36-dj20
+          - python-version: '3.9'
+            toxenv: py36-dj21
+          - python-version: '3.9'
+            toxenv: py36-dj22
+          - python-version: '3.9'
+            toxenv: py36-dj30
+          - python-version: '3.9'
+            toxenv: py36-djmaster
+          - python-version: '3.9'
+            toxenv: py37-dj111
+          - python-version: '3.9'
+            toxenv: py37-dj20
+          - python-version: '3.9'
+            toxenv: py37-dj21
+          - python-version: '3.9'
+            toxenv: py37-dj22
+          - python-version: '3.9'
+            toxenv: py37-dj30
+          - python-version: '3.9'
+            toxenv: py37-djmaster
+          - python-version: '3.9'
+            toxenv: py38-dj111
+          - python-version: '3.9'
+            toxenv: py38-dj20
+          - python-version: '3.9'
+            toxenv: py38-dj21
+          - python-version: '3.9'
+            toxenv: py38-dj22
+          - python-version: '3.9'
+            toxenv: py38-dj30
+          - python-version: '3.9'
+            toxenv: py38-djmaster
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox codecov
+
+      - name: Run tests
+        run: tox -e ${{ matrix.toxenv }}
+
+      - name: Upload coverage to Codecov
+        run: codecov
+```

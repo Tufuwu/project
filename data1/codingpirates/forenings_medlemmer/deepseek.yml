@@ -1,0 +1,30 @@
+```yaml
+name: Prepare deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - name: Setup Environment
+        run: cp .env.example .env
+      - name: Build the stack
+        run: docker-compose build
+      - name: Test
+        run: docker-compose run web ./manage.py test
+      - name: Create Coverage
+        run: docker-compose run web coverage run --source='.' manage.py test
+      - name: Upload coverage
+        run: docker-compose run web coveralls
+        env:
+          repo_token: ${{ secrets.repo_token }}
+```

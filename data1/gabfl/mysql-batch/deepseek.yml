@@ -1,0 +1,43 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pycodestyle codecov pytest pytest-cov
+        python setup.py install
+    - name: Set up MySQL database
+      run: |
+        mysql -h 127.0.0.1 -u root -proot -e 'CREATE DATABASE my_db;'
+        # mysql -h 127.0.0.1 -u root -proot my_db < sample_table/schema.sql
+    - name: Run pycodestyle
+      run: pycodestyle --exclude=venv --ignore=E501 .
+    - name: Run tests with coverage
+      run: |
+        coverage run --source=. -m pytest
+        coverage report -m
+    - name: Upload coverage to Codecov
+      run: codecov
+```

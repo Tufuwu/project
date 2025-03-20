@@ -1,0 +1,66 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - /\d+\.\d+/
+      - /\d+\.\d+\.\d+/
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      BOTO_CONFIG: /dev/null
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        bash build_scripts/freeze_requirements.sh
+        bash build_scripts/build_package.sh
+
+    - name: Dry run
+      run: |
+        pip install --no-cache-dir dist/ops*.tar.gz
+        ops --verbose -h
+
+    - name: Keep-alive
+      run: |
+        while sleep 5m; do echo "=====[ $SECONDS seconds still running ]====="; done &
+        sleep 300
+
+    - name: Build Docker image
+      run: docker build -f build_scripts/Dockerfile -t ops .
+
+    - name: Kill background sleep loop
+      run: kill %1
+
+    - name: Add requirements.txt
+      run: git add requirements.txt
+
+    - name: Deploy to GitHub Releases
+      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: dist/*
+        asset_name: dist
+        asset_content_type: application/octet-stream
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_API_KEY }}
+
+    - name: Deploy Docker image
+      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+      run: bash build_scripts/docker_push.sh
+```

@@ -1,0 +1,70 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Chrome
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable
+
+    - name: Install ChromeDriver
+      run: |
+        latest=$(wget -qO- https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
+        wget https://chromedriver.storage.googleapis.com/$latest/chromedriver_linux64.zip
+        unzip chromedriver_linux64.zip
+        sudo mv chromedriver /usr/local/bin/chromedriver
+        sudo chmod +x /usr/local/bin/chromedriver
+
+    - name: Set up environment
+      run: |
+        export LANGUAGE=en_GB.UTF-8
+        export PATH=$PATH:/usr/lib/chromium-browser/
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install coveralls codeclimate-test-reporter pycodestyle
+
+    - name: Collect static files
+      run: |
+        python manage.py collectstatic --noinput
+
+    - name: Run pycodestyle
+      run: |
+        pycodestyle . --exclude=migrations,importer*
+
+    - name: Run Django checks
+      run: |
+        python manage.py check
+        python manage.py makemigrations --check --dry-run
+
+    - name: Run tests with coverage
+      run: |
+        coverage run manage.py test --verbosity=2
+
+    - name: Upload coverage to Coveralls
+      run: |
+        coveralls
+
+    - name: Upload coverage to Code Climate
+      run: |
+        codeclimate-test-reporter
+```

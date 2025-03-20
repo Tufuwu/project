@@ -1,0 +1,124 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        firefox-version: [nightly, dev, beta, release, esr]
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y jwm
+
+    - name: Install geckodriver
+      run: |
+        GECKODRIVER_VERSION=0.24.0
+        wget -O /tmp/geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz
+        mkdir $HOME/geckodriver && tar xvf /tmp/geckodriver.tar.gz -C $HOME/geckodriver
+        echo "$HOME/geckodriver" >> $GITHUB_PATH
+
+    - name: Install Firefox ${{ matrix.firefox-version }}
+      run: |
+        if [ "${{ matrix.firefox-version }}" = "esr" ]; then
+          sudo apt-get install -y firefox-esr
+        else
+          sudo apt-get install -y firefox
+        fi
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox-travis
+
+    - name: Run tests
+      env:
+        FIREFOX: ${{ matrix.firefox-version }}
+      run: |
+        tox
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python '3.9'
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox-travis
+
+    - name: Run linting
+      env:
+        TOXENV: flake8
+      run: |
+        tox
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python '3.9'
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox-travis
+
+    - name: Build docs
+      env:
+        TOXENV: docs
+      run: |
+        tox
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python '3.9'
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox-travis
+
+    - name: Publish to PyPI
+      env:
+        TWINE_USERNAME: davehunt
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        python setup.py sdist bdist_wheel
+        pip install twine
+        twine upload dist/*
+```

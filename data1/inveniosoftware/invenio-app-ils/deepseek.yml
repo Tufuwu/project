@@ -1,0 +1,85 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        include:
+          - { es_version: 7, es_url: "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.3.0-linux-x86_64.tar.gz", extras: "all,postgresql,elasticsearch7" }
+          - { es_version: 6, es_url: "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.2.0.tar.gz", extras: "all,postgresql,elasticsearch6" }
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+      rabbitmq:
+        image: rabbitmq
+        ports:
+          - 5672:5672
+      postgres:
+        image: postgres:12.4
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget
+
+      - name: Set up Elasticsearch
+        run: |
+          mkdir /tmp/elasticsearch
+          wget -O - ${{ matrix.es_url }} | tar xz --directory=/tmp/elasticsearch --strip-components=1
+          /tmp/elasticsearch/bin/elasticsearch --quiet &
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools py
+          pip install twine wheel coveralls requirements-builder 'six>=1.12.0'
+          requirements-builder -e ${{ matrix.extras }} --level=min setup.py > .travis-lowest-requirements.txt
+          requirements-builder -e ${{ matrix.extras }} --level=pypi setup.py > .travis-release-requirements.txt
+          pip install -r .travis-release-requirements.txt
+          pip install -e .[${{ matrix.extras }}]
+
+      - name: Run style checks
+        run: ./run-style-checks.sh
+
+      - name: Run tests
+        run: |
+          ./run-tests.sh acquisition
+          ./run-tests.sh circulation
+          ./run-tests.sh document_requests
+          ./run-tests.sh ill
+          ./run-tests.sh ils
+
+      - name: Upload coverage to Coveralls
+        run: coveralls
+```

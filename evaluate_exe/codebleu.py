@@ -70,29 +70,33 @@ def calc_codebleu(
 
 
 if __name__ == "__main__":
-    csv_file = "D:/vscode/3/project/result/codebleu_result.csv"
-    df = pd.read_csv(csv_file)
-    count = 0
-    for index, row in df.iterrows():
-        repo_full_name = row['full_name']
-        references_path = f"D:/vscode/3/project/data1/{repo_full_name}/action.yml"
-        hypothesis_path  = f"D:/vscode/3/project/data1/{repo_full_name}/importer.yml"
-        with open(references_path, "r", encoding="utf-8") as f:
-            references = f.readlines()
-            references = [fix_file(references)]
-        with open(hypothesis_path, "r", encoding="utf-8") as f:
-            predictions = f.readlines()
-            predictions = [fix_file(predictions)]
-        try:
-            rs1,rs2,rs3,rs4 = calc_codebleu(references,predictions,"D:/vscode/3/project/evaluate_exe/action.txt")
+    csv_file = "D:/vscode/3/project/result/codebleu.csv"
+    file_names = ['importer','gpt-3.5','gpt-4o','deepseek']
 
-            new_data = {"importer": rs1}
-            #print(new_data,repo_full_name)
-            write_file_in(csv_file,repo_full_name,new_data)
-            count += 1
-           
-        except:
+
+    for file_name in file_names:
+        df = pd.read_csv(csv_file)
+        count = 0
+        for index, row in df.iterrows():
+            repo_full_name = row['full_name']
+            references_path = f"D:/vscode/3/project/data1/{repo_full_name}/action.yml"
+            hypothesis_path  = f"D:/vscode/3/project/data1/{repo_full_name}/{file_name}.yml"
+            with open(references_path, "r", encoding="utf-8") as f:
+                references = f.readlines()
+                references = [fix_file(references)]
+            with open(hypothesis_path, "r", encoding="utf-8") as f:
+                predictions = f.readlines()
+                predictions = [fix_file(predictions)]
+            try:
+                rs1,rs2,rs3,rs4 = calc_codebleu(references,predictions,"D:/vscode/3/project/evaluate_exe/action.txt")
+
+                new_data = {file_name: rs1}
+                #print(new_data,repo_full_name)
+                write_file_in(csv_file,repo_full_name,new_data)
+                count += 1
             
-            pass
-        break
-    print(count)
+            except:
+                
+                pass
+
+        print(count)

@@ -1,0 +1,71 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - 1.0
+  pull_request:
+    branches:
+      - 1.0
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+        include:
+          - os: ubuntu-latest
+            docker_image: quay.io/pypa/manylinux1_x86_64
+          - os: ubuntu-latest
+            docker_image: quay.io/pypa/manylinux1_i686
+            pre_cmd: linux32
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Pull Docker image (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: docker pull ${{ matrix.docker_image }}
+
+      - name: Build wheels (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: docker run --rm -v $PWD:/io ${{ matrix.docker_image }} ${{ matrix.pre_cmd }} /io/scripts/build-wheels-linux.sh
+
+      - name: Build wheels (macOS)
+        if: matrix.os == 'macos-latest'
+        run: scripts/build-wheels-macos.sh
+
+      - name: List artifacts
+        run: ls dist/
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: dist
+
+      - name: Upload to GitHub Releases
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*.whl
+          overwrite: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```

@@ -4,7 +4,7 @@ import pandas as pd
 from utils import write_file_in,fix_file
 
 file_names = ['importer','gpt-3.5','gpt-4o','deepseek']
-csv_file = f'D:/vscode/3/project/result/cosine_similarity_1.csv'
+csv_file = f'D:/vscode/3/project/result/cosine.csv'
 
 for file_name in file_names:
 

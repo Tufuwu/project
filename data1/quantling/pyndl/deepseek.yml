@@ -1,0 +1,40 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.8']
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 3
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Upgrade pip
+      run: pip3 install --upgrade pip
+
+    - name: Install dependencies
+      run: pip3 install tox-travis
+
+    - name: Run tests
+      run: tox -e travis
+      env:
+        OMP_NUM_THREADS: 4
+
+    - name: Run tests on MacOS
+      if: matrix.os == 'macos-latest'
+      run: tox -e nolinux
+      env:
+        OMP_NUM_THREADS: 4
+```

@@ -1,0 +1,55 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:10
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements/dev.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements/dev.txt
+        pip install coverage codecov
+
+    - name: Decrypt local settings
+      run: |
+        openssl aes-256-cbc -K ${{ secrets.ENCRYPTED_B2BEF351FF2E_KEY }} -iv ${{ secrets.ENCRYPTED_B2BEF351FF2E_IV }} -in openstax/settings/local.py.enc -out openstax/settings/local.py -d
+
+    - name: Create database
+      run: |
+        createdb -U postgres openstax
+
+    - name: Run tests
+      run: |
+        coverage run manage.py test --verbosity=2 --settings=openstax.settings.test
+
+    - name: Upload coverage to Codecov
+      run: |
+        codecov
+```
