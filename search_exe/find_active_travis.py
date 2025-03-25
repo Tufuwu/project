@@ -12,8 +12,7 @@ def get_travis_build_results(owner,repo,api_token):
     """
     url = f"https://api.travis-ci.com/repo/{owner}%2F{repo}/builds"
 
-    #headers = {"Travis-API-Version": "3"} 
-    
+
     headers = {
         "Travis-API-Version": "3",
         'Authorization': f'token {api_token}'
@@ -42,12 +41,13 @@ def get_travis_build_results(owner,repo,api_token):
         return None
 
 api_token = 'jBJ-BCBxEo7el5503bFJkA'
-csv_file = 'D:/vscode/3/project/python-csv/travis_and_action.csv' 
+csv_file = 'D:/vscode/3/project/python-csv/target.csv' 
 df = pd.read_csv(csv_file)
+fo = file_operate()
 for index, row in df.iterrows():
     repo_full_name = row['full_name']
-    new_data ={'full_name':row['full_name'],'commits':row['commits'],'releases':row['releases'],'forks':row['forks'],'stargazers':row['stargazers'],'size':row['size'],'createdAt':row['createdAt'],'pushedAt':row['pushedAt'],'updatedAt':row['updatedAt'],'lastCommit':row['lastCommit'],'traviscommit':row['traviscommit']}
-    #repo_full_name = 'joanbm/full-offline-backup-for-todoist'
+    new_data ={'full_name':row['full_name'],'commits':row['commits'],'releases':row['releases'],'forks':row['forks'],'stargazers':row['stargazers'],'size':row['size'],'createdAt':row['createdAt'],'pushedAt':row['pushedAt'],'updatedAt':row['updatedAt'],'lastCommit':row['lastCommit'],'travisredate':row['travisredate']}
+
     print(repo_full_name)
     owner,repo= repo_full_name.split('/')
     try:
@@ -55,12 +55,12 @@ for index, row in df.iterrows():
         if build_results:
             for build in build_results:
                 if build['state'] =='passed':
-                    csv_file = 'D:/vscode/3/project/python-csv/active_travis.csv'
+                    csv_path = 'D:/vscode/3/project/python-csv/try.csv'
 
                     # 新的数据行
                     fo = file_operate()
-                    fo.write_file_in(csv_file,new_data)
+                    fo.write_file_in(csv_path,new_data)
                     break
     except:
         csv_file1 = 'D:/vscode/3/project/search_exe/1.csv'
-        fo.wwrite_file_in(csv_file1,new_data)
+        fo.write_file_in(csv_file1,new_data)
