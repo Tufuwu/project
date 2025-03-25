@@ -26,7 +26,7 @@ def creat_deepseek_model(api_token,prompt):
             {"role": "user", "content":prompt},
         ],
 
-        temperature=0.3,
+        temperature=0,
 
         stream=False
         

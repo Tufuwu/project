@@ -50,7 +50,7 @@ def get_wrong_message(github_token,repo_full_name,commit_sha):
             conclusion = latest_run["conclusion"]
 
             if conclusion != 'success':
-                print(f"❌ Workflow 运行失败 (ID: {run_id})，获取日志...")
+                print(f" Workflow 运行失败 (ID: {run_id})，获取日志...")
                 
                 # 获取失败的日志 ZIP 文件
                 logs_url = f"https://api.github.com/repos/{repo_full_name}/actions/runs/{run_id}/logs"
