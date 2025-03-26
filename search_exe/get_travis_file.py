@@ -15,7 +15,7 @@ def process_repos_from_csv(csv_file, api_token):
     df = pd.read_csv(csv_file)
     for index, row in df.iterrows():
         repo_full_name = row['full_name']
-        new_data ={'full_name':row['full_name'],'commits':row['commits'],'releases':row['releases'],'forks':row['forks'],'stargazers':row['stargazers'],'size':row['size'],'createdAt':row['createdAt'],'pushedAt':row['pushedAt'],'updatedAt':row['updatedAt'],'lastCommit':row['lastCommit'],'travisredate':row['travisredate']}
+        new_data ={'full_name':row['full_name'],'commits':row['commits'],'releases':row['releases'],'forks':row['forks'],'stargazers':row['stargazers'],'size':row['size'],'createdAt':row['createdAt'],'pushedAt':row['pushedAt'],'updatedAt':row['updatedAt'],'lastCommit':row['lastCommit'],'travisredate':row['travisredate'],'commit_sha':0,'file_name':0}
         print(index)
 
         try:
@@ -32,16 +32,17 @@ def process_repos_from_csv(csv_file, api_token):
                 b = c['commit']['message']
                 if (fo.re_match("Migrate",b) or fo.re_match('Move',b) or fo.re_match('Replace',b) ) and fo.re_match('Travis',b) :
                     output_dir = os.path.join(parent_dir, repo_full_name)
-
-                    fo.split_and_save_diffs(gh.get_commit_diff(c['url'],api_token), output_dir)
-                    return
-                    if fo.split_and_save_diffs(gh.get_commit_diff(c['url'],api_token), output_dir):
-
-                        csv_file = 'D:/vscode/3/project/python-csv/final.csv'
+                    c['url'] = 'https://api.github.com/repos/VarIr/scikit-hubness/commits/45adfbc'
+                    action_name = fo.split_and_save_diffs(gh.get_commit_diff(c['url'],api_token), output_dir)
+                    if action_name:
+                        new_data['commit_sha'] = c['sha']
+                        new_data['file_name'] = action_name
+                        new_data['travisredate'] = c['commit']['author']['date']
+                        csv_file = 'D:/vscode/3/project/python-csv/final_csv/repo.csv'
                         fo.write_file_in(csv_file,new_data)
         except Exception as e:
             print(f"无法获取 {repo_full_name} 的 workflow 文件历史: {e}")
- 
+        break
  
  
 if __name__ == "__main__":

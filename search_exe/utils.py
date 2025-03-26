@@ -138,42 +138,53 @@ class file_operate(diff_operate):
         action_file = []
         travis_file = []
         # diff 文件的文件名计数
-        print(diffs)
-        return
+
 
         for i in range(0, len(diffs), 2):
             # 提取出文件名，确保文件名唯一
-            file_identifier = diffs[i].split()[2].replace('b/', '').replace('/', '_')
-            if 'git' in file_identifier or 'travis' in file_identifier:
 
+            if self.re_match('workflows',diffs[i]):
+                file_name = diffs[i].split("/")
+                action_file.append(file_name[-1])
+            elif self.re_match('travis',diffs[i]):
+                diff_data = self.pross_travis_file(diffs[i+1])
+                if diff_data:
+                    travis_file.append(diff_data)
 
+        if len(action_file) ==1 and travis_file:
+            os.makedirs(output_dir, exist_ok=True)
+            file_name = f"travis.yml"
+            output_path = os.path.join(output_dir, file_name)
+            with open(output_path, 'w') as f:
+                f.write(travis_file[0])
+            return action_file[0]
+        
+        return False
+    
+''' 
                 
-                # 获取完整的 diff 内容
-                diff_data = diffs[i] + diffs[i + 1]
+                
 
-                if self.re_match('git',file_identifier):
-                    diff_data = self.pross_github_file(diff_data)
-                    if diff_data:
-                        action_file.append(diff_data)
+
                 elif self.re_match('travis',file_identifier):
                     diff_data = self.pross_travis_file(diff_data)
                     if diff_data:
                         travis_file.append(diff_data)
-                '''
+                
                 file_name = f"importer.yml"
                 output_path = os.path.join(output_dir, file_name)
                 with open(output_path, 'w') as f:
                     f.write(diff_data)
                 print(f"Saved diff to {output_dir}")
-                '''
+                
         if len(action_file) ==1:
             os.makedirs(output_dir, exist_ok=True)
-            '''
+                    
             file_name = f"action.yml"
             output_path = os.path.join(output_dir, file_name)
             with open(output_path, 'w') as f:
                 f.write(action_file[0])'
-            '''
+                    
             file_name = f"travis.yml"
             output_path = os.path.join(output_dir, file_name)
             with open(output_path, 'w') as f:
@@ -181,7 +192,7 @@ class file_operate(diff_operate):
           
             return True
         return False
-
+'''
 
 class get_history():
 
