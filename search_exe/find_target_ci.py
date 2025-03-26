@@ -12,7 +12,7 @@ def process_repos_from_csv(csv_file, api_token):
     df = pd.read_csv(csv_file)
     for index, row in df.iterrows():
         repo_full_name = row['full_name']
-        new_data ={'full_name':row['full_name'],'commits':row['commits'],'releases':row['releases'],'forks':row['forks'],'stargazers':row['stargazers'],'size':row['size'],'createdAt':row['createdAt'],'pushedAt':row['pushedAt'],'updatedAt':row['updatedAt'],'lastCommit':row['lastCommit'],'travisredate':0}
+        new_data ={'full_name':row['full_name'],'commits':row['commits'],'releases':row['releases'],'forks':row['forks'],'stargazers':row['stargazers'],'size':row['size'],'createdAt':row['createdAt'],'pushedAt':row['pushedAt'],'updatedAt':row['updatedAt'],'lastCommit':row['lastCommit'],'traviscommit':row['traviscommit']}
         print(index)
         try:
             # 假设 workflow 文件在 `.github/workflows/` 下
@@ -29,7 +29,7 @@ def process_repos_from_csv(csv_file, api_token):
                 if (fo.re_match("Migrate",b) or fo.re_match('Move',b) or fo.re_match('Replace',b) ) and fo.re_match('Travis',b):
 
                     # 你要操作的CSV文件路径
-                    csv_file = 'D:/vscode/3/project/python-csv/target.csv'
+                    csv_file = 'D:/vscode/3/project/python-csv/target2.csv'
 
                     # 新的数据行
                     new_data['travisredate'] = c['commit']['author']["date"]
@@ -47,5 +47,5 @@ def process_repos_from_csv(csv_file, api_token):
 if __name__ == "__main__":
     # 从 CSV 文件中读取仓库，并获取每个仓库的 workflow 文件提交历史
     api_token = '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'
-    csv_file = 'D:/vscode/3/project/python-csv/active_action.csv'  # 假设这个CSV文件有 'full_name' 列
+    csv_file = 'D:/vscode/3/project/python-csv/mid_csv/active_travis.csv'  # 假设这个CSV文件有 'full_name' 列
     process_repos_from_csv(csv_file, api_token)

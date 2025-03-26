@@ -194,7 +194,7 @@ class get_history():
         :return: 提交历史记录列表
         """
         api_url = f"https://api.github.com/repos/{repo_full_name}/commits"
-        params = {"path": file_path}
+        params = {"path": file_path,"per_page": 100, "page": 1}
         headers = {
             "Authorization": f"token {api_token}",
             "Accept": "application/vnd.github.v3+json"
