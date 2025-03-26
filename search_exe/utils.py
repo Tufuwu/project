@@ -135,15 +135,17 @@ class file_operate(diff_operate):
         
         # diffs[0] 会是空字符串，因为它是第一个 'diff --git' 之前的部分，所以可以忽略
         diffs = diffs[1:]
-        temp = []
+        action_file = []
+        travis_file = []
         # diff 文件的文件名计数
-        file_count = 1
+        print(diffs)
+        return
 
         for i in range(0, len(diffs), 2):
             # 提取出文件名，确保文件名唯一
             file_identifier = diffs[i].split()[2].replace('b/', '').replace('/', '_')
             if 'git' in file_identifier or 'travis' in file_identifier:
-                file_name = f"{file_count}_{file_identifier}.diff"
+
 
                 
                 # 获取完整的 diff 内容
@@ -152,32 +154,34 @@ class file_operate(diff_operate):
                 if self.re_match('git',file_identifier):
                     diff_data = self.pross_github_file(diff_data)
                     if diff_data:
-                        temp.append(diff_data)
+                        action_file.append(diff_data)
                 elif self.re_match('travis',file_identifier):
                     diff_data = self.pross_travis_file(diff_data)
                     if diff_data:
-                        temp.append(diff_data)
-                # 将每个 diff 文件写入到单独的文件
+                        travis_file.append(diff_data)
+                '''
                 file_name = f"importer.yml"
                 output_path = os.path.join(output_dir, file_name)
                 with open(output_path, 'w') as f:
                     f.write(diff_data)
                 print(f"Saved diff to {output_dir}")
-        '''
-        if len(temp) ==2:
+                '''
+        if len(action_file) ==1:
             os.makedirs(output_dir, exist_ok=True)
+            '''
             file_name = f"action.yml"
             output_path = os.path.join(output_dir, file_name)
             with open(output_path, 'w') as f:
-                f.write(temp[0])
+                f.write(action_file[0])'
+            '''
             file_name = f"travis.yml"
             output_path = os.path.join(output_dir, file_name)
             with open(output_path, 'w') as f:
-                f.write(temp[1])
+                f.write(travis_file[0])
           
             return True
         return False
-        '''
+
 
 class get_history():
 
