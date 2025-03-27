@@ -51,5 +51,6 @@ if __name__ == "__main__":
         print(repo_full_name)
         forks = get_forks(repo_full_name, token)
         for fork in forks:
+            print(fork,repo_full_name)
             file_path = 'D:/vscode/3/project/python-csv/repo.csv' 
             remove_name_from_csv(file_path, fork)
