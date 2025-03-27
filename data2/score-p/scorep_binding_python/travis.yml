@@ -1,0 +1,13 @@
+dist: bionic
+
+language: python
+python:
+ - "2.7"
+ - "3.6"
+        - libopenmpi-dev
+ 
+install:
+  - pip install mpi4py numpy
+
+script:
+  - pip install ./ && cd test && python test_scorep.py

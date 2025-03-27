@@ -32,7 +32,6 @@ def process_repos_from_csv(csv_file, api_token):
                 b = c['commit']['message']
                 if (fo.re_match("Migrate",b) or fo.re_match('Move',b) or fo.re_match('Replace',b) ) and fo.re_match('Travis',b) :
                     output_dir = os.path.join(parent_dir, repo_full_name)
-                    c['url'] = 'https://api.github.com/repos/VarIr/scikit-hubness/commits/45adfbc'
                     action_name = fo.split_and_save_diffs(gh.get_commit_diff(c['url'],api_token), output_dir)
                     if action_name:
                         new_data['commit_sha'] = c['sha']
@@ -42,7 +41,7 @@ def process_repos_from_csv(csv_file, api_token):
                         fo.write_file_in(csv_file,new_data)
         except Exception as e:
             print(f"无法获取 {repo_full_name} 的 workflow 文件历史: {e}")
-        break
+
  
  
 if __name__ == "__main__":

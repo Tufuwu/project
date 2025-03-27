@@ -146,7 +146,7 @@ class file_operate(diff_operate):
             if self.re_match('workflows',diffs[i]):
                 file_name = diffs[i].split("/")
                 action_file.append(file_name[-1])
-            elif self.re_match('travis',diffs[i]):
+            elif self.re_match('.travis',diffs[i]):
                 diff_data = self.pross_travis_file(diffs[i+1])
                 if diff_data:
                     travis_file.append(diff_data)

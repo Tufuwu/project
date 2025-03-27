@@ -1,0 +1,10 @@
+language: python
+python:
+  - "3.8"
+  - "3.9"
+  - "3.10"
+install:
+  - pip install -e .
+  - pip install pre_commit
+script:
+  - pre-commit run --all-files
