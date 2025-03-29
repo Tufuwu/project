@@ -5,7 +5,7 @@ from utils import file_operate
 
 # 读取 CSV 文件
 fo = file_operate()
-csv_file = "D:/vscode/3/project/python-csv/final_csv/repo.csv"  
+csv_file = "D:/vscode/3/project/search_exe/1.csv"  
 df = pd.read_csv(csv_file)
 base_download_path = "D:/vscode/3/project/repositories"
 for index, row in df.iterrows():
@@ -23,7 +23,7 @@ for index, row in df.iterrows():
         csv_repositiries = 'D:/vscode/3/project/python-csv/123.csv'
         fo.write_file_in(csv_repositiries,new_data)
     else:
-        csv_repositiries = 'D:/vscode/3/project/search_exe/1.csv'
+        csv_repositiries = 'D:/vscode/3/project/search_exe/2.csv'
         fo.write_file_in(csv_repositiries,new_data)
     
 print("所有仓库克隆完成！")
