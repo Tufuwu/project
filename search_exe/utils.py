@@ -136,6 +136,7 @@ class file_operate(diff_operate):
         # diffs[0] 会是空字符串，因为它是第一个 'diff --git' 之前的部分，所以可以忽略
         diffs = diffs[1:]
         action_file = []
+        action_name = []
         travis_file = []
         # diff 文件的文件名计数
 
@@ -144,9 +145,12 @@ class file_operate(diff_operate):
             # 提取出文件名，确保文件名唯一
 
             if self.re_match('workflows',diffs[i]):
-                file_name = diffs[i].split("/")
-                action_file.append(file_name[-1])
-            elif self.re_match('.travis',diffs[i]):
+                file_name = diffs[i].split('/')[-1]
+                action_name.append(file_name)
+                diff_data = self.pross_github_file(diffs[i+1])
+                if diff_data:
+                    action_file.append(diff_data)
+            elif self.re_match(r'\.travis',diffs[i]):
                 diff_data = self.pross_travis_file(diffs[i+1])
                 if diff_data:
                     travis_file.append(diff_data)
@@ -157,7 +161,7 @@ class file_operate(diff_operate):
             output_path = os.path.join(output_dir, file_name)
             with open(output_path, 'w') as f:
                 f.write(travis_file[0])
-            return action_file[0]
+            return action_name[0]
         
         return False
     

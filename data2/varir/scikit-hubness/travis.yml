@@ -1,31 +1,67 @@
-#!/usr/bin/env bash
-# If you use this file as template, don't forget to `chmod a+x newfile`
-
-set -e
-
-# the miniconda directory may exist if it has been restored from cache
-if [[ -d "$MINICONDA_DIR" ]] && [[ -e "$MINICONDA_DIR/bin/conda" ]]; then
-    echo "Miniconda install already present from cache: $MINICONDA_DIR"
-else # if it does not exist, we need to install miniconda
-    rm -rf "$MINICONDA_DIR" # remove the directory in case we have an empty cached directory
-
-    if [[ "$TRAVIS_OS_NAME" == 'linux' ]] && [[ "$TRAVIS_PYTHON_VERSION" == 2* ]]; then
-        echo "WARNING: using Python2"
-        wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
-    elif [[ "$TRAVIS_OS_NAME" == 'linux' ]]; then
-        wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-    elif [[ "$TRAVIS_OS_NAME" == 'osx' ]]; then
-        wget https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
-    fi
-
-    bash miniconda.sh -b -p "$MINICONDA_DIR"
-    chown -R "$USER" "$MINICONDA_DIR"
-    export PATH="$MINICONDA_DIR/bin:$PATH"
-    conda config --set always_yes yes --set changeps1 no
-    conda update -q conda
-    conda info -a # for debugging
-    echo "$TRAVIS_PYTHON_VERSION"
-    conda create --yes -n test python="$TRAVIS_PYTHON_VERSION"
-    source activate test
-
-fi
+# No default os and language here, due to special macos config
+ 
+ jobs:
+   include:
+     - name: Python 3.7 on Ubuntu Linux 18.04
+       os: linux
+       dist: bionic
+       language: python
+       python: '3.7'
+     - name: Python 3.8 on Ubuntu Linux 18.04
+       os: linux
+       dist: bionic
+       language: python
+       python: '3.8'
+     # See https://blog.travis-ci.com/2019-08-07-extensive-python-testing-on-travis-ci
+     # for macos config peculiarities.
+     - name: Python 3.7 on MacOS X (xcode 10.3)
+       os: osx
+       language: shell
+       osx_image: xcode10.3  # Python 3.7
+     - name: Python 3.7 on MacOS X (xcode 11.3)
+       os: osx
+       language: shell
+       osx_image: xcode11.3  # Python 3.7.5
+ 
+ env:
+   global:
+   - CACHE_DIR="$HOME/virtualenv"
+   - MINICONDA_DIR="$HOME/miniconda"
+   - PYTHONIOENCODING=UTF8
+ 
+ before_install:
+   - travis/install-conda.sh
+   - export PATH="$MINICONDA_DIR/bin:$PATH"
+   - hash -r
+   - conda install -y numpy                # install optimized numpy first
+   - pip install pybind11                  # so that nmslib can build
+   - travis/install-pip.sh                 # install all the other requirements
+   - travis/install-build-puffinn.sh       # install from cache or build first
+ 
+ install:
+   - python3 setup.py build
+   - python3 setup.py install
+ 
+ before_script:
+   - flake8 --exit-zero .
+ 
+ script:
+   - pytest skhubness --cov=skhubness
+ 
+ after_success:
+   # Coverage reports should be merged automatically by codecov
+   - codecov
+ 
+ cache:
+   - pip
+   - ccache
+   - packages
+   - directories:
+       - "$HOME/.cache/pip"
+       - "$HOME/virtualenv"
+       - "$HOME/miniconda"
+ 
+ branches:
+   only:
+   - master
+   - develop

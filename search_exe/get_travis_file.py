@@ -11,7 +11,7 @@ def process_repos_from_csv(csv_file, api_token):
     :param csv_file: 包含 GitHub 仓库信息的 CSV 文件
     :param api_token: GitHub API 的访问令牌
     """
-    parent_dir = 'D:/vscode/3/project/data2'
+    parent_dir = 'D:/vscode/3/project/data'
     df = pd.read_csv(csv_file)
     for index, row in df.iterrows():
         repo_full_name = row['full_name']
@@ -30,15 +30,15 @@ def process_repos_from_csv(csv_file, api_token):
 
             for c in commits:
                 b = c['commit']['message']
-                if (fo.re_match("Migrate",b) or fo.re_match('Move',b) or fo.re_match('Replace',b) ) and fo.re_match('Travis',b) :
+                if (fo.re_match("Migrate.*travis",b) or fo.re_match('Move.*travis',b) or fo.re_match('Replace.*travis',b) or fo.re_match('switch.*travis',b)):
                     output_dir = os.path.join(parent_dir, repo_full_name)
                     action_name = fo.split_and_save_diffs(gh.get_commit_diff(c['url'],api_token), output_dir)
                     if action_name:
                         new_data['commit_sha'] = c['sha']
                         new_data['file_name'] = action_name
                         new_data['travisredate'] = c['commit']['author']['date']
-                        csv_file = 'D:/vscode/3/project/python-csv/final_csv/repo.csv'
-                        fo.write_file_in(csv_file,new_data)
+                        csv_path = 'D:/vscode/3/project/python-csv/final_csv/repo1.csv'
+                        fo.write_file_in(csv_path,new_data)
         except Exception as e:
             print(f"无法获取 {repo_full_name} 的 workflow 文件历史: {e}")
 
@@ -47,5 +47,5 @@ def process_repos_from_csv(csv_file, api_token):
 if __name__ == "__main__":
     # 从 CSV 文件中读取仓库，并获取每个仓库的 workflow 文件提交历史
     api_token = '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'
-    csv_file = 'D:/vscode/3/project/python-csv/target2.csv'  # 假设这个CSV文件有 'full_name' 列 
+    csv_file = 'D:/vscode/3/project/python-csv/target3.csv'  # 假设这个CSV文件有 'full_name' 列 
     process_repos_from_csv(csv_file, api_token)

@@ -26,7 +26,7 @@ def process_repos_from_csv(csv_file, api_token):
             
             for c in commits:
                 b = c['commit']['message']
-                if (fo.re_match("Migrate",b) or fo.re_match('Move',b) or fo.re_match('Replace',b) ) and fo.re_match('Travis',b):
+                if (fo.re_match("Migrate.*travis",b) or fo.re_match('Move.*travis',b) or fo.re_match('Replace.*travis',b) or fo.re_match('switch.*travis',b) ):
 
                     # 你要操作的CSV文件路径
                     csv_file = 'D:/vscode/3/project/python-csv/target2.csv'

@@ -1,0 +1,8 @@
+language: python
+python:
+  - 3.9
+cache:
+  - pip
+script: make check PIP=pip BUILDBOT=buildbot
+notifications:
+  email: false
