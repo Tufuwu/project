@@ -3,7 +3,7 @@ import subprocess
 from utils import file_operate,get_history
 
 
-csv_file = 'D:/vscode/3/project/python-csv/final_csv/fix_time.csv'
+csv_file = 'D:/vscode/3/project/python_csv/final_csv/fix_time.csv'
 df = pd.read_csv(csv_file)
 fo = file_operate()
 for index, row in df.iterrows():
