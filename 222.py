@@ -1,5 +1,6 @@
-import re
+from collections import Counter
 
-s = '   2  \n'
-if re.search(r"\S",s):
-    print("ssss")
+fix_times = Counter()
+fix_times['sss'] += 1
+fix_times['sss'] += 1
+print(fix_times['sss'])

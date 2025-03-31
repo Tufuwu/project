@@ -21,11 +21,11 @@ def process_repos_from_csv(csv_file, api_token):
     df = pd.read_csv(csv_file)
     for index, row in df.iterrows():
         repo_full_name = row['full_name']
-        #repo_full_name = 'socialpoint-labs/unity-yaml-parser' 
+        #repo_full_name = 'nextstrain/ncov' 
         file_name = row['file_name']
-        #file_name = 'ci.yml'
+        #file_name = 'ci.yaml'
         file_commit_date = row['travisredate']
-        #file_commit_date = '2022-02-14T12:15:52Z'
+        #file_commit_date = '2022-04-28T20:05:14Z'
         new_data ={'full_name':row['full_name'],'travisredate':row['travisredate'],'file_name':row['file_name'],'commit_sha':row['commit_sha'],'new_commits_sha':0,'commits_times':0}
         print(index)
 
@@ -63,7 +63,7 @@ def process_repos_from_csv(csv_file, api_token):
                             #print(pre_name,lat_name)
                             #print(len(pre_name),len(lat_name))
                             if pre_name ==lat_name:
-                                fix_times[file_name] += 1
+                                fix_times[pre_name] += 1
                                 if pre_name ==file_name:
                                     new_data['new_commits_sha'] = c['sha']
                                 
@@ -85,8 +85,8 @@ def process_repos_from_csv(csv_file, api_token):
                                 else:
                                     fix_times[pre_name] += 1
                                     fix_times[lat_name] += 1
-                                    
-                            print(fix_times[file_name])
+                            #print(file_name)      
+                            #print('11',fix_times[file_name])
                 else:
                     break
             
@@ -102,7 +102,7 @@ def process_repos_from_csv(csv_file, api_token):
             file_path = "D:/vscode/3/project/search_exe/errer_file.csv"
             fo.write_file_in(file_path,new_data)
         
-
+        
 
 
 
