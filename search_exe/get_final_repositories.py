@@ -23,7 +23,7 @@ for index, row in df.iterrows():
         csv_repositiries = 'D:/vscode/3/project/python-csv/123.csv'
         fo.write_file_in(csv_repositiries,new_data)
     else:
-        csv_repositiries = 'D:/vscode/3/project/search_exe/2.csv'
+        csv_repositiries = 'D:/vscode/3/project/search_exe/errer_file.csv'
         fo.write_file_in(csv_repositiries,new_data)
     
 print("所有仓库克隆完成！")
