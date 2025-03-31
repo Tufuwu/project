@@ -5,7 +5,7 @@ import re
 from collections import Counter
 
 def get_flie_name(file):
-    print(file)
+    
     file_len = (len(file)-52)//2 + 20
     pre_file = file[:len(file)-file_len-1]
     pre_name = pre_file.split('/')[-1]
@@ -20,12 +20,12 @@ def process_repos_from_csv(csv_file, api_token):
     """
     df = pd.read_csv(csv_file)
     for index, row in df.iterrows():
-        #repo_full_name = row['full_name']
-        repo_full_name = 'socialpoint-labs/unity-yaml-parser' 
-        #file_name = row['file_name']
-        file_name = 'ci.yml'
-        #file_commit_date = row['travisredate']
-        file_commit_date = '2022-02-14T12:15:52Z'
+        repo_full_name = row['full_name']
+        #repo_full_name = 'socialpoint-labs/unity-yaml-parser' 
+        file_name = row['file_name']
+        #file_name = 'ci.yml'
+        file_commit_date = row['travisredate']
+        #file_commit_date = '2022-02-14T12:15:52Z'
         new_data ={'full_name':row['full_name'],'travisredate':row['travisredate'],'file_name':row['file_name'],'commit_sha':row['commit_sha'],'new_commits_sha':0,'commits_times':0}
         print(index)
 
@@ -60,13 +60,13 @@ def process_repos_from_csv(csv_file, api_token):
                         if re.search('workflows',diffs[i]):
                             pre_name,lat_name = get_flie_name(diffs[i])
 
-                            print(pre_name,lat_name)
-                            print(len(pre_name),len(lat_name))
+                            #print(pre_name,lat_name)
+                            #print(len(pre_name),len(lat_name))
                             if pre_name ==lat_name:
                                 fix_times[file_name] += 1
                                 if pre_name ==file_name:
                                     new_data['new_commits_sha'] = c['sha']
-                                print('111')
+                                
                             else:
                                 if pre_name ==file_name:
                                     file_name = lat_name
@@ -75,17 +75,17 @@ def process_repos_from_csv(csv_file, api_token):
                                     fix_times[lat_name] += 1
                                     new_data['new_commits_sha'] = c['sha']
                                     new_data['file_name'] = file_name
-                                    print('222')
+                                    
                                 elif lat_name ==file_name:
                                     fix_times[lat_name] += fix_times[pre_name]
                                     fix_times[pre_name] += 1
                                     fix_times[lat_name] += 1
                                     new_data['new_commits_sha'] = c['sha']
-                                    print('333')
+                                    
                                 else:
                                     fix_times[pre_name] += 1
                                     fix_times[lat_name] += 1
-                                    print('444')
+                                    
                             print(fix_times[file_name])
                 else:
                     break
