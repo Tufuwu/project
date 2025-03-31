@@ -610,3 +610,4 @@ esrg-knights/Squire,2021-10-09T14:00:12Z,run_tests.yml,a60d5feb4f56164571637afdd
 moira-alert/moira-trigger-role,2023-04-10T09:16:00Z,run_tests.yml,0c1403ab464d5aa03b7ac5d64124ebff07cdb0cc,0c1403ab464d5aa03b7ac5d64124ebff07cdb0cc,1
 rapydo/do,2020-12-13T06:32:57Z,pytests.yml,e5ae6e8a0382ce22b4519dee79580aec39b4fcfe,e5ae6e8a0382ce22b4519dee79580aec39b4fcfe,1
 bbc2/shuffled,2020-10-10T14:44:42Z,main.yml,fb514d17b13b01019fa96d0b4f95638f667a5cdf,b0ec146f12e0cb824dcf96ac327f3e1b882014fb,3
+
