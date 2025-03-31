@@ -28,7 +28,7 @@ def process_repos_from_csv(csv_file, api_token):
         try:
             # 假设 workflow 文件在 `.github/workflows/` 下
             workflow_file_path = f'.github/workflows/'
-            print(f"正在获取仓库 {workflow_file_path} 的 workflow 文件历史...")
+            print(f"正在获取仓库 {repo_full_name} 的 workflow 文件历史...")
             
             # 获取文件历史
             gh = get_history()
@@ -52,9 +52,9 @@ def process_repos_from_csv(csv_file, api_token):
                     diffs = diff_pattern.split(diff_content)
                     diffs = diffs[1:]
 
-                    for file in diffs:
-                        if re.search('workflows',file):
-                            pre_name,lat_name = get_flie_name(file)
+                    for i in range(0, len(diffs), 2):
+                        if re.search('workflows',diffs[i]):
+                            pre_name,lat_name = get_flie_name(diffs[i])
 
                             #print(pre_name,lat_name)
 
@@ -91,13 +91,16 @@ def process_repos_from_csv(csv_file, api_token):
 
                                     
         except Exception as e:
-            print(f"无法获取 {repo_full_name} 的 workflow 文件历史: {e}")
+            file_path = "D:/vscode/3/project/search_exe/errer_file.csv"
+            fo.write_file_in(file_path,new_data)
+
+
 
 
 
 if __name__ =="__main__":
 
     api_token = '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'
-    csv_file = 'D:/vscode/3/project/python-csv/final_csv/repo.csv' 
+    csv_file = 'D:/vscode/3/project/python-csv/final_csv/repo1.csv' 
     
     process_repos_from_csv(csv_file,api_token)

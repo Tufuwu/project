@@ -26,7 +26,7 @@ def process_repos_from_csv(csv_file, api_token):
             
             for c in commits:
                 b = c['commit']['message']
-                if (fo.re_match("Migrate.*travis",b) or fo.re_match('Move.*travis',b) or fo.re_match('Replace.*travis',b) or fo.re_match('switch.*travis',b) ):
+                if ( fo.re_match("Migrate.*travis",b) or fo.re_match('Move.*travis',b) or fo.re_match('Replace.*travis',b) or fo.re_match('switch.*travis',b) ):
 
                     # 你要操作的CSV文件路径
                     csv_file = 'D:/vscode/3/project/python-csv/target2.csv'
@@ -39,7 +39,8 @@ def process_repos_from_csv(csv_file, api_token):
 
                 
         except Exception as e:
-            print(f"无法获取 {repo_full_name} 的 workflow 文件历史: {e}")
+            file_path = "D:/vscode/3/project/search_exe/errer_file.csv"
+            fo.write_file_in(file_path,new_data)
 
 
 

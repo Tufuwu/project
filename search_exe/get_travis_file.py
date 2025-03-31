@@ -40,7 +40,8 @@ def process_repos_from_csv(csv_file, api_token):
                         csv_path = 'D:/vscode/3/project/python-csv/final_csv/repo1.csv'
                         fo.write_file_in(csv_path,new_data)
         except Exception as e:
-            print(f"无法获取 {repo_full_name} 的 workflow 文件历史: {e}")
+            file_path = "D:/vscode/3/project/search_exe/errer_file.csv"
+            fo.write_file_in(file_path,new_data)
 
  
  
