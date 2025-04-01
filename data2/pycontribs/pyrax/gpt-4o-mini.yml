@@ -1,0 +1,37 @@
+```yaml
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['2.7', '3.4', '3.5', '3.6', '3.7', 'pypy']
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          pip install -U setuptools tox coveralls
+
+      - name: Run tests
+        run: |
+          if [[ "${{ matrix.python-version }}" == "2.7" ]]; then tox -e pep8,py27; fi
+          if [[ "${{ matrix.python-version }}" == "3.4" ]]; then tox -e pep8,py34; fi
+          if [[ "${{ matrix.python-version }}" == "3.5" ]]; then tox -e pep8,py35; fi
+          if [[ "${{ matrix.python-version }}" == "3.6" ]]; then tox -e pep8,py36; fi
+          if [[ "${{ matrix.python-version }}" == "3.7" ]]; then tox -e pep8,py37; fi
+          if [[ "${{ matrix.python-version }}" == "pypy" ]]; then tox -e pep8,pypy; fi
+
+      - name: Upload coverage to Coveralls
+        run: coveralls
+```

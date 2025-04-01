@@ -1,3 +1,2 @@
 If the sourcefile_content contains a notification section, ignore that section.
-Ensure that the Python versions specified in the migrated configuration file are 3.9 or higher .
 Always enclose Python versions in single quotes, e.g., '3.9', '3.10'.

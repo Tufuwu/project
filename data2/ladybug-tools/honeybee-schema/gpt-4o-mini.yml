@@ -1,0 +1,94 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+
+      - name: Install dependencies
+        run: |
+          pip install -r dev-requirements.txt
+          pip install -r requirements.txt
+          pip install .
+
+      - name: Run tests
+        run: |
+          python -m pytest --cov=. tests/
+          
+      - name: Coverage report
+        run: coverage report
+
+      - name: Upload coverage to Coveralls
+        run: coveralls
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+
+      - name: Install dependencies
+        run: |
+          pip install -r dev-requirements.txt
+          npm install @semantic-release/exec
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "releases@ladybug.tools"
+          git config --global user.name "ladybugbot"
+
+      - name: Release
+        run: npx semantic-release
+
+  docs:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+
+      - name: Install dependencies
+        run: |
+          pip install -r dev-requirements.txt
+          npm install -g redoc-cli
+
+      - name: Generate documentation
+        run: |
+          CLEAN_TAG=$(echo $GITHUB_REF | sed 's/refs\/tags\/v//g')
+          python docs.py --version $CLEAN_TAG
+          redoc-cli bundle ./docs/model_inheritance.json -o ./docs/model.html
+
+      - name: Deploy documentation
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
+          publish_dir: ./docs
+          keep_history: false
+```

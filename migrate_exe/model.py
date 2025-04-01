@@ -48,7 +48,7 @@ def read_file(file_path):
 def write_file_in(repo_full_name,reponse,file_name):
 
     file_name = file_name
-    output_dir = f"D:/vscode/3/project/data1/{repo_full_name}"
+    output_dir = f"D:/vscode/3/project/data2/{repo_full_name}"
     output_path = os.path.join(output_dir, file_name)
     with open(output_path, 'w') as f:
         f.write(reponse)

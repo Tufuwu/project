@@ -1,0 +1,92 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['2.7', '3.4', '3.5', '3.6', '3.7']
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python --version
+          pip install -U pip
+          pip install pytest pytest-cov tox-travis
+          pip install -r requirements.txt
+          if [[ ${{ matrix.python-version }} == '2.7' ]]; then pip install https://download.pytorch.org/whl/cpu/torch-1.0.1.post2-cp27-cp27mu-linux_x86_64.whl; fi
+          if [[ ${{ matrix.python-version }} == '2.7' ]]; then pip install future; fi
+          if [[ ${{ matrix.python-version }} == '3.5' ]]; then pip install https://download.pytorch.org/whl/cpu/torch-1.0.1.post2-cp35-cp35m-linux_x86_64.whl; fi
+          if [[ ${{ matrix.python-version }} == '3.6' ]]; then pip install https://download.pytorch.org/whl/cpu/torch-1.0.1.post2-cp36-cp36m-linux_x86_64.whl; fi
+          if [[ ${{ matrix.python-version }} == '3.7' ]]; then pip install https://download.pytorch.org/whl/cpu/torch-1.0.1.post2-cp37-cp37m-linux_x86_64.whl; fi
+          if [[ ${{ matrix.python-version }} == '2.7' ]]; then pip install torchvision --no-cache-dir; fi
+          if [[ ${{ matrix.python-version }} == '3.5' ]]; then pip install torchvision; fi
+          if [[ ${{ matrix.python-version }} == '3.6' ]]; then pip install torchvision; fi
+          if [[ ${{ matrix.python-version }} == '3.7' ]]; then pip install torchvision; fi
+          pip install -e .
+      - name: Run tests
+        run: tox
+      - name: Upload coverage to Codecov
+        if: success()
+        run: bash <(curl -s https://codecov.io/bash) -t c1817983-8176-4535-b31d-9fa9d649438a
+
+  macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version: ['2.7', '3.6', '3.7']
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python --version
+          pip install -U pip
+          pip install pytest pytest-cov tox-travis
+          pip install -r requirements.txt
+          pip install torch torchvision
+          pip install -e .
+      - name: Run tests
+        run: |
+          if [[ ${{ matrix.python-version }} == '2.7' ]]; then python -m pytest --verbose --cov=cleanlab/ --cov-config .coveragerc_py27; else pytest --verbose --cov=cleanlab/ --cov-config .coveragerc_py3; fi
+
+  windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ['2.7', '3.5', '3.6', '3.7']
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python --version
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov tox-travis
+          pip install -r requirements.txt
+          if [[ ${{ matrix.python-version }} == '2.7' ]]; then pip install future; fi
+          if [[ ${{ matrix.python-version }} != '2.7' ]]; then pip install torch==1.4.0+cpu torchvision==0.5.0+cpu -f https://download.pytorch.org/whl/torch_stable.html; fi
+          pip install -e .
+      - name: Run tests
+        run: |
+          if [[ ${{ matrix.python-version }} == '2.7' ]]; then pytest --verbose --cov=cleanlab/ --cov-config .coveragerc_py27; else pytest --verbose --cov=cleanlab/ --cov-config .coveragerc_py3; fi
+```
