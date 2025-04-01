@@ -3,7 +3,7 @@ from utils import write_repo,inital_repo, upload_gpt4o_test,write_file_in
 from get_wrong_message import get_target_history
 
 
-my_repo_name = 'test10'
+my_repo_name = 'test3'
 # 配置
 github_repo_url = f"https://github.com/Tufuwu/{my_repo_name}.git"  # GitHub仓库URL
 local_directory = f"D:/vscode/1/{my_repo_name}"                    # 本地目录，Git仓库所在的目录
