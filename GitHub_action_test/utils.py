@@ -72,11 +72,11 @@ def fix_action_file(lines):
             line_index +=1
         elif re.search('python-version:',lines[line_index]):
             if re.search(r'\[.*\]',lines[line_index]):
-                temp = re.sub(r'\[.*\]','["3.9", "3.10"]',lines[line_index])
+                temp = re.sub(r'\[.*\]','["3.9"]',lines[line_index])
                 result.append(temp)
                 line_index +=1
             elif re.search(r'python-version:\n',lines[line_index]):
-                temp  = re.sub(r'python-version:','python-version: ["3.9", "3.10"]',lines[line_index])
+                temp  = re.sub(r'python-version:','python-version: ["3.9"]',lines[line_index])
                 result.append(temp)
                 line_index += 1
                 while re.search(r'- ',lines[line_index]):
@@ -92,11 +92,11 @@ def fix_action_file(lines):
                 line_index += 1
         elif re.search('python:',lines[line_index]):
             if re.search(r'\[.*\]',lines[line_index]):
-                temp = re.sub(r'\[.*\]','["3.9", "3.10"]',lines[line_index])
+                temp = re.sub(r'\[.*\]','["3.9"]',lines[line_index])
                 result.append(temp)
                 line_index +=1
             elif re.search(r'python:\n',lines[line_index]):
-                temp  = re.sub(r'python:','python: ["3.9", "3.10"]',lines[line_index])
+                temp  = re.sub(r'python:','python: ["3.9"]',lines[line_index])
                 result.append(temp)
                 line_index += 1
                 while re.search(r'- ',lines[line_index]):
@@ -140,11 +140,11 @@ def fix_importer_file(lines):
 
         elif re.search('python-version:',lines[line_index]):
             if re.search(r'\[.*\]',lines[line_index]):
-                temp = re.sub(r'\[.*\]','["3.9", "3.10", "3.11"]',lines[line_index])
+                temp = re.sub(r'\[.*\]','["3.9"]',lines[line_index])
                 result.append(temp)
                 line_index +=1
             elif re.search(r'python-version:\n',lines[line_index]):
-                temp  = re.sub(r'python-version:','python-version: ["3.9", "3.10", "3.11"]',lines[line_index])
+                temp  = re.sub(r'python-version:','python-version: ["3.9"]',lines[line_index])
                 result.append(temp)
                 line_index += 1
                 while re.search(r'- ',lines[line_index]):
@@ -160,11 +160,11 @@ def fix_importer_file(lines):
                 line_index += 1
         elif re.search('python:',lines[line_index]):
             if re.search(r'\[.*\]',lines[line_index]):
-                temp = re.sub(r'\[.*\]','["3.9", "3.10", "3.11"]',lines[line_index])
+                temp = re.sub(r'\[.*\]','["3.9"]',lines[line_index])
                 result.append(temp)
                 line_index +=1
             elif re.search(r'python:\n',lines[line_index]):
-                temp  = re.sub(r'python:','python: ["3.9", "3.10", "3.11"]',lines[line_index])
+                temp  = re.sub(r'python:','python: ["3.9"]',lines[line_index])
                 result.append(temp)
                 line_index += 1
                 while re.search(r'- ',lines[line_index]):
@@ -219,7 +219,7 @@ def upload_repo_test(repo_full_name,base_download_path,local_directory,workflow_
     action_file_path = f"D:/vscode/3/project/data2/{repo_full_name}/action.yml"
     write_action_in(action_file_path,test_file_path)
     push_repositories(f'{repo_full_name}/action')
-    time.sleep(30)
+    time.sleep(15)
     return
     
     gpt_file_path = f"D:/vscode/3/project/data1/{repo_full_name}/gpt-4o.yml"
