@@ -3,12 +3,12 @@ import subprocess
 from utils import file_operate,get_history
 
 
-csv_file = 'D:/vscode/3/project/python_csv/final_csv/fix_time.csv'
+csv_file = 'D:/vscode/3/project/search_exe/errer_file.csv'
 df = pd.read_csv(csv_file)
 fo = file_operate()
 for index, row in df.iterrows():
     repo_full_name = row['full_name']
-    new_data ={'full_name':row['full_name'],'travisredate':row['travisredate'],'file_name':row['file_name'],'commit_sha':row['commit_sha'],'new_commits_sha':0,'commits_times':0}
+    new_data ={'full_name':row['full_name'],'travisredate':row['travisredate'],'file_name':row['file_name'],'commit_sha':row['commit_sha'],'new_commits_sha':row['new_commits_sha'],'commits_times':row['commits_times']}
     file_name = row['file_name']
     version = row['new_commits_sha']
     try:
@@ -29,7 +29,7 @@ for index, row in df.iterrows():
             f.writelines(lines)
  
     except Exception as e:
-        file_path = "D:/vscode/3/project/search_exe/errer_file.csv"
+        file_path = "D:/vscode/3/project/search_exe/1.csv"
         fo.write_file_in(file_path,new_data)
 
 

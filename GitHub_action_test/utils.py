@@ -207,7 +207,7 @@ def write_gpt_in(file_path,target_directory):
 
 def upload_repo_test(repo_full_name,base_download_path,local_directory,workflow_path):
 
-    file_path = f"D:/vscode/3/project/data1/{repo_full_name}"
+    file_path = f"D:/vscode/3/project/data2/{repo_full_name}"
     repo_path = os.path.join(base_download_path, repo_full_name)
     delet_file(local_directory)
 
@@ -216,9 +216,9 @@ def upload_repo_test(repo_full_name,base_download_path,local_directory,workflow_
     workflow_path = workflow_path
     test_file_path = f'{workflow_path}/test.yml'
     delet_file(workflow_path)
-    action_file_path = f"D:/vscode/3/project/data1/{repo_full_name}/gpt-4o.yml"
+    action_file_path = f"D:/vscode/3/project/data2/{repo_full_name}/action.yml"
     write_action_in(action_file_path,test_file_path)
-    push_repositories(f'{repo_full_name}/gpt-4o')
+    push_repositories(f'{repo_full_name}/action')
     time.sleep(30)
     return
     

@@ -18,11 +18,11 @@ def write_file_in(csv_file,new_data):
         writer.writerow(new_data)
 
 # 配置
-github_repo_url = "https://github.com/Tufuwu/test8.git"  # GitHub仓库URL
-local_directory = "D:/vscode/1/test8"                    # 本地目录，Git仓库所在的目录
-workflow_path = f"D:/vscode/1/test8/.github/workflows"
-csv_file_path = "D:/vscode/3/project/GitHub_action_test/csv_file/success_repo_result.csv"  # 存放文件路径的CSV文件路径
-base_repo_path ="d:/vscode/project"
+github_repo_url = "https://github.com/Tufuwu/test9.git"  # GitHub仓库URL
+local_directory = "D:/vscode/1/test9"                    # 本地目录，Git仓库所在的目录
+workflow_path = f"D:/vscode/1/test9/.github/workflows"
+csv_file_path = "D:/vscode/3/project/search_exe/1.csv"  # 存放文件路径的CSV文件路径
+base_repo_path ="d:/vscode/repo"
 
 api_token = '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'
 
@@ -40,7 +40,7 @@ for index, row in df.iterrows():
         new_data ={'full_name':row['full_name']}
         write_file_in(csv_file,new_data)
 
-    break
+
 
 #get_target_history(api_token)
 
