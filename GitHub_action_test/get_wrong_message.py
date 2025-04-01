@@ -75,9 +75,9 @@ def get_wrong_message(github_token,repo_full_name,commit_sha):
     else:
         print(f" 获取 Workflow 运行信息失败，HTTP 状态码: {response.status_code}")
 
-def get_target_history(repo_full_name,api_token):
+def get_target_history(repo_full_name,api_token,my_repo_name):
     workflow_file_path = '.github/workflows/'
-    repo_name = 'Tufuwu/test7'
+    repo_name = my_repo_name
     commits = get_workflow_file_history(repo_name, workflow_file_path, api_token)
     for c in commits:
         b = c['commit']['message']
@@ -89,5 +89,6 @@ def get_target_history(repo_full_name,api_token):
 
 if __name__ =='__main__':
     repo_full_name = 'aboucaud/pypher'
+    my_repo_name = 'Tufuwu/test7'
     api_token = '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'
-    get_target_history(repo_full_name,api_token)
+    get_target_history(repo_full_name,api_token,my_repo_name)

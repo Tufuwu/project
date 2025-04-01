@@ -9,7 +9,7 @@ def create_gpt_model(model_tag, api_token, prompt):
     completion = client.chat.completions.create(
         model=model_tag,
         messages=[{"role": "user", "content": prompt}],
-        temperature=0.3
+        temperature=0
     )
 
     return completion.choices[0].message.content 

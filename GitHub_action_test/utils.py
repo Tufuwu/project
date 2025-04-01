@@ -205,14 +205,15 @@ def write_gpt_in(file_path,target_directory):
     with open(target_directory, "w", encoding="utf-8") as f:
         f.writelines(temp)
 
-def upload_repo_test(repo_full_name,base_download_path,local_directory,workflow_path):
-
-    file_path = f"D:/vscode/3/project/data2/{repo_full_name}"
+def write_repo(repo_full_name,base_download_path,local_directory):
     repo_path = os.path.join(base_download_path, repo_full_name)
     delet_file(local_directory)
 
     write_repo_in(repo_path,local_directory)
 
+
+
+def upload_action_test(repo_full_name,workflow_path):
     workflow_path = workflow_path
     test_file_path = f'{workflow_path}/test.yml'
     delet_file(workflow_path)
@@ -220,31 +221,30 @@ def upload_repo_test(repo_full_name,base_download_path,local_directory,workflow_
     write_action_in(action_file_path,test_file_path)
     push_repositories(f'{repo_full_name}/action')
     time.sleep(15)
-    return
-    
-    gpt_file_path = f"D:/vscode/3/project/data1/{repo_full_name}/gpt-4o.yml"
+
+def upload_gpt4o_test(repo_full_name,workflow_path,count):
+    workflow_path = workflow_path
+    test_file_path = f'{workflow_path}/test.yml'
+    gpt_file_path = f"D:/vscode/3/project/data2/{repo_full_name}/gpt-4o.yml"
     write_gpt_in(gpt_file_path,test_file_path)
-    push_repositories(f'{repo_full_name}/gpt-4o')
-    time.sleep(30)
+    push_repositories(f'{repo_full_name}/gpt-4o/{count}')
+    time.sleep(15)
 
-
-    push_repositories(f'{repo_full_name}{count}')
-    push_to_main(commit_message="Trigger GitHub Action")
-    count +=1
-    time.sleep(30)
-
-    delet_file(workflow_path)
-    importer_file_path =f"D:/vscode/3/project/data1/{repo_full_name}/importer.yml"
-    write_importer_in(importer_file_path,test_file_path)
-    push_repositories(f'{repo_full_name}{count}')
-    count +=1
-    time.sleep(30)
-    delet_file(workflow_path)
-    
-    gpt_file_path = f"D:/vscode/3/project/data1/{repo_full_name}/gpt.yml"
+def upload_gpt4omini_test(repo_full_name,workflow_path):
+    workflow_path = workflow_path
+    test_file_path = f'{workflow_path}/test.yml'
+    gpt_file_path = f"D:/vscode/3/project/data2/{repo_full_name}/gpt-4o-mini.yml"
     write_gpt_in(gpt_file_path,test_file_path)
-    push_repositories(f'{repo_full_name}{count}')
-    time.sleep(30)
+    push_repositories(f'{repo_full_name}/gpt-4o-mini')
+    time.sleep(15)
+
+def upload_gpt4omini_test(repo_full_name,workflow_path):
+    workflow_path = workflow_path
+    test_file_path = f'{workflow_path}/test.yml'
+    gpt_file_path = f"D:/vscode/3/project/data2/{repo_full_name}/gpt-4o-mini.yml"
+    write_gpt_in(gpt_file_path,test_file_path)
+    push_repositories(f'{repo_full_name}/gpt-4o-mini')
+    time.sleep(15)
 
 def inital_repo(local_directory,github_repo_url):
     # 确保Git仓库初始化
@@ -373,3 +373,17 @@ def get_target_history(api_token):
     workflow_file_path = '.github/workflows/'
     repo_name = 'Tufuwu/action_test'
     get_workflow_file_history(repo_name, workflow_file_path, api_token,repo_name)
+
+
+def write_file_in(csv_file,new_data):
+        # 打开CSV文件并进行操作
+    with open(csv_file, mode='a', newline='', encoding='utf-8',errors='ignore') as file:
+        # 创建一个CSV写入器
+        writer = csv.DictWriter(file, fieldnames=new_data.keys())
+
+        # 如果文件是空的（或者是首次写入），就写入表头
+        if file.tell() == 0:
+            writer.writeheader()
+
+        # 写入新的数据行
+        writer.writerow(new_data)
