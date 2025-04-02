@@ -8,7 +8,7 @@ my_repo_name = 'test3'
 github_repo_url = f"https://github.com/Tufuwu/{my_repo_name}.git"  # GitHub仓库URL
 local_directory = f"D:/vscode/1/{my_repo_name}"                    # 本地目录，Git仓库所在的目录
 workflow_path = f"D:/vscode/1/{my_repo_name}/.github/workflows"
-csv_file_path = "D:/vscode/3/project/search_exe/1.csv"  # 存放文件路径的CSV文件路径
+csv_file_path = "D:/vscode/3/project/GitHub_action_test/csv_file/success.csv"  # 存放文件路径的CSV文件路径
 base_repo_path ="d:/vscode/repo"
 api_token = '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'
 
