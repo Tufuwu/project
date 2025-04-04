@@ -212,19 +212,36 @@ class get_history():
         :param api_token: GitHub API 的访问令牌
         :return: 提交历史记录列表
         """
-        api_url = f"https://api.github.com/repos/{repo_full_name}/commits"
-        params = {"path": file_path,"per_page": 100, "page": 1}
-        headers = {
-            "Authorization": f"token {api_token}",
-            "Accept": "application/vnd.github.v3+json"
-        }
-        response = requests.get(api_url, headers=headers, params=params)
-        
-        if response.status_code == 200:
-            return response.json()  # 返回提交历史记录
-        else:
-            raise Exception(f"错误：{response.status_code}, {response.text}")
-    
+        page = 1
+        per_page = 100
+        result = []
+        while True:
+            url = f"https://api.github.com/repos/{repo_full_name}/commits"
+            params = {
+                "path": file_path,
+                "per_page": per_page,
+                "page": page
+            }
+
+            headers = {
+                "Authorization": f"token {api_token}",
+                "Accept": "application/vnd.github.v3+json"  # 如果有 token 更好，防止频率限制
+            }
+
+            response = requests.get(url, headers=headers, params=params)
+            if response.status_code == 200:
+            
+                data = response.json()
+                if not data:
+                    break 
+                result += data
+                page += 1
+            #print(data)
+            else:
+                break  # 没有更多数据了
+
+            
+        return result
 
     def get_workflow_run_history(self,repo_full_name, file_path, api_token):
         """

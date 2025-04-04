@@ -24,12 +24,8 @@ def process_repos_from_csv(csv_file, api_token):
             fo = file_operate()
             commits = gh.get_workflow_file_history(repo_full_name, workflow_file_path, api_token)
             
-            
-            if len(commits) >=95:
-                
-                file_path = "D:/vscode/3/project/search_exe/errer_file.csv"
-                fo.write_file_in(file_path,new_data)
-            
+            print(len(commits))
+
             for c in commits:
                 b = c['commit']['message']
                 
@@ -40,15 +36,15 @@ def process_repos_from_csv(csv_file, api_token):
 
                     # 新的数据行
                     new_data['travisredate'] = c['commit']['author']["date"]
-
+                
                     fo.write_file_in(csv_file,new_data)
                     
 
                 
         except Exception as e:
+
             file_path = "D:/vscode/3/project/search_exe/errer_file.csv"
             fo.write_file_in(file_path,new_data)
-
 
 
 
