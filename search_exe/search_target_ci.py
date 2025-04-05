@@ -32,7 +32,7 @@ def process_repos_from_csv(csv_file, api_token):
                 if ( fo.re_match("Migrate.*travis",b) or fo.re_match('Move.*travis',b) or fo.re_match('Replace.*travis',b) or fo.re_match('switch.*travis',b) ):
 
                     # 你要操作的CSV文件路径
-                    csv_file = 'D:/vscode/3/project/python_csv/target.csv'
+                    csv_file = 'D:/vscode/3/project/python_csv/target3.csv'
 
                     # 新的数据行
                     new_data['travisredate'] = c['commit']['author']["date"]
