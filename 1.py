@@ -109,6 +109,6 @@ def process_repos_from_csv(csv_file, api_token):
 if __name__ =="__main__":
 
     api_token = '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'
-    csv_file = "D:/vscode/3/project/python_csv/final_csv/repo1.csv"
+    csv_file = "D:/vscode/3/project/python_csv/final_csv/repo.csv"
     
     process_repos_from_csv(csv_file,api_token)

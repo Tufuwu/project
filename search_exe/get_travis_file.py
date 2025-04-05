@@ -38,7 +38,7 @@ def process_repos_from_csv(csv_file, api_token):
                         new_data['commit_sha'] = c['sha']
                         new_data['file_name'] = action_name
                         new_data['travisredate'] = c['commit']['author']['date']
-                        csv_path = 'D:/vscode/3/project/python-csv/final_csv/repo.csv'
+                        csv_path = 'D:/vscode/3/project/python_csv/final_csv/repo.csv'
                         fo.write_file_in(csv_path,new_data)
         except Exception as e:
             file_path = "D:/vscode/3/project/search_exe/errer_file.csv"
@@ -49,5 +49,5 @@ def process_repos_from_csv(csv_file, api_token):
 if __name__ == "__main__":
     # 从 CSV 文件中读取仓库，并获取每个仓库的 workflow 文件提交历史
     api_token = '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'
-    csv_file = 'D:/vscode/3/project/python-csv/target3.csv'  # 假设这个CSV文件有 'full_name' 列 
+    csv_file = 'D:/vscode/3/project/python_csv/target3.csv'  # 假设这个CSV文件有 'full_name' 列 
     process_repos_from_csv(csv_file, api_token)
