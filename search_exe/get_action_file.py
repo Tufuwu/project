@@ -14,13 +14,13 @@ for index, row in df.iterrows():
     try:
         
         repo_path = f'D:/vscode/repos/{repo_full_name}'
-        subprocess.run(["git", "-C", repo_path, "fetch", "--all"], check=True)
+        #subprocess.run(["git", "-C", repo_path, "fetch", "--all"], check=True)
         
         # 切换到指定版本
-        subprocess.run(["git", "-C", repo_path, "checkout", version], check=True)
+        #subprocess.run(["git", "-C", repo_path, "checkout", version], check=True)
         
         
-        print(f"Successfully switched to {version}")
+        #print(f"Successfully switched to {version}")
         file_path = f'D:/vscode/repos/{repo_full_name}/.github/workflows/{file_name}'
         target_directory = f'D:/vscode/3/project/data/{repo_full_name}/action.yml'
         with open(file_path, "r", encoding="utf-8") as f:
