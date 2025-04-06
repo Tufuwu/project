@@ -1,6 +1,7 @@
 import subprocess
 import sys
 import pandas as pd
+from search_exe import get_history,file_operate
 
 def switch_git_version(repo_path, version):
     try:
@@ -17,10 +18,18 @@ def switch_git_version(repo_path, version):
         sys.exit(1)
 
 if __name__ == "__main__":
-    csv_file = 'D:/vscode/3/project/repositories/fix_time_3.csv'
+    csv_file = 'D:/vscode/3/project/python_csv/final_csv/fix_time.csv'
     df = pd.read_csv(csv_file)
+    fo = file_operate()
     for index, row in df.iterrows():
-        repo_full_name = row['full_name']
-        version = row['new_commits_sha']
-        repo_path = f'D:/vscode/repositories/{repo_full_name}'
-        switch_git_version(repo_path, version)
+        try:
+            repo_full_name = row['full_name']
+            print(repo_full_name)
+            new_data ={'full_name':row['full_name'],'travisredate':row['travisredate'],'file_name':row['file_name'],'commit_sha':row['commit_sha'],'new_commits_sha':row['new_commits_sha'],'commits_times':row['commits_times']}
+            version = row['new_commits_sha']
+            repo_path = f'D:/vscode/repos/{repo_full_name}'
+            
+            switch_git_version(repo_path, version)
+        except:
+            csv_repositiries = 'D:/vscode/3/project/search_exe/errer_file.csv'
+            fo.write_file_in(csv_repositiries,new_data)
