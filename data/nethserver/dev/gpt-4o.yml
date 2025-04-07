@@ -1,0 +1,22 @@
+```yaml
+name: CI
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Read the Docs webhook
+        if: github.event_name == 'schedule'
+        env:
+          RTD_TOKEN: ${{ secrets.RTD_TOKEN }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+        run: |
+          curl -s -X POST \
+            -d "branches=${GITHUB_REF_NAME}" \
+            -d "token=${RTD_TOKEN}" \
+            https://readthedocs.org/api/v2/webhook/nethserver-devel/49560/
+```

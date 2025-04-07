@@ -1,0 +1,36 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.7', '3.8', '3.9']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          pip install .[test]
+          pip install codecov
+
+      - name: Run tests
+        run: ./run-tests.py
+
+      - name: Upload coverage to Codecov
+        run: codecov
+
+      - name: Clean up pip cache
+        run: rm -f $HOME/.cache/pip/log/debug.log
+```
