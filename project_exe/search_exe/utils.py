@@ -306,3 +306,6 @@ class get_history():
             return response.text  # 返回 diff 内容
         else:
             raise Exception(f"请求失败: {response.status_code}, {response.text}")
+        
+def github_token():
+    return "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"

@@ -7,13 +7,6 @@ import requests
 import csv
 
 
-def push_to_main(commit_message="Trigger GitHub Action"):
-    try:
-        subprocess.run(['git', 'commit', '--allow-empty', '-m', commit_message], check=True)
-        subprocess.run(['git', 'push', 'origin', 'main'], check=True)
-        print("GitHub Action triggered successfully!")
-    except subprocess.CalledProcessError as e:
-        print(f"Error: {e}")
 def delet_file(local_directory):
     # 清空当前仓库中的文件和文件夹（保留 .git）
     for item in os.listdir(local_directory):
@@ -388,3 +381,21 @@ def write_file_in(csv_file,new_data):
 
         # 写入新的数据行
         writer.writerow(new_data)
+
+def prompt_constructor(*args):
+    prompt = ""
+    prompt_path = 'D:/vscode/3/project/project_exe/github_action_test/prompt'
+    for arg in args:
+        with open(os.path.abspath(f'{prompt_path}/{arg}'), 'r') as file:
+            prompt += file.read().strip()
+    return prompt
+
+def read_file(file_path):
+    try:
+        with open(file_path,"r",encoding= 'utf-8') as file:
+            content = file.read()
+            return content
+    except FileNotFoundError:
+        print(f"Error: The file '{file_path}' was not found.")
+    except Exception as e:
+        print(f"An error occurred: {e}")

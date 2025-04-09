@@ -1,5 +1,5 @@
 import pandas as pd
-from utils import get_history,file_operate
+from utils import get_history,file_operate,github_token
 
 
 
@@ -40,6 +40,6 @@ def process_repos_from_csv(csv_file, api_token):
 
 
 if __name__ == "__main__":
-    api_token = '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'
+
     csv_file = 'D:/vscode/2/project/python-csv/results4.csv'  
-    process_repos_from_csv(csv_file, api_token)
+    process_repos_from_csv(csv_file, github_token())

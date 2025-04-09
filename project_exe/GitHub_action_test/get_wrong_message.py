@@ -58,7 +58,9 @@ def get_wrong_message(github_token,repo_full_name,commit_sha):
                 
                 if log_response.status_code == 200:
                     with zipfile.ZipFile(io.BytesIO(log_response.content)) as z:
+                        result_content = ''
                         for log_file in z.namelist():
+                    
                             if log_file.endswith(".txt"):  # 只处理文本日志
                                 with z.open(log_file) as f:
                                     lines = f.readlines()
@@ -66,11 +68,13 @@ def get_wrong_message(github_token,repo_full_name,commit_sha):
                                     for line in lines:
                                         count += len(line)
                                     print(count) 
-                                    return
+                                    
                                     for line in lines:
                                         decoded_line = line.decode("utf-8").strip()
                                         if "error" in decoded_line.lower() or "fail" in decoded_line.lower():
-                                            print(f"错误: {decoded_line}")
+                                            result_content += decoded_line+'\n'
+                        print(f"{result_content}")
+                        return(result_content)
                 else:
                     print(f" 获取日志失败，HTTP 状态码: {log_response.status_code}")
             else:
@@ -82,7 +86,7 @@ def get_wrong_message(github_token,repo_full_name,commit_sha):
 
 def get_target_history(repo_full_name,api_token,my_repo_name,count):
     workflow_file_path = '.github/workflows/'
-    repo_name = my_repo_name
+    repo_name = 'Tufuwu/'+my_repo_name
     commits = get_workflow_file_history(repo_name, workflow_file_path, api_token)
     for c in commits:
         b = c['commit']['message']
@@ -93,8 +97,8 @@ def get_target_history(repo_full_name,api_token,my_repo_name,count):
             break
 
 if __name__ =='__main__':
-    repo_full_name = 'rkrahl/pytest-dependency'
-    my_repo_name = 'Tufuwu/test3'
-    api_token = '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'
+    repo_full_name = 'ros2/ros2_documentation'
+    my_repo_name = 'refixs_gpt-4o'
+    api_token = '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'
     count = 0 
     get_target_history(repo_full_name,api_token,my_repo_name,count)
