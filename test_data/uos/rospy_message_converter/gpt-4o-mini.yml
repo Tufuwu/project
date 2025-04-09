@@ -1,0 +1,28 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ros_distro: [kinetic, melodic, noetic]
+        python: ['python', 'python', 'python3']
+
+    services:
+      docker:
+        image: docker:latest
+        options: --privileged
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build Docker image
+        run: docker build -t rospy_message_converter_${{ matrix.ros_distro }} -f Dockerfile-${{ matrix.ros_distro }} .
+
+      - name: Run tests
+        run: docker run rospy_message_converter_${{ matrix.ros_distro }} /bin/bash -c "source devel/setup.bash && CTEST_OUTPUT_ON_FAILURE=1 catkin_make test && roscd rospy_message_converter && ${{ matrix.python }} src/rospy_message_converter/json_message_converter.py && ${{ matrix.python }} src/rospy_message_converter/message_converter.py"
+```

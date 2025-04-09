@@ -1,9 +1,0 @@
-diff --git a/.github/workflows/ci_failure_email.md.tmpl b/.github/workflows/ci_failure_email.md.tmpl
-new file mode 100644
-index 0000000..322186b
---- /dev/null
-++ b/.github/workflows/ci_failure_email.md.tmpl
-@@ -0,0 +1,3 @@
-CI workflow ${WORKFLOW} failed!
-
-The failed job can be found in [here](${SERVER_URL}/${REPOSITORY}/actions/runs/${RUN_ID}).

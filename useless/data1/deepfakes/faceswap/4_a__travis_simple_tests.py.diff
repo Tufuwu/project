@@ -1,4 +1,0 @@
-diff --git a/_travis/simple_tests.py b/tests/simple_tests.py
-similarity index 100%
-rename from _travis/simple_tests.py
-rename to tests/simple_tests.py

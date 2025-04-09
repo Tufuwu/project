@@ -1,9 +1,0 @@
-diff --git a/travis-requirements.txt b/travis-requirements.txt
-deleted file mode 100644
-index 03773b6..0000000
--- a/travis-requirements.txt
-+++ /dev/null
-@@ -1,2 +0,0 @@
-coveralls
-tox-travis
-\ No newline at end of file

@@ -1,9 +1,0 @@
-diff --git a/.gitignore b/.gitignore
-index df5c857..16df7c1 100644
---- a/.gitignore
-++ b/.gitignore
-@@ -3,3 +3,4 @@ pkg
- .idea/
- Gemfile.lock
- .yardoc
-vendor/bundle

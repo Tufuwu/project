@@ -1,8 +1,0 @@
-name: make
-on: push
-jobs:
-  make:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - run: make test

@@ -1,8 +1,0 @@
-diff --git a/.idea/.gitignore b/.idea/.gitignore
-deleted file mode 100644
-index e7e9d11..0000000
---- a/.idea/.gitignore
-++ /dev/null
-@@ -1,2 +0,0 @@
--# Default ignored files
--/workspace.xml

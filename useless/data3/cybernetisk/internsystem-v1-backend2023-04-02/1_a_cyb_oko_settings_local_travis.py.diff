@@ -1,4 +1,0 @@
-diff --git a/cyb_oko/settings_local_travis.py b/cyb_oko/settings_local_ci.py
-similarity index 100%
-rename from cyb_oko/settings_local_travis.py
-rename to cyb_oko/settings_local_ci.py

@@ -1,8 +1,0 @@
-     branches: [master]
- 
- jobs:
--  pre-commit:
-  pytest:
-     strategy:
-       matrix:
-         python-version: [2.7, 3.5, 3.6, 3.7]

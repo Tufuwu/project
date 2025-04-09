@@ -1,6 +1,0 @@
-
- language: cpp
- compiler:
-   - gcc
-script: cd 'BCH Code'; make && make test
-+script: cd 'src'; make && make test

@@ -1,4 +1,0 @@
-diff --git a/tests/travis/idle_agenda.yaml b/tests/ci/idle_agenda.yaml
-similarity index 100%
-rename from tests/travis/idle_agenda.yaml
-rename to tests/ci/idle_agenda.yaml

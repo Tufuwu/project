@@ -1,7 +1,0 @@
-diff --git a/.github/.gitignore b/.github/.gitignore
-new file mode 100644
-index 0000000..2d19fc7
---- /dev/null
-++ b/.github/.gitignore
-@@ -0,0 +1 @@
-*.html

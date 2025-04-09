@@ -1,4 +1,0 @@
-diff --git a/.travis.s3cfg b/.ci.s3cfg
-similarity index 100%
-rename from .travis.s3cfg
-rename to .ci.s3cfg

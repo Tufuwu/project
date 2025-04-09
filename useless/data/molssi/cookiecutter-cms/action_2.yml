@@ -1,8 +1,0 @@
-       shell: bash -l {0}
- 
-       run: |
--        pytest -v --cov=prj_1_1_3_2 --cov-report=xml --color=yes prj_1_1_3_2/tests/
-        pytest -v --cov=prj_1_1_2 --cov-report=xml --color=yes prj_1_1_2/tests/
- 
-     - name: CodeCov
-       uses: codecov/codecov-action@v1

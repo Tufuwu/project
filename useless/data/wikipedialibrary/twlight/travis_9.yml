@@ -1,4 +1,0 @@
-diff --git a/conf/travis.twlight.env b/conf/cicd.twlight.env
-similarity index 100%
-rename from conf/travis.twlight.env
-rename to conf/cicd.twlight.env
