@@ -7,8 +7,9 @@ df =pd.read_csv(csv_file)
 for index,row in df.iterrows():
     repo_full_name = row['full_name']
     file_path = f"D:/vscode/3/project/data/{repo_full_name}/travis.yml"
+    prompt_path = 'D:/vscode/3/project/project_exe/migrate_exe/prompt'
     s1 = read_file(file_path)
-    write_migration_template = prompt_constructor('1','2','3')
+    write_migration_template = prompt_constructor(prompt_path,'1','2','3')
 
 
     prompt =  write_migration_template.format(sourcelang = 'Travis CI',targetlang = 'Github Action',sourcefile_content =s1 )

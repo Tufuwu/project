@@ -54,9 +54,9 @@ def write_file_in(repo_full_name,reponse,file_name):
         f.write(reponse)
     print(f"Saved diff to {output_dir}")
     
-def prompt_constructor(*args):
+def prompt_constructor(prompt_path,*args):
     prompt = ""
-    prompt_path = 'D:/vscode/3/project/project_exe/migrate_exe/prompt'
+    prompt_path = prompt_path
     for arg in args:
         with open(os.path.abspath(f'{prompt_path}/{arg}'), 'r') as file:
             prompt += file.read().strip()
