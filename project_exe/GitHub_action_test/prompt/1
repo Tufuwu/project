@@ -1,5 +1,5 @@
 This GitHub Actions workflow file produced the following error after execution. Please correct the configuration file.
-here are the contents of the {sourcelang} file
+here are the contents of the GitHub Actions workflow file
 ```
 {sourcefile_content}
 ```

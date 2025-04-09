@@ -68,14 +68,14 @@ def get_wrong_message(github_token,repo_full_name,commit_sha):
                                     count = 0
                                     for line in lines:
                                         count += len(line)
-                                    print(count) 
+                                    #print(count) 
                                     
                                     for line in lines:
                                         decoded_line = line.decode("utf-8").strip()
                                         if "error" in decoded_line.lower() or "fail" in decoded_line.lower():
                                             result_content += decoded_line+'\n'
-                        print(f"{result_content}")
-                        return(result_content)
+                        #print(f"{result_content}")
+                        return result_content
                 else:
                     print(f" 获取日志失败，HTTP 状态码: {log_response.status_code}")
             else:
