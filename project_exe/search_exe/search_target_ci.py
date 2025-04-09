@@ -1,5 +1,5 @@
 import pandas as pd
-from utils import get_history,file_operate
+from utils import get_history,file_operate,github_token
 
 
 
@@ -50,6 +50,5 @@ def process_repos_from_csv(csv_file, api_token):
 
 if __name__ == "__main__":
     # 从 CSV 文件中读取仓库，并获取每个仓库的 workflow 文件提交历史
-    api_token = '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'
     csv_file = 'D:/vscode/3/project/python_csv/mid_csv/active_action.csv'  # 假设这个CSV文件有 'full_name' 列
-    process_repos_from_csv(csv_file, api_token)
+    process_repos_from_csv(csv_file, github_token())

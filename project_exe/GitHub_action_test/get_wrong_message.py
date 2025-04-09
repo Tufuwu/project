@@ -2,6 +2,7 @@ import requests
 import zipfile
 import io
 import re
+from project_exe.search_exe import github_token 
 
 def get_workflow_file_history(repo_full_name, file_path, api_token):
     """
@@ -99,6 +100,5 @@ def get_target_history(repo_full_name,api_token,my_repo_name,count):
 if __name__ =='__main__':
     repo_full_name = 'ros2/ros2_documentation'
     my_repo_name = 'refixs_gpt-4o'
-    api_token = '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'
     count = 0 
-    get_target_history(repo_full_name,api_token,my_repo_name,count)
+    get_target_history(repo_full_name,github_token(),my_repo_name,count)

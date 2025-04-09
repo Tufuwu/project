@@ -1,8 +1,5 @@
 import requests
 import subprocess
-import os
-
-
 
 def add_comments(api_token):
     # GitHub 个人访问令牌 (PAT)
@@ -53,9 +50,6 @@ def push_repositories(commit_message):
 # 强制推送到远程仓库（覆盖原仓库中的内容）
     subprocess.run(["git", "push", "-f", "origin", "main"], check=True)  # 如果主分支是main
     print("Changes pushed to GitHub, overwriting the remote repository.")
-
-
-
 
 
 def copy_files(source_dir, target_dir):

@@ -26,12 +26,13 @@ for index, row in df.iterrows():
         inital_repo(local_directory,github_repo_url)
         write_repo(repo_full_name,base_repo_path,local_directory)
         upload_gpt4o_test(repo_full_name,workflow_path,count)
-        error_message = get_target_history(repo_full_name,github_token)
+        error_message = get_target_history(repo_full_name,github_token())
         action_path = f'D:/vscode/3/project/data/{repo_full_name}/{file_name}'
         s1 = read_file(action_path)
         write_migration_template = prompt_constructor('1','2','3')
         prompt =  write_migration_template.format(error_message = error_message,sourcefile_content =s1)
-        reponse = create_gpt_model("gpt-4o-mini",github_token,prompt)
+        reponse = create_gpt_model("gpt-4o-mini",github_token(),prompt)
+        write_file_in(repo_full_name,reponse,'gpt-4o-mini.yml')
     except:
 
         csv_file = 'D:/vscode/3/project/project_exe/GitHub_action_test/errors_files.csv'
