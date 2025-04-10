@@ -9,6 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent  # 指到项目根目�
 
 
 my_repo_name = 'gpt-4o'
+
 # 配置
 github_repo_url = f"https://github.com/Tufuwu/{my_repo_name}.git"  # GitHub仓库URL
 local_directory = f"D:/vscode/1/{my_repo_name}"                    # 本地目录，Git仓库所在的目录
