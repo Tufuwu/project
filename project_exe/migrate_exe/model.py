@@ -45,14 +45,13 @@ def read_file(file_path):
         print(f"An error occurred: {e}")
 
 
-def save_file_in(save_path,repo_full_name,reponse,file_name):
+def save_file_in(base_path,repo_full_name,reponse,file_name):
 
     file_name = file_name
-    output_dir = save_path + f"D:/vscode/3/project/data/{repo_full_name}"
-    output_path = os.path.join(output_dir, file_name)
+    output_path = base_path + f"/{repo_full_name}/{file_name}"
     with open(output_path, 'w') as f:
         f.write(reponse)
-    print(f"Saved diff to {output_dir}")
+    print(f"Saved diff to {output_path}")
     
 def prompt_constructor(prompt_path,*args):
     prompt = ""
