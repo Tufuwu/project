@@ -22,7 +22,7 @@ prompt_path = BASE_DIR / 'project_exe' / 'github_action_test' / 'prompt'
 df = pd.read_csv(csv_file_path)
 
 for index, row in df.iterrows():
-    count = 0
+    count = 1
     repo_full_name = row['full_name']
  
     file_name = f'gpt-4o-{count}.yml'
