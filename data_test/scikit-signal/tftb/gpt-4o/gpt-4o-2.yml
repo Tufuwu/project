@@ -1,0 +1,45 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'  # Updated to a version available on Ubuntu 24.04
+
+    - name: Install Miniconda
+      run: |
+        wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O $HOME/miniconda.sh
+        bash $HOME/miniconda.sh -b -u -p $HOME/miniconda
+        echo "$HOME/miniconda/bin" >> $GITHUB_PATH
+
+    - name: Install dependencies
+      run: |
+        pip install nose2 coverage coveralls flake8 scikit-image
+        pip install -e .
+
+    - name: Lint with flake8
+      run: flake8
+
+    - name: Test with nose2
+      run: nose2 --with-coverage --coverage=tftb
+
+    - name: Coveralls
+      run: coveralls
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+```

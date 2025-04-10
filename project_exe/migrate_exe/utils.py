@@ -63,7 +63,7 @@ def copy_files(source_dir, target_dir):
 
 
 def gpt_token():
-    return "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"
+    return "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"
 
 def deepseek_token():
     return "sk-92fdd67f916e40f68b35547955d260ff"

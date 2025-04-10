@@ -14,7 +14,7 @@ my_repo_name = 'gpt-4o'
 github_repo_url = f"https://github.com/Tufuwu/{my_repo_name}.git"  # GitHub仓库URL
 local_directory = f"D:/vscode/1/{my_repo_name}"                    # 本地目录，Git仓库所在的目录
 workflow_path = f"D:/vscode/1/{my_repo_name}/.github/workflows"
-csv_file_path = "D:/vscode/3/project/project_exe/python_csv/final_csv/now_can_run.csv"  # 存放文件路径的CSV文件路径
+csv_file_path = "D:/vscode/3/project/project_exe/python_csv/fix_file_csv/fix_time_1.csv"  # 存放文件路径的CSV文件路径
 base_repo_path ="d:/vscode/repos"
 prompt_path = BASE_DIR / 'project_exe' / 'github_action_test' / 'prompt'
 
@@ -40,7 +40,7 @@ for index, row in df.iterrows():
         save_file_name = f'gpt-4o-{count+1}.yml'
         save_file_in(base_path,repo_full_name,reponse,save_file_name)
         
-        csv_path = 'D:/vscode/3/project/project_exe/python_csv/fix_file_csv/fix_time_1.csv'
+        csv_path = 'D:/vscode/3/project/project_exe/python_csv/fix_file_csv/fix_time_2.csv'
         new_data = {'full_name':row['full_name']}
         write_csv_in(csv_path,new_data)
     else:
