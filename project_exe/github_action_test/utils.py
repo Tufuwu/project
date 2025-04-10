@@ -219,9 +219,9 @@ def upload_gpt4o_test(repo_full_name,workflow_path,count):
     workflow_path = workflow_path
     test_file_path = f'{workflow_path}/test.yml'
     delet_file(workflow_path)
-    gpt_file_path = f"D:/vscode/3/project/data/{repo_full_name}/gpt-4o.yml"
+    gpt_file_path = f"D:/vscode/3/project/data_test/{repo_full_name}/gpt-4o/gpt-4o-{count}.yml"
     write_gpt_in(gpt_file_path,test_file_path)
-    push_repositories(f'{repo_full_name}/gpt-4o/{count}')
+    push_repositories(f'{repo_full_name}/gpt-4o-{count}')
     time.sleep(15)
 
 def upload_gpt4omini_test(repo_full_name,workflow_path):

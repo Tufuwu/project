@@ -45,45 +45,50 @@ def get_wrong_message(github_token,repo_full_name,commit_sha):
 
     if response.status_code == 200:
         runs = response.json().get("workflow_runs", [])
-        if runs:
-            latest_run = runs[0]  # 获取最新的 workflow 运行信息
-            run_id = latest_run["id"]
-            conclusion = latest_run["conclusion"]
+        for run in runs:
+            if run['actor']['login'] =='Tufuwu':
 
-            if conclusion != 'success':
-                print(f" Workflow 运行失败 (ID: {run_id})，获取日志...")
-                
-                # 获取失败的日志 ZIP 文件
-                logs_url = f"https://api.github.com/repos/{repo_full_name}/actions/runs/{run_id}/logs"
-                log_response = requests.get(logs_url, headers=HEADERS)
-                
-                if log_response.status_code == 200:
-                    with zipfile.ZipFile(io.BytesIO(log_response.content)) as z:
-                        result_content = ''
-                        for log_file in z.namelist():
+                 # 获取最新的 workflow 运行信息
+                run_id = run["id"]
+                conclusion = run["conclusion"]
+           
+                if conclusion != 'success':
+                    print(f" Workflow 运行失败 (ID: {run_id})，获取日志...")
                     
-                            if log_file.endswith(".txt"):  # 只处理文本日志
-                                with z.open(log_file) as f:
-                                    lines = f.readlines()
-                                    count = 0
-                                    for line in lines:
-                                        count += len(line)
-                                    #print(count) 
-                                    
-                                    for line in lines:
-                                        decoded_line = line.decode("utf-8").strip()
-                                        if "error" in decoded_line.lower() or "fail" in decoded_line.lower():
-                                            result_content += decoded_line+'\n'
-                        #print(f"{result_content}")
-                        return result_content
+                    # 获取失败的日志 ZIP 文件
+                    logs_url = f"https://api.github.com/repos/{repo_full_name}/actions/runs/{run_id}/logs"
+                    log_response = requests.get(logs_url, headers=HEADERS)
+                    
+                    if log_response.status_code == 200:
+                        with zipfile.ZipFile(io.BytesIO(log_response.content)) as z:
+                            result_content = ''
+                            for log_file in z.namelist():
+                        
+                                if log_file.endswith(".txt"):  # 只处理文本日志
+                                    with z.open(log_file) as f:
+                                        lines = f.readlines()
+                                        count = 0
+                                        for line in lines:
+                                            count += len(line)
+                                        #print(count) 
+                                        
+                                        for line in lines:
+                                            decoded_line = line.decode("utf-8").strip()
+                                            if "error" in decoded_line.lower() or "fail" in decoded_line.lower():
+                                                result_content += decoded_line+'\n'
+                            #print(f"{result_content}")
+                            return result_content
+                    else:
+                        
+                        return 'The workflow is not valid'
+                        print(f" 获取日志失败，HTTP 状态码: {log_response.status_code}")
                 else:
-                    print(f" 获取日志失败，HTTP 状态码: {log_response.status_code}")
-            else:
-                return 0
+                    
+                    return 0
 
-        else:
-            print(" 未找到对应 commit 的 Workflow 运行记录")
+
     else:
+        
         print(f" 获取 Workflow 运行信息失败，HTTP 状态码: {response.status_code}")
 
 def get_target_history(repo_full_name,api_token,my_repo_name,count):
@@ -93,13 +98,13 @@ def get_target_history(repo_full_name,api_token,my_repo_name,count):
     for c in commits:
         b = c['commit']['message']
         #print(b)
-        if re.search(f"{repo_full_name}/gpt-4o/{count}",b) :
+        if re.search(f"{repo_full_name}/gpt-4o-{count}",b) :
             #print('ssss')
-            get_wrong_message(api_token,repo_name,c['sha'])
-            break
+            return get_wrong_message(api_token,repo_name,c['sha'])
+            
 
 if __name__ =='__main__':
-    repo_full_name = 'ros2/ros2_documentation'
-    my_repo_name = 'refixs_gpt-4o'
+    repo_full_name = 'srittau/python-asserts'
+    my_repo_name = 'gpt-4o'
     count = 0 
-    get_target_history(repo_full_name,github_token(),my_repo_name,count)
+    get_target_history(repo_full_name,'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',my_repo_name,count)

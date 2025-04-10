@@ -1,0 +1,42 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install doc8 sphinx
+        pip install git+https://github.com/osrf/sphinx-tabs
+        pip install sphinx_multiversion
+
+    - name: Build documentation
+      run: |
+        make html 2> stderr.log || true
+        cat stderr.log
+        doc8 --ignore D001 --ignore-path build --ignore-path source/Tutorials/Actions
+        doc8 --ignore D000 --ignore D001 --ignore-path build source/Tutorials/Actions
+        if [ -s "stderr.log" ]; then exit 1; fi
+```

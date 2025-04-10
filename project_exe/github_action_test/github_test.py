@@ -23,7 +23,7 @@ for index, row in df.iterrows():
         upload_gpt4o_test(repo_full_name,workflow_path,count)
     except:
 
-        csv_file = 'D:/vscode/3/project/GitHub_action_test/errors_files.csv'
+        csv_file = 'D:/vscode/3/project/project_exe/github_action_test/errors_files.csv'
         new_data ={'full_name':row['full_name']}
         write_csv_in(csv_file,new_data)
 
