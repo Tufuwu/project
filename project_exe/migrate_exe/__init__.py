@@ -1,2 +1,2 @@
 from .utils import add_comments,push_repositories,copy_files,gpt_token,deepseek_token
-from .model import prompt_constructor,write_file_in,read_file,create_gpt_model,creat_deepseek_model
+from .model import prompt_constructor,save_file_in,read_file,create_gpt_model,creat_deepseek_model

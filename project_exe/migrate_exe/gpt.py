@@ -1,5 +1,5 @@
 import pandas as pd
-from model import create_gpt_model,read_file,prompt_constructor,write_file_in,creat_deepseek_model
+from model import create_gpt_model,read_file,prompt_constructor,save_file_in,creat_deepseek_model
 from utils import deepseek_token,gpt_token
 
 csv_file = "D:/vscode/3/project/project_exe/python_csv/final_csv/now_can_run.csv"

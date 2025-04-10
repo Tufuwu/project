@@ -45,10 +45,10 @@ def read_file(file_path):
         print(f"An error occurred: {e}")
 
 
-def write_file_in(repo_full_name,reponse,file_name):
+def save_file_in(save_path,repo_full_name,reponse,file_name):
 
     file_name = file_name
-    output_dir = f"D:/vscode/3/project/data/{repo_full_name}"
+    output_dir = save_path + f"D:/vscode/3/project/data/{repo_full_name}"
     output_path = os.path.join(output_dir, file_name)
     with open(output_path, 'w') as f:
         f.write(reponse)
