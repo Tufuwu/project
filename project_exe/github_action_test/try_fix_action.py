@@ -23,19 +23,25 @@ df = pd.read_csv(csv_file_path)
 for index, row in df.iterrows():
     count = 0
     repo_full_name = row['full_name']
+    new_data = {'full_name':row['full_name'],'gpt-4o':10}
     file_name = f'gpt-4o-{count}.yml'
     my_repo_name = 'refixs_gpt-4o'
     base_path = f'D:/vscode/3/project/data_test'
     error_message = get_target_history(repo_full_name,github_token(),my_repo_name,count)
-    action_path = base_path + f'/{repo_full_name}/{file_name}'
-    s1 = read_file(action_path)
-    write_migration_template = prompt_constructor(prompt_path,'1','2')
-    prompt =  write_migration_template.format(error_message = error_message,sourcefile_content =s1)
-    reponse = create_gpt_model("gpt-4o-mini",gpt_token(),prompt)
-    save_file_name = f'gpt-4o-mini-{count+1}.yml'
-    save_file_in(base_path,repo_full_name,reponse,save_file_name)
-    print(reponse)
-    break
+    if error_message:
+        action_path = base_path + f'/{repo_full_name}/gpt-4o/{file_name}'
+        s1 = read_file(action_path)
+        write_migration_template = prompt_constructor(prompt_path,'1','2')
+        prompt =  write_migration_template.format(error_message = error_message,sourcefile_content =s1)
+        reponse = create_gpt_model("gpt-4o",gpt_token(),prompt)
+        save_file_name = f'gpt-4o-mini-{count+1}.yml'
+        save_file_in(base_path,repo_full_name,reponse,save_file_name)
+        print(reponse)
+    else:
+        csv_path = 'D:/vscode/3/project/project_exe/python_csv/result/fix_result.csv'
+        new_data['gpt-4o'] = count +1
+        write_csv_in(csv_path,new_data)
+    continue
     try:
         '''
         inital_repo(local_directory,github_repo_url)

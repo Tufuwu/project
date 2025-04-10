@@ -79,7 +79,8 @@ def get_wrong_message(github_token,repo_full_name,commit_sha):
                 else:
                     print(f" 获取日志失败，HTTP 状态码: {log_response.status_code}")
             else:
-                print(f" Workflow 运行成功 (ID: {run_id})")
+                return 0
+
         else:
             print(" 未找到对应 commit 的 Workflow 运行记录")
     else:
