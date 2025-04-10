@@ -48,7 +48,7 @@ def read_file(file_path):
 def save_file_in(base_path,repo_full_name,reponse,file_name):
 
     file_name = file_name
-    output_path = base_path + f"/{repo_full_name}/gpt-4o/{file_name}"
+    output_path = base_path + f"/{repo_full_name}/{file_name}"
     with open(output_path, 'w') as f:
         f.write(reponse)
     print(f"Saved diff to {output_path}")

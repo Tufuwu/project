@@ -13,33 +13,28 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.6', '3.7', '3.8', '3.8-dev']
-
+        python-version: ['3.8', '3.9', '3.10', '3.11']
     steps:
-    - uses: actions/checkout@v2
-
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-
     - name: Cache pip
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-
     - name: Install dependencies
       run: |
         pip install -U pip setuptools wheel
         pip install -r test-requirements.txt
         pip install tox-travis .[devel]
-
     - name: Run tests
       run: |
         tox
@@ -69,27 +64,23 @@ jobs:
         cp test2.yaml test2.old.yaml && niet -f yaml .list test2.yaml --in-place && ! diff test2.old.yaml
 
   deploy:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     needs: build
-    if: github.event_name == 'release'
     steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
       with:
-        python-version: '3.8'
-
+        python-version: '3.9'
     - name: Install dependencies
       run: |
         pip install -U pip setuptools wheel
-        pip install tox-travis .[devel]
-
-    - name: Build and publish
+    - name: Publish to PyPI
       env:
         TWINE_USERNAME: 4383
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
+        pip install twine
         python setup.py sdist bdist_wheel
         twine upload dist/*
 ```

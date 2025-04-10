@@ -14,29 +14,33 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['2.7', '3.4', '3.5', '3.6', '3.7', 'nightly']
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
         include:
           - python-version: 'nightly'
-            env: PRE: --pre
+            pre: '--pre'
     allow_failures:
-      - python-version: 'nightly'
+      python-version: 'nightly'
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         python -m pip install -v .
-        python -m pip install ${{ matrix.env.PRE }} --upgrade pytest pytest-cov coverage
+        python -m pip install ${{ matrix.pre }} --upgrade pytest pytest-cov coverage
+
     - name: Run tests
       run: |
         coverage run run_tests.py
         coverage report -m
+
     - name: Upload coverage to Codecov
       if: success()
-      run: bash <(curl -s https://codecov.io/bash)
+      uses: codecov/codecov-action@v3
 ```

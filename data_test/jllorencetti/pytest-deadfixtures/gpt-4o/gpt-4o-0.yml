@@ -10,24 +10,26 @@ on:
       - main
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        python-version: ['3.6.12', '3.7.9', '3.8.6', '3.9.1', 'pypy3']
-        env:
-          TOX_ENV: [py36, py37, py38, py39, pypy3, lint]
+        python-version: ['3.8', '3.9', '3.10', '3.11', 'pypy-3.9']
+        include:
+          - python-version: '3.9'
+            env: TOX_ENV: lint
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
       run: |
+        python -m pip install --upgrade pip
         pip install -U -r requirements-dev.txt
         pip install .
 
@@ -36,11 +38,7 @@ jobs:
         tox -e ${{ matrix.env.TOX_ENV }}
         pytest --dead-fixtures
 
-    - name: Cache pip
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements-dev.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
+    cache:
+      paths:
+        - ~/.cache/pip
 ```

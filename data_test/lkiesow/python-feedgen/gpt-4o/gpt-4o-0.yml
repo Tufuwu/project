@@ -1,5 +1,5 @@
 ```yaml
-name: CI
+name: Python package
 
 on:
   push:
@@ -11,17 +11,17 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     strategy:
       matrix:
-        python-version: ['3.6', '3.7', '3.8']
+        python-version: ['3.8', '3.9', '3.10', '3.11']
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -33,13 +33,9 @@ jobs:
         pip install dist/feedgen*
 
     - name: Run tests
-      run: make test
-
-    - name: Check licenses
-      run: liccheck -s .licenses.ini
-
-    - name: Run feedgen
       run: |
+        make test
+        liccheck -s .licenses.ini
         python -m feedgen
         python -m feedgen atom
         python -m feedgen rss

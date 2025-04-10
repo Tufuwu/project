@@ -10,8 +10,8 @@ on:
       - main
 
 jobs:
-  build:
-    runs-on: ubuntu-18.04
+  test:
+    runs-on: ubuntu-20.04
     services:
       postgres:
         image: postgres:11
@@ -32,45 +32,14 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.6', '3.7', '3.8']
-        env:
-          - PG: 9.6
-            DJANGO: 2.1
-          - PG: 10
-            DJANGO: 2.1
-          - PG: 11
-            DJANGO: 2.1
-          - PG: 12
-            DJANGO: 2.1
-          - PG: 9.6
-            DJANGO: 2.2
-          - PG: 10
-            DJANGO: 2.2
-          - PG: 11
-            DJANGO: 2.2
-          - PG: 12
-            DJANGO: 2.2
-          - PG: 9.6
-            DJANGO: 3.0
-          - PG: 10
-            DJANGO: 3.0
-          - PG: 11
-            DJANGO: 3.0
-          - PG: 12
-            DJANGO: 3.0
-          - PG: 9.6
-            DJANGO: 3.1
-          - PG: 10
-            DJANGO: 3.1
-          - PG: 11
-            DJANGO: 3.1
-          - PG: 12
-            DJANGO: 3.1
+        python-version: ['3.8', '3.9', '3.10']
+        pg-version: ['11', '12']
+        django-version: ['2.2', '3.0', '3.1']
 
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
@@ -78,24 +47,26 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y dirmngr apt-transport-https postgresql-contrib-${{ matrix.env.PG }} postgresql-client-${{ matrix.env.PG }} unzip rabbitmq-server
+        sudo apt-get install -y dirmngr apt-transport-https unzip rabbitmq-server
         sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv E0C56BD4
+        echo "deb http://repo.yandex.ru/clickhouse/deb/stable/ main/" | sudo tee /etc/apt/sources.list.d/clickhouse.list
+        sudo apt-get update
         sudo apt-get install -y clickhouse-client clickhouse-server clickhouse-common-static
         sudo service clickhouse-server restart
         pip install -r requirements-test.txt
-        pip install -q Django==${{ matrix.env.DJANGO }}.*
-        python setup.py -q install
+        pip install Django==${{ matrix.django-version }}.*
+        python setup.py install
 
     - name: Configure PostgreSQL
       run: |
-        sudo sed -i 's/port = 5433/port = 5432/' /etc/postgresql/${{ matrix.env.PG }}/main/postgresql.conf
-        sudo cp /etc/postgresql/{10,${{ matrix.env.PG }}}/main/pg_hba.conf
+        sudo sed -i 's/port = 5433/port = 5432/' /etc/postgresql/${{ matrix.pg-version }}/main/postgresql.conf
+        sudo cp /etc/postgresql/10/main/pg_hba.conf /etc/postgresql/${{ matrix.pg-version }}/main/pg_hba.conf
         sudo systemctl stop postgresql
-        sudo systemctl start postgresql@${{ matrix.env.PG }}-main
+        sudo systemctl start postgresql@${{ matrix.pg-version }}-main
 
     - name: Before script
       run: |
-        erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
+        erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().' -noshell
         rabbitmqctl status | grep "RabbitMQ"
         clickhouse-client --query "SELECT version();"
         psql -tc 'SHOW server_version' -U postgres

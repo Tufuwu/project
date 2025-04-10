@@ -1,13 +1,13 @@
 import pandas as pd
-from utils import write_repo,inital_repo, upload_action_test,write_csv_in
+from utils import write_repo,inital_repo, upload_action_test,write_csv_in,upload_gpt4o_test
 
 
-my_repo_name = 'test4'
+my_repo_name = 'gpt-4o'
 # 配置
 github_repo_url = f"https://github.com/Tufuwu/{my_repo_name}.git"  # GitHub仓库URL
 local_directory = f"D:/vscode/1/{my_repo_name}"                    # 本地目录，Git仓库所在的目录
 workflow_path = f"D:/vscode/1/{my_repo_name}/.github/workflows"
-csv_file_path = "D:/vscode/3/project/python_csv/final_csv/fix_time.csv"  # 存放文件路径的CSV文件路径
+csv_file_path = "D:/vscode/3/project/project_exe/python_csv/final_csv/now_can_run.csv"  # 存放文件路径的CSV文件路径
 base_repo_path ="d:/vscode/repos"
 api_token = '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'
 
@@ -16,11 +16,11 @@ df = pd.read_csv(csv_file_path)
 
 for index, row in df.iterrows():
     repo_full_name = row['full_name']
-
+    count = 0
     try:
         inital_repo(local_directory,github_repo_url)
         write_repo(repo_full_name,base_repo_path,local_directory)
-        upload_action_test(repo_full_name,workflow_path)
+        upload_gpt4o_test(repo_full_name,workflow_path,count)
     except:
 
         csv_file = 'D:/vscode/3/project/GitHub_action_test/errors_files.csv'

@@ -14,10 +14,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: '3.7'
 
@@ -39,6 +39,7 @@ jobs:
       run: nosetests -sv --with-doctest --no-byte-compile --with-coverage --cover-package=tftb
 
     - name: Coveralls
-      if: success()
       run: coveralls
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 ```
