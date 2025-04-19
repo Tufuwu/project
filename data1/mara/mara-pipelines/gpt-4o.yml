@@ -1,0 +1,60 @@
+```yaml
+name: Python Package
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.7', '3.8', '3.9']
+        include:
+          - python-version: '3.8'
+            upload: true
+          - python-version: '3.6'
+            upload: false
+          - python-version: '3.7'
+            upload: false
+          - python-version: '3.9'
+            upload: false
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: pip install .[test]
+    - name: Run script
+      run: echo hello world
+
+  deploy:
+    if: github.event_name == 'push' && github.ref_type == 'tag' && matrix.upload == true
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: pip install .[test]
+    - name: Build and publish
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        python setup.py sdist
+        twine upload dist/*
+```
