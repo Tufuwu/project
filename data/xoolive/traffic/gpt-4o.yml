@@ -1,0 +1,65 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9]
+
+    env:
+      TRAFFIC_NOPLUGIN: ""
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Cache traffic
+      uses: actions/cache@v2
+      with:
+        path: ${{ github.workspace }}/.cache/traffic
+        key: ${{ runner.os }}-traffic
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libgeos-dev libproj-dev proj-bin proj-data libarchive-dev
+        python -m pip install -U pip
+        python -m pip install --upgrade codecov pytest-cov pytest==4.5
+        python -m pip install --upgrade numpy pyproj
+        python -m pip install --upgrade libarchive
+        python -m pip install --upgrade xarray
+        python -m pip install --upgrade sphinx sphinx-rtd-theme
+        python -m pip install --upgrade cython
+        python -m pip install --upgrade git+https://github.com/xoolive/cartes
+        python -m pip install -e .
+
+    - name: Test with pytest
+      run: python -m pytest --cov --cov-report term-missing
+
+    - name: Upload coverage to Codecov
+      if: success()
+      uses: codecov/codecov-action@v2
+```

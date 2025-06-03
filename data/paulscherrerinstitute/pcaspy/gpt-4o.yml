@@ -1,0 +1,76 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            conda_version: latest
+          - os: macos-latest
+            conda_version: latest
+            conda_build_sysroot: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Miniconda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-update-conda: true
+        activate-environment: base
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        conda config --set always_yes yes --set changeps1 no
+        conda update -q --all
+        conda config --add channels defaults
+        conda install conda-build pip anaconda-client
+        conda info
+
+    - name: Build
+      run: |
+        if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          [[ -e /opt/MacOSX10.9.sdk ]] || sudo ln -s ${{ matrix.conda_build_sysroot }} /opt/MacOSX10.9.sdk
+          printf "CONDA_BUILD_SYSROOT:\n    - ${{ matrix.conda_build_sysroot }}\n" >> conda-recipe/conda_build_config.yaml
+          conda build -c $MY_CONDA_CHANNEL conda-recipe
+        else
+          mkdir -m 0777 -p $HOME/miniconda/conda-bld/linux-64
+          ./conda_build_in_docker.sh `pwd` $HOME/miniconda/conda-bld/linux-64 $MY_CONDA_CHANNEL
+        fi
+
+    - name: After success
+      if: success()
+      run: |
+        ls $HOME/miniconda/conda-bld/${{ matrix.os == 'ubuntu-latest' && 'linux' || 'osx' }}-64
+        if [[ ! -z "$GITHUB_REF_NAME" ]]; then
+          anaconda -t $CONDA_TOKEN upload --force $HOME/miniconda/conda-bld/${{ matrix.os == 'ubuntu-latest' && 'linux' || 'osx' }}-64/*.tar.bz2
+          echo [distutils]                > ~/.pypirc
+          echo index-servers = mypypi    >> ~/.pypirc
+          echo [mypypi]                  >> ~/.pypirc
+          echo repository=$PYPI_URL      >> ~/.pypirc
+          echo username=$PYPI_USER       >> ~/.pypirc
+          echo password=$PYPI_PASSWORD   >> ~/.pypirc
+          pip install twine
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            twine upload -r mypypi --skip-existing $HOME/miniconda/conda-bld/linux-64/pcaspy-*.tar.gz
+            twine upload -r mypypi --skip-existing $HOME/miniconda/conda-bld/linux-64/pcaspy-*.egg
+          fi
+          if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            twine upload -r mypypi --skip-existing $HOME/miniconda/conda-bld/osx-64/pcaspy-*.whl
+          fi
+        fi
+```

@@ -10,14 +10,14 @@ on:
       - main
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10']
+        python-version: [2.7, 3.6, 3.7, 3.8, 3.9, nightly]
         include:
-          - python-version: 'nightly'
+          - python-version: nightly
             allow_failure: true
 
     steps:
@@ -32,6 +32,8 @@ jobs:
         pip install --upgrade pytest
         pip install --editable .
     - name: Test with pytest
-      run: |
-        pytest
+      run: pytest
+
+  notifications:
+    email: false
 ```

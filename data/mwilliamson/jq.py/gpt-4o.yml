@@ -1,0 +1,78 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  release:
+    types: [created]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["2.7", "3.4", "3.5", "3.6", "3.7", "3.8", "pypy", "pypy3"]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          make jq.c
+          pip install tox
+      - name: Run tests
+        run: tox -e py
+
+  linux-wheels:
+    if: startsWith(github.ref, 'refs/tags/') && github.ref =~ /^refs\/tags\/([0-9]+\.[0-9]+\.[0-9]+)(\.?(dev|a|b|rc)[0-9]+)?$/
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install cibuildwheel and twine
+        run: python3 -m pip install cibuildwheel==1.6.2 twine virtualenv
+      - name: Build and upload Linux wheels
+        env:
+          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+        run: |
+          export CIBW_BEFORE_BUILD="pip install cython==0.29.16 && cython {project}/jq.pyx"
+          export CIBW_TEST_REQUIRES="-r test-requirements.txt"
+          export CIBW_TEST_COMMAND="nosetests {project}/tests"
+          python3 -m cibuildwheel --output-dir wheelhouse &&
+          twine check wheelhouse/*.whl &&
+          twine upload wheelhouse/*.whl --skip-existing
+
+  osx-wheels:
+    if: startsWith(github.ref, 'refs/tags/') && github.ref =~ /^refs\/tags\/([0-9]+\.[0-9]+\.[0-9]+)(\.?(dev|a|b|rc)[0-9]+)?$/
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install cibuildwheel and twine
+        run: python3 -m pip install cibuildwheel==1.6.2 twine virtualenv
+      - name: Build and upload OS X wheels
+        env:
+          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+        run: |
+          export CIBW_BEFORE_BUILD="pip install cython==0.29.16 && cython {project}/jq.pyx"
+          export CIBW_TEST_REQUIRES="-r test-requirements.txt"
+          export CIBW_TEST_COMMAND="nosetests {project}/tests"
+          python3 -m cibuildwheel --output-dir wheelhouse &&
+          twine check wheelhouse/*.whl &&
+          twine upload wheelhouse/*.whl --skip-existing
+```

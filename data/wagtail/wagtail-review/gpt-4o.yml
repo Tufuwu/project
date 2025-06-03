@@ -1,0 +1,50 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8]
+        toxenv:
+          - py37-dj22-wa27-postgres
+          - py37-dj22-wa26-postgres
+          - py37-dj30-wa28-postgres
+          - py38-dj22-wa27-postgres
+          - py37-dj22-wa27-sqlite
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get --yes remove postgresql\*
+        sudo apt-get install -y postgresql-11 postgresql-client-11
+        sudo cp /etc/postgresql/{9.6,11}/main/pg_hba.conf
+        sudo service postgresql restart 11
+        pip install tox
+
+    - name: Create PostgreSQL role
+      run: |
+        sudo -u postgres psql -c 'CREATE ROLE travis SUPERUSER LOGIN CREATEDB;'
+
+    - name: Run tests
+      env:
+        TOXENV: ${{ matrix.toxenv }}
+      run: tox
+```

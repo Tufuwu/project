@@ -14,22 +14,35 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        python-version: ['3.8', '3.9', '3.10']
         include:
           - os: ubuntu-latest
-            python-version: '3.8'
-            env: RUN_COVERAGE: true
+            python-version: 3.5
+            run-coverage: false
           - os: ubuntu-latest
-            python-version: '3.8'
-            env: RUN_COVERAGE: false
-            env: TZ: XXX-05:30
+            python-version: 3.6
+            run-coverage: false
+          - os: ubuntu-latest
+            python-version: 3.7
+            run-coverage: false
+          - os: ubuntu-latest
+            python-version: 3.8
+            run-coverage: true
+          - os: ubuntu-latest
+            python-version: 3.8
+            run-coverage: false
+            env: TZ=XXX-05:30
+          - os: ubuntu-latest
+            python-version: 3.9-dev
+            run-coverage: false
+          - os: macos-latest
+            python-version: 3.x
+            run-coverage: false
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -44,18 +57,18 @@ jobs:
 
       - name: Run tests
         env:
-          RUN_COVERAGE: ${{ matrix.env.RUN_COVERAGE }}
+          RUN_COVERAGE: ${{ matrix.run-coverage }}
         run: |
           PYTEST_ARGS=('-n' '2')
-          if [ "$RUN_COVERAGE" = "true" ]; then
+          if [ "${{ matrix.run-coverage }}" = "true" ]; then
             PYTEST_ARGS+=('--cov=metomi/isodatetime')
           fi
           pytest "${PYTEST_ARGS[@]}"
 
       - name: Upload coverage to Codecov
-        if: env.RUN_COVERAGE == 'true'
+        if: matrix.run-coverage == 'true'
         run: |
-          pip install codecov
+          pip install coverage
           coverage xml --ignore-errors
-          codecov
+          bash <(curl -s https://codecov.io/bash)
 ```

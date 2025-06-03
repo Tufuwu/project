@@ -15,7 +15,7 @@ jobs:
   include:
     - name: Code quality checks
       python: "3.8"
-      env: TOXENV=lint
+      env: TOXENV=lintjingx
     - name: Types checking
       python: "3.8"
       env: TOXENV=types

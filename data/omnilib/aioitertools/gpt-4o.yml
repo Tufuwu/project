@@ -1,0 +1,40 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        python-version: [3.7, 3.7-dev, 3.6]
+        include:
+          - python-version: 3.6
+            env: LINTING=true
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          make setup
+          pip install .
+      - name: Run tests
+        run: |
+          if [ "${{ matrix.env.LINTING }}" = "true" ]; then
+            make lint test
+          else
+            make test
+          fi
+    allow_failures:
+      - python-version: 3.7-dev
+```

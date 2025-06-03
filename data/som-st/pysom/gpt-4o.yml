@@ -1,0 +1,63 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: [2.7, 3.8]
+        include:
+          - python-version: pypy
+            name: AST-based VM
+            before_script: |
+              export SOM_INTERP=AST
+              export SOM_BIN=som-ast-interp
+          - python-version: pypy
+            name: Bytecode-based VM
+            before_script: |
+              export SOM_INTERP=BC
+              export SOM_BIN=som-bc-interp
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      if: matrix.python-version == 'pypy'
+      run: |
+        wget https://downloads.python.org/pypy/pypy2.7-v7.3.1-src.tar.bz2
+        tar -xjf pypy2.7-v7.3.1-src.tar.bz2
+        mv pypy2.7-v7.3.1-src .pypy
+
+    - name: Before script
+      run: echo "${{ matrix.before_script }}"
+      shell: bash
+
+    - name: Run tests
+      run: |
+        if [ "${{ matrix.python-version }}" == "pypy" ]; then
+          PYTHONPATH=$PYTHONPATH:.pypy:src pytest
+          PYTHONPATH=$PYTHONPATH:.pypy ./som.sh -cp Smalltalk TestSuite/TestHarness.som
+          PYTHONPATH=$PYTHONPATH:.pypy .pypy/rpython/bin/rpython --batch src/main-rpython.py
+          ./$SOM_BIN -cp Smalltalk TestSuite/TestHarness.som
+        else
+          export PYTHON=python
+          export PYTHONPATH=src
+          SOM_INTERP=AST pytest
+          SOM_INTERP=BC pytest
+          SOM_INTERP=AST ./som.sh -cp Smalltalk TestSuite/TestHarness.som
+          SOM_INTERP=BC ./som.sh -cp Smalltalk TestSuite/TestHarness.som
+```

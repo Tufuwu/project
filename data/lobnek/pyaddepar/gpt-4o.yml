@@ -1,0 +1,57 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-16.04
+
+    env:
+      DOCKER_COMPOSE_VERSION: 1.23.2
+
+    steps:
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+
+    - name: Install Docker Compose
+      run: |
+        sudo rm /usr/local/bin/docker-compose
+        curl -L https://github.com/docker/compose/releases/download/${{ env.DOCKER_COMPOSE_VERSION }}/docker-compose-`uname -s`-`uname -m` > docker-compose
+        chmod +x docker-compose
+        sudo mv docker-compose /usr/local/bin
+
+    - name: Cache conda
+      uses: actions/cache@v2
+      with:
+        path: ~/conda
+        key: ${{ runner.os }}-conda-${{ hashFiles('**/environment.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-conda-
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Set up Docker
+      uses: docker/setup-buildx-action@v1
+
+    - name: Run tests
+      run: make test
+
+    - name: Upload coverage to Coveralls
+      if: success()
+      run: coveralls
+```

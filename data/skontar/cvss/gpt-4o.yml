@@ -1,0 +1,45 @@
+```yaml
+name: Python CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version:
+          - "2.6"
+          - "2.7"
+          - "3.2"
+          - "3.3"
+          - "3.4"
+          - "3.5"
+          - "3.6"
+          - "3.7"
+          - "3.8"
+          - "3.9"
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        if [[ "${{ matrix.python-version }}" == "2.6" || "${{ matrix.python-version }}" == "3.2" || "${{ matrix.python-version }}" == "3.3" ]]; then
+          sudo apt-get update && sudo apt-get install -y python${{ matrix.python-version }}-dev
+        fi
+        pip install -e .
+    - name: Run tests
+      run: |
+        cd tests
+        python test_cvss2.py
+        python test_cvss3.py
+```

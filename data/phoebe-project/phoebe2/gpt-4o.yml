@@ -1,0 +1,134 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            compiler: g++-5
+            python-version: 3.6
+            numpy-version: 1.12
+            scipy-version: 1.2
+            astropy-version: 1.0
+            nosetests: 1
+            benchmark: 0
+          - os: ubuntu-latest
+            compiler: g++-5
+            python-version: 3.6
+            numpy-version: 1.16
+            scipy-version: 1.4
+            astropy-version: 2.0
+            nosetests: 1
+            benchmark: 0
+          - os: ubuntu-latest
+            compiler: g++-5
+            python-version: 3.6
+            numpy-version: 1.16
+            scipy-version: 1.4
+            astropy-version: stable
+            nosetests: 1
+            benchmark: 0
+          - os: ubuntu-latest
+            compiler: g++-5
+            python-version: 3.6
+            numpy-version: stable
+            scipy-version: 1.4
+            astropy-version: stable
+            nosetests: 1
+            benchmark: 0
+          - os: ubuntu-latest
+            compiler: g++-5
+            python-version: 3.7
+            numpy-version: stable
+            scipy-version: 1.4
+            astropy-version: stable
+            nosetests: 1
+            benchmark: 0
+          - os: ubuntu-latest
+            compiler: g++-5
+            python-version: 3.6
+            numpy-version: 1.10
+            scipy-version: 1.4
+            astropy-version: 1.0
+            nosetests: 0
+            benchmark: 1
+        allow_failures:
+          - os: ubuntu-latest
+            compiler: g++-5
+            python-version: 3.7
+            numpy-version: dev
+            scipy-version: 1.4
+            astropy-version: dev
+            nosetests: 1
+            benchmark: 0
+          - os: macos-latest
+            compiler: clang
+            python-version: 3.6
+            numpy-version: 1.12
+            scipy-version: 1.2
+            astropy-version: 1.0
+            nosetests: 0
+            benchmark: 0
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gfortran g++-5 gcc-5 libstdc++-5-dev libopenmpi-dev
+        git clone git://github.com/astropy/ci-helpers.git
+        source ci-helpers/travis/setup_conda.sh
+        python setup.py build
+        python setup.py install --user
+        git clone -b phoebe_legacy git://github.com/phoebe-project/phoebe1.git
+        cd phoebe1
+        python setup_static.py install --user
+        cd ..
+        git clone git://github.com/phoebe-project/photodynam.git
+        cd photodynam
+        make
+        sudo cp photodynam /usr/local/bin/
+        python setup.py build
+        python setup.py install --user
+        cd ..
+
+    - name: Run tests
+      run: |
+        if [ ${{ matrix.nosetests }} == 1 ]; then
+          nosetests -v -s -d -w tests/nosetests/
+        fi
+
+    - name: After success
+      if: ${{ matrix.benchmark }} == 1 && github.event_name == 'push' && github.ref == 'refs/heads/main'
+      run: |
+        git clone --depth 1 git://github.com/phoebe-project/phoebe2-benchmark.git
+        cp ./phoebe2-benchmark/*.log ./tests/benchmark/ 2>/dev/null || :
+        cd tests && python run_tests.py benchmark
+        cp ./benchmark/*.profile ../phoebe2-benchmark/ 2>/dev/null || :
+        cp ./benchmark/*.log ../phoebe2-benchmark/ 2>/dev/null || :
+        cp ./benchmark/*.log.png ../phoebe2-benchmark 2>/dev/null || :
+        cd ../phoebe2-benchmark
+        git add *.profile
+        git add *.log
+        git add *.png
+        git -c user.name='github-actions' -c user.email='github-actions@github.com' commit -m "updating benchmarks" -m "branch: ${{ github.ref }}   commit: ${{ github.sha }}"
+        git push -q -f https://kecnry:${{ secrets.GITHUB_API_KEY }}@github.com/phoebe-project/phoebe2-benchmark master
+```

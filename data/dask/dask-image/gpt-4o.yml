@@ -1,0 +1,53 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version: [3.8, 3.7, 3.6]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Miniconda
+      run: source .travis_support/install_miniconda.sh
+
+    - name: Create test environment
+      run: |
+        export CONDA_ENV_TYPE="tst_py${{ matrix.python-version }}"
+        source .travis_support/create_env.sh
+
+    - name: Install package
+      run: pip install -e .
+
+    - name: Run tests
+      run: |
+        coverage erase
+        coverage run --source . setup.py test
+        coverage report -m
+
+    - name: Upload coverage to Coveralls
+      if: success()
+      run: |
+        export CONDA_ENV_TYPE="dpl"
+        source .travis_support/create_env.sh
+        coveralls
+
+  notifications:
+    email: false
+```

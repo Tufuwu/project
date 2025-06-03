@@ -1,0 +1,43 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y sdcc
+        pip install yowasp-yosys yowasp-nextpnr-ice40-5k yowasp-nextpnr-ice40-8k
+        export YOSYS=yowasp-yosys NEXTPNR_ICE40=yowasp-nextpnr-ice40 ICEPACK=yowasp-icepack
+
+    - name: Install software
+      run: |
+        cd software
+        python setup.py install
+
+    - name: Run tests
+      run: |
+        cd software
+        python -W ignore::DeprecationWarning test.py
+```

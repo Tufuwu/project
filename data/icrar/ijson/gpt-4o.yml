@@ -1,0 +1,107 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [2.7, 3.5, 3.6, 3.7, 3.8, 3.9, 3.10, 3.11]
+        env:
+          - YAJL_VERSION: [1.0.12, cant_find_it, none]
+          - UPLOAD_C_COVERAGE: [yes, no]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libyajl-dev
+          if [ -n "${{ matrix.env.YAJL_VERSION }}" ]; then
+            sudo apt-get purge -y libyajl-dev libyajl2
+            if [ "${{ matrix.env.YAJL_VERSION }}" = "cant_find_it" ]; then
+              export YAJL_DLL=/usr/lib/libyajl_cannot_be_found.so
+            elif [ "${{ matrix.env.YAJL_VERSION }}" != "none" ]; then
+              wget https://github.com/lloyd/yajl/archive/${{ matrix.env.YAJL_VERSION }}.zip
+              unzip ${{ matrix.env.YAJL_VERSION }}.zip
+              cd yajl-${{ matrix.env.YAJL_VERSION }}
+              ./configure && make all && sudo make install
+              sudo ldconfig
+              cd ..
+            fi
+          fi
+          pip install cffi pytest-cov
+          CFLAGS='--coverage' LDFLAGS='--coverage' python setup.py develop
+      - name: Run tests
+        run: |
+          python -mdoctest ijson/common.py
+          pytest -v --cov
+          test "`IJSON_BACKEND=python coverage run -a <(echo 'import ijson; print(ijson.backend)')`" == python
+      - name: Upload coverage to Coveralls
+        if: matrix.env.UPLOAD_C_COVERAGE == 'yes'
+        run: |
+          pip install cpp-coveralls
+          coveralls --gcov-options '\-lp'
+      - name: Upload coverage to Coveralls
+        if: matrix.env.UPLOAD_C_COVERAGE != 'yes'
+        run: |
+          pip install coveralls
+          coveralls
+
+  buildwheels:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            arch: amd64
+          - os: ubuntu-latest
+            arch: arm64
+          - os: macos-latest
+            arch: amd64
+          - os: windows-latest
+            arch: amd64
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install cibuildwheel
+        run: python3 -m pip install cibuildwheel
+      - name: Build wheels
+        run: python3 -m cibuildwheel --output-dir wheelhouse
+      - name: Upload wheels to PyPI
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          python3 -m pip install twine
+          python3 -m twine upload wheelhouse/*.whl
+
+  source_distribution:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Build source distribution
+        run: python3 setup.py sdist
+      - name: Upload source distribution to PyPI
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          python3 -m pip install twine
+          python3 -m twine upload dist/*.tar.gz
+```

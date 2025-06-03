@@ -1,0 +1,38 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8]
+        task: [test, integration]
+        include:
+          - python-version: 3.8
+            task: checks
+
+    steps:
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get -y install libdbus-1-dev
+        pip install tox-travis
+
+    - name: Run Tox
+      env:
+        TASK: ${{ matrix.task }}
+      run: tox
+```

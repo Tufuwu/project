@@ -15,13 +15,13 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11']
+        python-version: [3.6, 3.7, 3.8]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -33,14 +33,19 @@ jobs:
         pip install dist/feedgen*
 
     - name: Run tests
+      run: make test
+
+    - name: Check licenses
+      run: liccheck -s .licenses.ini
+
+    - name: Run feedgen
       run: |
-        make test
-        liccheck -s .licenses.ini
         python -m feedgen
         python -m feedgen atom
         python -m feedgen rss
 
-    - name: Coveralls
-      if: success()
+    - name: Upload coverage to Coveralls
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
       run: coveralls
 ```

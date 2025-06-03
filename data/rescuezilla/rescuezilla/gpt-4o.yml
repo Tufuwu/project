@@ -1,0 +1,67 @@
+```yaml
+name: CI
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:latest
+        options: --privileged
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Build Docker image
+      run: docker build --no-cache=true --tag builder.image .
+
+    - name: Run Docker container
+      run: docker run --rm --detach --privileged --name=builder.container --volume=${{ github.workspace }}:/home/rescuezilla/ --tty builder.image cat
+
+    - name: Clean git environment
+      run: |
+        git clean -dfX && git clean -dfx
+        git reset --hard HEAD
+
+    - name: Trust Rescuezilla git folder
+      run: docker exec --interactive --tty --workdir=/home/rescuezilla/ builder.container ./git_add_safe_directory.sh
+
+    - name: Run unit tests
+      run: docker exec --interactive --tty --workdir=/home/rescuezilla/ builder.container make test
+
+    - name: Make impish
+      run: docker exec --interactive --tty --workdir=/home/rescuezilla/ builder.container make impish
+
+    - name: Make focal
+      run: docker exec --interactive --tty --workdir=/home/rescuezilla/ builder.container make focal
+
+    - name: Prepare files for release
+      run: |
+        sudo mv build/rescuezilla.amd64.focal.iso build/rescuezilla-${GITHUB_REF##*/}-64bit.focal.iso
+        sudo mv build/rescuezilla.amd64.impish.iso build/rescuezilla-${GITHUB_REF##*/}-64bit.impish.iso
+        rm -f SHA256SUM SHA1SUM MD5SUM
+        sha256sum build/rescuezilla-${GITHUB_REF##*/}-64bit.impish.iso build/rescuezilla-${GITHUB_REF##*/}-64bit.focal.iso > SHA256SUM
+        sha1sum build/rescuezilla-${GITHUB_REF##*/}-64bit.impish.iso build/rescuezilla-${GITHUB_REF##*/}-64bit.focal.iso > SHA1SUM
+        md5sum build/rescuezilla-${GITHUB_REF##*/}-64bit.impish.iso build/rescuezilla-${GITHUB_REF##*/}-64bit.focal.iso > MD5SUM
+
+    - name: Upload Release Assets
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          build/rescuezilla-${GITHUB_REF##*/}-64bit.impish.iso
+          build/rescuezilla-${GITHUB_REF##*/}-64bit.focal.iso
+          build/rescuezilla_${GITHUB_REF##*/}-1_all.deb
+          SHA256SUM
+          SHA1SUM
+          MD5SUM
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```

@@ -1,0 +1,49 @@
+```yaml
+name: Python CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        python-version: ['3.5', '3.6', '3.7', '3.8']
+
+    runs-on: ubuntu-latest
+
+    env:
+      DARCS_EMAIL: 'foo <foo@example.com>'
+      PATH: ${{ runner.path }}:/opt
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y darcs
+        curl https://www.fossil-scm.org/home/uv/fossil-linux-x64-2.11.1.tar.gz -o ~/fossil.tgz
+        tar -xvf ~/fossil.tgz -C /opt
+        pip install poetry
+        poetry install
+
+    - name: Configure bzr
+      run: bzr whoami 'foo <foo@example.com>'
+
+    - name: Run tests
+      run: poetry run pytest --verbose --cov --cov-report term-missing
+
+    - name: Run pre-commit
+      if: matrix.python-version == '3.7'
+      run: poetry run pre-commit run --all-files --show-diff-on-failure
+```

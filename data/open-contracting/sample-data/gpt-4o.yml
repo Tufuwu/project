@@ -1,0 +1,48 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.6"]
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        BASEDIR="https://raw.githubusercontent.com/open-contracting/standard-maintenance-scripts/master"
+        curl -s -S --retry 3 $BASEDIR/tests/install.sh | bash -
+        pip install -r requirements.txt
+
+    - name: Run tests
+      run: |
+        BASEDIR="https://raw.githubusercontent.com/open-contracting/standard-maintenance-scripts/master"
+        curl -s -S --retry 3 $BASEDIR/tests/script.sh | bash -
+        pytest
+```

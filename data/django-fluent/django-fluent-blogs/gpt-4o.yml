@@ -1,5 +1,5 @@
 ```yaml
-name: Python package
+name: CI
 
 on:
   push:
@@ -10,17 +10,24 @@ on:
       - master
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-16.04
     strategy:
       matrix:
-        python-version: ['3.10', '3.9', '3.8', '3.7']
-        django-version: 
-          - 'django>=2.2,<2.3'
-          - 'django>=3.0,<3.1'
+        python-version: ['3.6', '3.5', '2.7']
+        env:
+          - PACKAGES: "django>=1.11,<1.12"
+          - PACKAGES: "django>=2.0,<2.1"
       exclude:
-        - python-version: '3.7'
-          django-version: 'django>=3.0,<3.1'
+        - python-version: '2.7'
+          env: PACKAGES: "django>=2.0,<2.1"
+      include:
+        - python-version: '3.6'
+          env: PACKAGES: "django>=2.1,<2.2"
+        - python-version: '3.6'
+          env: PACKAGES: "django>=2.2,<2.3"
+        - python-version: '3.6'
+          env: PACKAGES: "django>=3.0,<3.1"
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
@@ -30,13 +37,28 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip wheel setuptools
-        pip install ${{ matrix.django-version }} -e .[tests]
-    - name: Test with coverage
-      run: |
         pip install codecov
-        coverage run --rcfile=.coveragerc runtests.py
+        pip install ${{ matrix.env.PACKAGES }} -e .[tests]
+    - name: Run tests
+      run: coverage run --rcfile=.coveragerc runtests.py
     - name: Upload coverage to Codecov
+      if: success()
       run: codecov
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  notifications:
+    irc:
+      channels:
+        - irc.freenode.org#django-fluent
+      template:
+        - '%{repository}#%{build_number} (%{commit}) %{message}  --  %{build_url}'
+      skip_join: true
+    email:
+      recipients:
+        - travis@edoburu.nl
+      on_success: never
+      on_failure: always
+    slack:
+      secure: CJ+oORfxdm/EQDbIbQ8VZmPLgA15wohO7tv5RpgZXnuTBIWrWE/DwGULqms8P6qiDgHyvR/S8g2wGdaS2HXdz/aDpPPfypyRJJu9y1mupuv1tG2NkN7+7qmjRhjTrn9vvo5I8GaEGKtGVh5jMeahsZkqrYykmLB9rsHoyhZwNmo=
+      on_success: never
+      on_failure: always
 ```

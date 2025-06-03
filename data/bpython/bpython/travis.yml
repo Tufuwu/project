@@ -1,23 +1,26 @@
-#!/bin/bash
-set -e
-set -x
+language: python
+sudo: false
+dist: bionic
 
-pip install setuptools
+python:
+    - "3.9-dev"
+    - "3.8"
+    - "3.7"
+    - "3.6"
+    - "nightly"
+    - "pypy3"
 
-if [[ $RUN == nosetests ]]; then
-    # core dependencies
-    pip install -r requirements.txt
-    # urwid specific dependencies
-    pip install urwid twisted
-    # filewatch specific dependencies
-    pip install watchdog
-    # jedi specific dependencies
-    pip install 'jedi >= 0.16'
-    # translation specific dependencies
-    pip install babel
-    # build and install
-    python setup.py install
-elif [[ $RUN == build_sphinx ]]; then
-    # documentation specific dependencies
-    pip install 'sphinx >=1.5'
-fi
+env:
+    - RUN=nosetests
+    - RUN=build_sphinx
+
+matrix:
+    allow_failures:
+        - python: "nightly"
+        - python: "pypy3"
+
+install:
+    - ./.travis.install.sh
+
+script:
+    - ./.travis.script.sh

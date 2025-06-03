@@ -1,0 +1,71 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  flake8:
+    name: Flake8
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '2.7'
+      - name: Install dependencies
+        run: |
+          bash bin/travis-build.bash
+          pip install flake8==3.5.0
+          pip install pycodestyle==2.3.0
+      - name: Run Flake8
+        run: |
+          flake8 --version
+          flake8 . --count --select=E901,E999,F821,F822,F823 --show-source --statistics --exclude ckan
+          flake8 . --count --max-line-length=127 --statistics --exclude ckan
+
+  test:
+    name: Test
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        ckan-version: [master, 2.6, 2.7, 2.8]
+    services:
+      redis:
+        image: redis
+        options: --entrypoint redis-server
+        ports:
+          - 6379:6379
+      postgres:
+        image: postgres
+        options: --entrypoint postgres
+        env:
+          POSTGRES_DB: test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '2.7'
+      - name: Install dependencies
+        env:
+          CKANVERSION: ${{ matrix.ckan-version }}
+        run: |
+          bash bin/travis-build.bash
+          pip install coveralls
+      - name: Run tests
+        run: sh bin/travis-run.sh
+      - name: Coveralls
+        if: success()
+        run: coveralls
+```

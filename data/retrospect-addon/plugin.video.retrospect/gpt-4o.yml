@@ -1,0 +1,41 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    strategy:
+      matrix:
+        python-version: [3.7]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        pip install kodi-addon-checker
+
+    - name: Run tests
+      run: |
+        git config core.quotepath false
+        kodi-addon-checker --branch=leia .
+
+    - name: Notify on failure
+      if: failure()
+      run: |
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"Build failed"}' https://www.travisbuddy.com/
+```

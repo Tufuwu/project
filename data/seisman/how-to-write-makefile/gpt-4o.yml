@@ -1,0 +1,51 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.6']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        curl -sSL https://gist.githubusercontent.com/seisman/ad00252a9f03fc644146a11e6983d9c5/raw/install-tl.sh -o install-tl.sh
+        sudo bash install-tl.sh
+        source ~/.bash_profile
+        export TLMGR=`which tlmgr`
+        sudo $TLMGR update --self --all
+        sudo $TLMGR install letltxmacro
+
+    - name: Build HTML
+      run: make html
+
+    - name: Build PDF
+      run: make latexpdf
+
+    - name: Copy PDF to HTML directory
+      run: cp build/latex/Makefile.pdf build/html/
+
+    - name: Deploy to GitHub Pages
+      if: github.ref == 'refs/heads/master'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GH_TOKEN }}
+        publish_dir: ./build/html
+```

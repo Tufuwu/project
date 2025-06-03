@@ -1,0 +1,85 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  schedule:
+    - cron: '0 0 * * 0'
+
+jobs:
+  initial_tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        include:
+          - os: ubuntu-latest
+            env:
+              SETUP_CMD: 'egg_info'
+          - os: ubuntu-latest
+            env:
+              SETUP_CMD: 'build_docs -w'
+              CONDA_DEPENDENCIES: 'pytz matplotlib six'
+              PIP_DEPENDENCIES: 'pytest-mpl pytest-astropy astroquery'
+          - os: ubuntu-latest
+            env:
+              SETUP_CMD: 'test --remote-data -V'
+              CONDA_DEPENDENCIES: 'pytz matplotlib six'
+              PIP_DEPENDENCIES: 'pytest-mpl pytest-astropy'
+          - os: ubuntu-latest
+            env:
+              MAIN_CMD: 'flake8 astroplan --count --max-line-length=100'
+              SETUP_CMD: ''
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version || '3.7' }}
+      - name: Install dependencies
+        run: |
+          git clone git://github.com/astropy/ci-helpers.git
+          source ci-helpers/travis/setup_conda.sh
+      - name: Run tests
+        run: ${{ matrix.env.MAIN_CMD || 'python setup.py' }} ${{ matrix.env.SETUP_CMD }}
+
+  comprehensive_tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            env:
+              PYTHON_VERSION: 3.6
+          - os: windows-latest
+            env:
+              CONDA_DEPENDENCIES: 'pytz matplotlib six'
+              PIP_DEPENDENCIES: 'pyephem pytest-mpl pytest-astropy'
+          - os: ubuntu-latest
+            env:
+              ASTROPY_VERSION: dev
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version || '3.7' }}
+      - name: Install dependencies
+        run: |
+          git clone git://github.com/astropy/ci-helpers.git
+          source ci-helpers/travis/setup_conda.sh
+      - name: Run tests
+        run: ${{ matrix.env.MAIN_CMD || 'python setup.py' }} ${{ matrix.env.SETUP_CMD }}
+
+  after_success:
+    if: success()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upload coverage to Coveralls
+        if: contains(matrix.env.SETUP_CMD, '--coverage')
+        run: coveralls --rcfile='astroplan/tests/coveragerc'
+```

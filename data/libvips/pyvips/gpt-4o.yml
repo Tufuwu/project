@@ -1,0 +1,83 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        python-version: ["2.7", "3.3", "3.4", "3.5", "3.6", "3.7", "3.8", "pypy2", "pypy3", "3.x"]
+        include:
+          - python-version: "3.3"
+            allow_failure: true
+          - python-version: "3.7"
+            allow_failure: true
+          - python-version: "3.8"
+            allow_failure: true
+          - python-version: "3.x"
+            allow_failure: true
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          libexpat1-dev \
+          gettext \
+          liblcms2-dev \
+          libmagickwand-dev \
+          libopenexr-dev \
+          libcfitsio3-dev \
+          libfftw3-dev \
+          libgif-dev \
+          libgs-dev \
+          libgsf-1-dev \
+          libmatio-dev \
+          libopenslide-dev \
+          liborc-0.4-dev \
+          libpango1.0-dev \
+          libpoppler-glib-dev \
+          librsvg2-dev \
+          libwebp-dev \
+          libtiff5-dev \
+          libglib2.0-dev
+
+    - name: Cache VIPS
+      uses: actions/cache@v2
+      with:
+        path: ${{ github.workspace }}/vips
+        key: ${{ runner.os }}-vips
+
+    - name: Install VIPS
+      run: |
+        export VIPS_VERSION_MAJOR=8
+        export VIPS_VERSION_MINOR=9
+        export VIPS_VERSION_MICRO=0
+        export PATH=$HOME/vips/bin:$PATH
+        export LD_LIBRARY_PATH=$HOME/vips/lib:$LD_LIBRARY_PATH
+        export PKG_CONFIG_PATH=$HOME/vips/lib/pkgconfig:$PKG_CONFIG_PATH
+        bash install-vips.sh --without-python
+
+    - name: Install dependencies
+      run: |
+        pip install -U setuptools
+        pip install -U .[test]
+
+    - name: Run tests
+      run: python setup.py test
+```

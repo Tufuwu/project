@@ -1,0 +1,45 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  unit-tests:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.6']
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: pip install tox-travis codecov
+      - name: Run tests
+        run: tox
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+
+  docker-image-build-test:
+    name: Docker image build test
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:19.03.12
+        options: --privileged
+    env:
+      TAG: "temp"
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Docker image
+        run: docker-compose build
+```

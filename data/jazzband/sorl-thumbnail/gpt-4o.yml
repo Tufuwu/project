@@ -1,0 +1,68 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+        django-version: [2.2, 3.0, 3.1]
+        package: [pil, imagemagick, graphicsmagick, redis, wand, dbm]
+    env:
+      TOXENV: qa
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libgraphicsmagick1-dev graphicsmagick libjpeg62 zlib1g-dev
+        pip install tox-travis codecov
+    - name: Run tests
+      env:
+        DJANGO: ${{ matrix.django-version }}
+        PACKAGE: ${{ matrix.package }}
+      run: |
+        env | sort
+        tox
+    - name: Upload coverage to Codecov
+      if: success()
+      run: codecov
+
+  deploy:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.6
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.6
+    - name: Install dependencies
+      run: |
+        pip install setuptools wheel twine
+    - name: Deploy to PyPI
+      env:
+        TWINE_USERNAME: jazzband
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        python setup.py sdist bdist_wheel
+        twine upload --repository-url https://jazzband.co/projects/sorl-thumbnail/upload dist/* --skip-existing
+```

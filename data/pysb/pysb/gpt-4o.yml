@@ -1,0 +1,67 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Miniconda
+      shell: bash
+      run: |
+        wget http://repo.continuum.io/miniconda/Miniconda${{ matrix.python-version[0] }}-latest-Linux-x86_64.sh -O miniconda.sh
+        chmod +x miniconda.sh
+        bash miniconda.sh -b -p $HOME/miniconda
+        echo "$HOME/miniconda/bin" >> $GITHUB_PATH
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        conda install --yes -c conda-forge python="${{ matrix.python-version }}" numpy scipy matplotlib sympy nose pexpect pandas networkx pydot codecov mock cython
+        pip install h5py
+        if [ "${{ matrix.python-version }}" != "3.8" ]; then
+          conda install --yes -c SBMLTeam python-libsbml
+        else
+          pip install python-libsbml
+        fi
+        if [ "${{ matrix.python-version }}" != "3.8" ]; then
+          pip install libroadrunner
+        fi
+        pip install twine
+        conda install --yes -c alubbock kappa stochkit bionetgen atomizer
+        mkdir -p ~/.config/matplotlib
+        echo "backend:Agg" > ~/.config/matplotlib/matplotlibrc
+
+    - name: Build
+      run: python setup.py build --build-lib=build/lib
+
+    - name: Before script
+      run: |
+        python setup.py sdist
+        twine check dist/*
+
+    - name: Test with nosetests
+      run: |
+        nosetests build/lib/pysb --with-coverage --cover-inclusive --cover-package=build/lib/pysb -a '!gpu'
+
+    - name: Upload coverage to Codecov
+      run: codecov
+```

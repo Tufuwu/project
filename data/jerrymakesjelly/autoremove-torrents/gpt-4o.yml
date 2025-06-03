@@ -1,0 +1,45 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    strategy:
+      matrix:
+        python-version: ["2.7", "3.5", "3.6", "3.7", "3.8"]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python setup.py install
+        pip install --upgrade pytest
+        pip install -r dev-requirements.txt
+
+    - name: Run tests
+      run: |
+        pytest -s --cov-report=xml --cov
+
+    - name: Upload coverage to Codacy
+      if: success()
+      env:
+        CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+      run: |
+        pip install python-codacy-coverage
+        python-codacy-coverage -r coverage.xml
+```

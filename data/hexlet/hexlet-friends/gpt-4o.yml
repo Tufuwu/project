@@ -1,0 +1,45 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      SECRET_KEY: secret
+      GITHUB_AUTH_TOKEN: secret
+      GITHUB_WEBHOOK_TOKEN: secret
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.6
+
+    - name: Install Poetry
+      run: pip install poetry
+
+    - name: Install dependencies
+      run: poetry install
+
+    - name: Run checks
+      run: make check
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+```

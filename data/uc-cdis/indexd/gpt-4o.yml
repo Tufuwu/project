@@ -1,0 +1,56 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+
+    - name: Install dependencies
+      run: |
+        pip install poetry
+        poetry install -vv
+
+    - name: Configure PostgreSQL
+      run: |
+        sudo cp travis/postgresql.conf /etc/postgresql/13/main/postgresql.conf
+        sudo cp travis/pg_hba.conf /etc/postgresql/13/main/pg_hba.conf
+        sudo pg_ctlcluster 13 main restart
+
+    - name: Run tests
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_TOKEN }}
+      run: |
+        pytest -vv --cov=indexd --cov-report xml tests
+        coveralls
+```

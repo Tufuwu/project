@@ -10,36 +10,50 @@ on:
       - main
 
 jobs:
-  test:
-    runs-on: ubuntu-20.04
+  build:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+        pg-django:
+          - { pg: 9.6, django: 2.1 }
+          - { pg: 10, django: 2.1 }
+          - { pg: 11, django: 2.1 }
+          - { pg: 12, django: 2.1 }
+          - { pg: 9.6, django: 2.2 }
+          - { pg: 10, django: 2.2 }
+          - { pg: 11, django: 2.2 }
+          - { pg: 12, django: 2.2 }
+          - { pg: 9.6, django: 3.0 }
+          - { pg: 10, django: 3.0 }
+          - { pg: 11, django: 3.0 }
+          - { pg: 12, django: 3.0 }
+          - { pg: 9.6, django: 3.1 }
+          - { pg: 10, django: 3.1 }
+          - { pg: 11, django: 3.1 }
+          - { pg: 12, django: 3.1 }
     services:
       postgres:
-        image: postgres:11
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+        image: postgres:${{ matrix.pg-django.pg }}
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
       redis:
         image: redis
         ports:
           - 6379:6379
 
-    strategy:
-      matrix:
-        python-version: ['3.8', '3.9', '3.10']
-        pg-version: ['11', '12']
-        django-version: ['2.2', '3.0', '3.1']
-
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up Python
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
@@ -54,19 +68,14 @@ jobs:
         sudo apt-get install -y clickhouse-client clickhouse-server clickhouse-common-static
         sudo service clickhouse-server restart
         pip install -r requirements-test.txt
-        pip install Django==${{ matrix.django-version }}.*
-        python setup.py install
-
-    - name: Configure PostgreSQL
-      run: |
-        sudo sed -i 's/port = 5433/port = 5432/' /etc/postgresql/${{ matrix.pg-version }}/main/postgresql.conf
-        sudo cp /etc/postgresql/10/main/pg_hba.conf /etc/postgresql/${{ matrix.pg-version }}/main/pg_hba.conf
-        sudo systemctl stop postgresql
-        sudo systemctl start postgresql@${{ matrix.pg-version }}-main
+        pip install -q Django==${{ matrix.pg-django.django }}.*
+        python setup.py -q install
 
     - name: Before script
       run: |
-        erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().' -noshell
+        sudo systemctl stop postgresql
+        sudo systemctl start postgresql@${{ matrix.pg-django.pg }}-main
+        erl -eval 'erlang:display(erlang:system_info(otp_release)), halt().'  -noshell
         rabbitmqctl status | grep "RabbitMQ"
         clickhouse-client --query "SELECT version();"
         psql -tc 'SHOW server_version' -U postgres

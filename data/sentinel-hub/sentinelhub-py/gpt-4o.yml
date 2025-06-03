@@ -1,0 +1,67 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8, 3.9]
+        include:
+          - python-version: 3.9
+            install-extra: true
+          - python-version: 3.8
+            run-lint: true
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture: arm64
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y libopenjp2-7
+        if [ "${{ matrix.install-extra }}" == "true" ]; then
+          pip install -e .[DEV] --upgrade
+        else
+          pip install .[DEV] --upgrade
+        fi
+
+    - name: Lint with pylint
+      if: matrix.run-lint == 'true'
+      run: |
+        pylint sentinelhub
+
+    - name: Test with pytest
+      run: |
+        if [[ "${{ github.event.pull_request }}" != "null" || "${{ matrix.python-version }}" != "3.9" ]]; then
+          pytest --cov \
+            --ignore tests/test_ogc.py \
+            --ignore tests/test_sentinelhub_batch.py \
+            --ignore tests/test_sentinelhub_client.py \
+            --ignore tests/test_session.py \
+            --ignore tests/test_fis.py \
+            --ignore tests/test_data_request.py \
+            --ignore tests/test_aws.py \
+            --ignore tests/test_aws_safe.py \
+            --ignore tests/test_commands.py
+        else
+          pytest --cov
+        fi
+
+    - name: Upload coverage to Codecov
+      if: matrix.python-version == '3.9' && github.event_name == 'push' && github.event.pull_request == 'null'
+      uses: codecov/codecov-action@v2
+```

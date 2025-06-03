@@ -1,0 +1,114 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox
+
+      - name: Start RabbitMQ
+        run: |
+          docker run -d --rm -p 15672:15672 -p 5672:5672 -p 5671:5671 --name nameko-rabbitmq nameko/nameko-rabbitmq:3.6.6
+          docker cp nameko-rabbitmq:/srv/ssl certs
+
+      - name: Install Toxiproxy
+        run: |
+          mkdir $GITHUB_WORKSPACE/bin
+          wget -O $GITHUB_WORKSPACE/bin/toxiproxy-server https://github.com/Shopify/toxiproxy/releases/download/v2.0.0/toxiproxy-server-linux-amd64
+          chmod +x $GITHUB_WORKSPACE/bin/toxiproxy-server
+          echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
+
+      - name: Remove boto.cfg
+        run: sudo rm -f /etc/boto.cfg
+
+  build:
+    runs-on: ubuntu-latest
+    needs: setup
+    strategy:
+      matrix:
+        python-version: [2.7, 3.5, 3.6]
+        tox-env:
+          - py27-static
+          - py36-static
+          - docs
+          - py27-examples
+          - py36-examples
+          - py27-oldest-lib
+          - py27-pinned-lib
+          - py27-latest-lib
+          - py27-extra-lib
+          - py35-oldest-lib
+          - py35-pinned-lib
+          - py35-latest-lib
+          - py36-oldest-lib
+          - py36-pinned-lib
+          - py36-latest-lib
+          - py36-extra-lib
+          - py27-mastereventlet
+          - py35-mastereventlet
+          - py36-mastereventlet
+          - py36-branchcoverage-lib
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox
+
+      - name: Run tests
+        run: tox -e ${{ matrix.tox-env }}
+        continue-on-error: ${{ matrix.tox-env == 'py27-mastereventlet' || matrix.tox-env == 'py35-mastereventlet' || matrix.tox-env == 'py36-mastereventlet' || matrix.tox-env == 'py36-branchcoverage-lib' }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.6
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox twine
+
+      - name: Build and publish
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          python setup.py sdist bdist_wheel
+          twine upload dist/*
+```

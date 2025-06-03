@@ -1,5 +1,5 @@
 ```yaml
-name: Python package
+name: Python application
 
 on:
   push:
@@ -11,25 +11,21 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
-        python-version: ['3.7', '3.8']
+        python-version: [2.7, 3.5, 3.6, 3.7, 3.8]
 
     steps:
-    - uses: actions/checkout@v3
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-
     - name: Upgrade setuptools
       run: pip install --upgrade setuptools
-
     - name: Install dependencies
       run: pip install -r requirements.txt
-
     - name: Test with setup.py
       run: python setup.py test
 ```

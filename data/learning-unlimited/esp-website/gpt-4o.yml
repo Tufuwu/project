@@ -1,0 +1,76 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-16.04
+    services:
+      memcached:
+        image: memcached:latest
+        ports:
+          - 11211:11211
+    env:
+      DJANGO_SETTINGS_MODULE: esp.settings
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 2.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 2.7
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Before Install
+        run: deploy/travis/before_install
+      - name: Install
+        run: deploy/travis/install
+      - name: Before Script
+        run: deploy/travis/before_script
+      - name: Lint
+        run: deploy/travis/script
+        if: env.TRAVIS_JOB == 'lint'
+
+  test:
+    runs-on: ubuntu-16.04
+    services:
+      memcached:
+        image: memcached:latest
+        ports:
+          - 11211:11211
+    env:
+      DJANGO_SETTINGS_MODULE: esp.settings
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 2.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 2.7
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Before Install
+        run: deploy/travis/before_install
+      - name: Install
+        run: deploy/travis/install
+      - name: Before Script
+        run: deploy/travis/before_script
+      - name: Test
+        run: deploy/travis/script
+        if: env.TRAVIS_JOB == 'test'
+```

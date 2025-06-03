@@ -1,0 +1,79 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+        include:
+          - python-version: 3.6
+            check-type: style
+          - python-version: 3.6
+            check-type: test
+          - python-version: 3.7
+            check-type: test
+          - python-version: 3.8
+            check-type: test
+
+    env:
+      INSTALL_DEPENDS: pip setuptools
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Upgrade pip and setuptools
+      run: |
+        python -m pip install --upgrade ${{ env.INSTALL_DEPENDS }}
+
+    - name: Install package
+      run: |
+        python -m pip install .
+        INTENDED_VERSION="$(python -c 'import versioneer; print(versioneer.get_version())')"
+        INSTALLED_VERSION="$(python -c 'import smriprep; print(smriprep.__version__)')"
+        echo "Intended: $INTENDED_VERSION"
+        echo "Installed: $INSTALLED_VERSION"
+        test "$INTENDED_VERSION" == "$INSTALLED_VERSION"
+
+    - name: Install dependencies for ${{ matrix.check-type }}
+      run: |
+        python -m pip install .[${{ matrix.check-type }}]
+
+    - name: Run ${{ matrix.check-type }} checks
+      run: |
+        if [ "${{ matrix.check-type }}" == "style" ]; then
+          flake8 smriprep
+        elif [ "${{ matrix.check-type }}" == "test" ]; then
+          pytest -v --cov smriprep --cov-report xml:cov.xml smriprep
+        else
+          exit 1
+        fi
+
+    - name: Upload coverage to Codecov
+      if: matrix.check-type == 'test'
+      run: |
+        python -m pip install codecov
+        codecov
+```

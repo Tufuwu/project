@@ -12,19 +12,19 @@ on:
     types: [created]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11']
+        python-version: ['3.6', '3.7', '3.8', '3.8-dev']
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
     - name: Cache pip
-      uses: actions/cache@v3
+      uses: actions/cache@v2
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -64,23 +64,24 @@ jobs:
         cp test2.yaml test2.old.yaml && niet -f yaml .list test2.yaml --in-place && ! diff test2.old.yaml
 
   deploy:
-    runs-on: ubuntu-latest
-    needs: build
+    runs-on: ubuntu-18.04
+    needs: test
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python
-      uses: actions/setup-python@v4
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
       with:
-        python-version: '3.9'
+        python-version: 3.8
     - name: Install dependencies
       run: |
         pip install -U pip setuptools wheel
-    - name: Publish to PyPI
+        pip install .[devel]
+    - name: Build and publish
       env:
-        TWINE_USERNAME: 4383
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
-        pip install twine
         python setup.py sdist bdist_wheel
         twine upload dist/*
+    if: github.event_name == 'release' && github.event.action == 'created'
 ```

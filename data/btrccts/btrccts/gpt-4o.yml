@@ -1,0 +1,49 @@
+```yaml
+name: Python CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.8, 3.7, 3.6]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        python3 --version
+        sudo apt-get install python3-pip flake8
+        flake8 .
+        pip3 install --upgrade setuptools pip
+        pip3 install -r requirements.txt
+        pip3 install -e . --no-deps
+        python3 examples/print_time.py --start-date 2017-01-01 --end-date 2017-01-02
+        pip3 install -e .[dev]
+
+    - name: Run tests
+      run: |
+        python3 -m unittest tests/unit/tests.py
+        python3 -m unittest tests/integration/tests.py
+        pip3 install -r version_hashes.txt
+```

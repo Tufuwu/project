@@ -1,0 +1,48 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        distro:
+          - registry.centos.org/centos/centos:7
+          - registry.fedoraproject.org/fedora:latest
+          - registry.fedoraproject.org/fedora:rawhide
+      allow_failures:
+        - distro: registry.fedoraproject.org/fedora:rawhide
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Pull Docker image
+        run: docker pull ${{ matrix.distro }}
+
+      - name: Run Docker container
+        run: |
+          docker run --detach --volume="${{ github.workspace }}":/tmp/test \
+          --name $(echo ${{ matrix.distro }} | sed -E -e "s,[:/\.],-,g") ${{ matrix.distro }} sleep 600
+
+      - name: Setup test container
+        run: ./tests/setup_test_container.sh ${{ matrix.distro }}
+
+      - name: Run tests
+        run: |
+          docker exec $(echo ${{ matrix.distro }} | sed -E -e "s,[:/\.],-,g") \
+          bash -c 'cd /tmp/test && ./runtests.sh -v'
+
+      - name: Stop Docker container
+        if: always()
+        run: |
+          docker stop $(echo ${{ matrix.distro }} | sed -E -e "s,[:/\.],-,g")
+```

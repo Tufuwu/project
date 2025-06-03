@@ -1,0 +1,119 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: [3.7, 3.6, 3.5, 2.7, pypy3]
+        include:
+          - os: windows-latest
+            python-version: 3.7
+            env: PYTHON_ROOT="/c/Python37" PYTHON_CHOCO_PKG="python3"
+          - os: windows-latest
+            python-version: 2.7
+            env: PYTHON_ROOT="/c/Python27" PYTHON_CHOCO_PKG="python2"
+          - os: ubuntu-latest
+            python-version: 3.8-dev
+          - os: ubuntu-latest
+            python-version: 3.7
+            env: PROJECT=distributed
+                 TEST_REQUIREMENTS="pytest pytest-timeout numpy pandas mock bokeh fsspec>=0.3.3"
+                 PROJECT_URL=https://github.com/dask/distributed.git
+                 PYTEST_ADDOPTS="--timeout-method=thread --timeout=300 -m \"not avoid_travis\" -k \"not test_dask_scheduler and not test_workspace_concurrency and not test_defaults and not test_service_hosts and not test_logging_file_config and not test_hostport and not test_workdir_simple and not test_two_workspaces_in_same_directory and not test_recompute_released_results and not test_connection_args and not test_listen_args\""
+          - os: ubuntu-latest
+            python-version: 3.7
+            env: PROJECT=loky TEST_REQUIREMENTS="pytest psutil"
+                 PROJECT_URL=https://github.com/tomMoral/loky.git
+          - os: ubuntu-latest
+            python-version: 3.7
+            env: PROJECT=joblib TEST_REQUIREMENTS="pytest numpy distributed"
+                 PROJECT_URL=https://github.com/joblib/joblib.git
+          - os: ubuntu-latest
+            python-version: 3.7
+            env: PROJECT=ray
+            install:
+              - pip install --upgrade -r dev-requirements.txt
+              - pip install setproctitle psutil ray==0.6.4
+              - PROJECT_DIR="$(python -c 'import os, ray; print(os.path.dirname(ray.__file__), flush=True)')"
+              - rm $PROJECT_DIR/cloudpickle/cloudpickle.py
+              - cp cloudpickle/cloudpickle.py $PROJECT_DIR/cloudpickle/cloudpickle.py
+            script:
+              - COVERAGE_PROCESS_START="$GITHUB_WORKSPACE/.coveragerc" PYTHONPATH='.:tests' pytest -r s
+              - pytest -vl $PROJECT_DIR/tests/test_basic.py::test_simple_serialization
+              - pytest -vl $PROJECT_DIR/tests/test_basic.py::test_complex_serialization
+              - pytest -vl $PROJECT_DIR/tests/test_basic.py::test_ray_recursive_objects
+              - pytest -vl $PROJECT_DIR/tests/test_basic.py::test_serialization_final_fallback
+              - pytest -vl $PROJECT_DIR/tests/test_recursion.py
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+          choco install -y ${{ matrix.env.PYTHON_CHOCO_PKG }}
+          echo "${{ matrix.env.PYTHON_ROOT }}:${{ matrix.env.PYTHON_ROOT }}/Scripts" >> $GITHUB_PATH
+          python -m pip install --upgrade pip
+        fi
+        if [[ "${{ matrix.python-version }}" == "3.8-dev" ]]; then
+          sudo apt-get install libopenblas-dev
+          python -m pip install numpy scipy
+        else
+          python -m pip install numpy scipy
+        fi
+        python -m pip install .
+        python -m pip install --upgrade -r dev-requirements.txt
+        python -m pip install tornado
+        if [[ "${{ matrix.env.PROJECT }}" != "" ]]; then
+          python -m pip install ${{ matrix.env.TEST_REQUIREMENTS }}
+          git clone ${{ matrix.env.PROJECT_URL }} ../${{ matrix.env.PROJECT }}
+          if [[ "${{ matrix.env.PROJECT }}" == "joblib" ]]; then
+            pushd ../joblib/joblib/externals
+            source vendor_cloudpickle.sh ../../../cloudpickle
+            popd
+          fi
+          python -m pip install ../${{ matrix.env.PROJECT }}
+        fi
+        python -m pip list
+
+    - name: Lint with flake8
+      run: |
+        python -m flake8 . --count --verbose --select=E901,E999,F821,F822,F823 --show-source --statistics
+        python -m flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Run tests
+      run: |
+        COVERAGE_PROCESS_START="$GITHUB_WORKSPACE/.coveragerc" PYTHONPATH='.:tests' python -m pytest -r s
+        if [[ "${{ matrix.env.PROJECT }}" != "" ]]; then
+          pushd ../${{ matrix.env.PROJECT }}
+          python -m pytest -vl
+          TEST_RETURN_CODE=$?
+          popd
+          if [[ "$TEST_RETURN_CODE" != "0" ]]; then
+            exit $TEST_RETURN_CODE
+          fi
+        fi
+
+    - name: Upload coverage to Codecov
+      if: success()
+      run: |
+        pip install coverage codecov
+        coverage combine --append
+        codecov
+```

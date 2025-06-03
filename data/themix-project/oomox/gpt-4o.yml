@@ -1,0 +1,44 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    services:
+      docker:
+        image: docker:stable-dind
+    strategy:
+      matrix:
+        pyver: [python36_ubuntu_1804, current_arch]
+        skip_shellcheck: [1, 0]
+        skip_mypy: [1, 0]
+        skip_vulture: [1, 0]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          submodules: false
+
+      - name: Move Dockerfiles
+        run: mv ./dockerfiles/* ./
+
+      - name: Build Docker image
+        run: docker build . -f Dockerfile_${{ matrix.pyver }} -t oomox
+
+      - name: Run CI script
+        run: |
+          docker run \
+            -e SKIP_SHELLCHECK=${{ matrix.skip_shellcheck }} \
+            -e SKIP_MYPY=${{ matrix.skip_mypy }} \
+            -e SKIP_VULTURE=${{ matrix.skip_vulture }} \
+            oomox:latest \
+            ./maintenance_scripts/run_ci.sh
+```

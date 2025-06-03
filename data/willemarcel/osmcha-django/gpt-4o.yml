@@ -1,0 +1,64 @@
+```yaml
+name: Python application
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:9.5
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: osmcha
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    strategy:
+      matrix:
+        python-version: [3.8, 3.7, 3.6, 3.5]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y postgresql-9.5-postgis-2.4 binutils libproj-dev python3-gdal libgeos-dev libyaml-dev libgnutls28-dev
+        pip install coveralls
+        pip install -r requirements/test.txt
+
+    - name: Set up Postgres
+      run: |
+        psql -c 'CREATE EXTENSION postgis;' -U postgres -d osmcha
+        psql -c 'CREATE EXTENSION postgis_topology;' -U postgres -d osmcha
+
+    - name: Run tests
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost/osmcha
+      run: |
+        coverage run manage.py test --settings=config.settings.tests
+
+    - name: Coveralls
+      if: success()
+      run: coveralls
+```

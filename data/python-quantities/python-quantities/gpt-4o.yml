@@ -1,0 +1,97 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [2.7, 3.4, 3.5, 3.6, 3.7, 3.8]
+        numpy-version: 
+          - "1.8.2"
+          - "1.9.3"
+          - "1.10.4"
+          - "1.11.3"
+          - "1.12.1"
+          - "1.13.3"
+          - "1.14.5"
+          - "1.15.1"
+          - "1.15.4"
+          - "1.16.1"
+          - "1.17.2"
+      exclude:
+        - python-version: 3.4
+          numpy-version: "1.15.1"
+        - python-version: 3.4
+          numpy-version: "1.15.4"
+        - python-version: 3.4
+          numpy-version: "1.16.1"
+        - python-version: 3.4
+          numpy-version: "1.17.2"
+        - python-version: 3.5
+          numpy-version: "1.15.1"
+        - python-version: 3.5
+          numpy-version: "1.15.4"
+        - python-version: 3.5
+          numpy-version: "1.16.1"
+        - python-version: 3.5
+          numpy-version: "1.17.2"
+        - python-version: 3.6
+          numpy-version: "1.15.1"
+        - python-version: 3.6
+          numpy-version: "1.17.2"
+        - python-version: 3.7
+          numpy-version: "1.8.2"
+        - python-version: 3.7
+          numpy-version: "1.9.3"
+        - python-version: 3.7
+          numpy-version: "1.10.4"
+        - python-version: 3.7
+          numpy-version: "1.11.3"
+        - python-version: 3.7
+          numpy-version: "1.12.1"
+        - python-version: 3.7
+          numpy-version: "1.13.3"
+        - python-version: 3.8
+          numpy-version: "1.8.2"
+        - python-version: 3.8
+          numpy-version: "1.9.3"
+        - python-version: 3.8
+          numpy-version: "1.10.4"
+        - python-version: 3.8
+          numpy-version: "1.11.3"
+        - python-version: 3.8
+          numpy-version: "1.12.1"
+        - python-version: 3.8
+          numpy-version: "1.13.3"
+        - python-version: 3.8
+          numpy-version: "1.14.5"
+        - python-version: 3.8
+          numpy-version: "1.15.1"
+        - python-version: 3.8
+          numpy-version: "1.15.4"
+        - python-version: 3.8
+          numpy-version: "1.16.1"
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        pip install numpy==${{ matrix.numpy-version }}
+        pip install .
+    - name: Test with setup.py
+      run: |
+        python setup.py test
+        python -m doctest README.rst
+```

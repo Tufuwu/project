@@ -1,0 +1,55 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+        ffmpeg-version: [4.3, 4.2, 4.1, 4.0.2, 3.4, 3.2.4]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get -y install gpac
+        bash .travis_dependencies.sh
+        pip install -e .[tests]
+
+    - name: Run tests
+      run: |
+        python --version
+        py.test tests
+
+    - name: After success
+      if: success()
+      run: pip uninstall -y stempeg
+
+    - name: After failure
+      if: failure()
+      run: pip uninstall -y stempeg
+```

@@ -1,0 +1,127 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+env:
+  MAKEFLAGS: "-j 2"
+  NXDRIVE_TEST_NUXEO_URL: "https://nuxeo-drive-preview.platform.dev.nuxeo.com/nuxeo"
+  RELEASE_TYPE: "alpha"
+
+jobs:
+  build-linux:
+    name: GNU/Linux [.AppImage]
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:stable
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup SSH
+        run: |
+          echo "${{ secrets.SSH_PRIV_KEY }}" | base64 --decode > private.key
+          chmod 0600 private.key
+          eval "$(ssh-agent -s)"
+          ssh-add private.key
+          rm private.key
+      - name: Configure Git
+        run: |
+          git config user.email "maintainers-python+travis@nuxeo.com"
+          git config user.name "GitHub Actions bot"
+          git fetch --unshallow --tags
+      - name: Bump Alpha Version
+        run: bash tools/bump-alpha-version.sh
+      - name: Run Build Script
+        run: bash tools/linux/travis.sh
+      - name: Cancel Release on Failure
+        if: failure()
+        run: bash tools/release.sh --cancel
+
+  build-macos:
+    name: macOS [.dmg]
+    runs-on: macos-10.15
+    env:
+      KEYCHAIN_PATH: "~/Library/Keychains/drive.keychain-db"
+      SIGNING_ID: "NUXEO CORP"
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup SSH
+        run: |
+          echo "${{ secrets.SSH_PRIV_KEY }}" | base64 --decode > private.key
+          chmod 0600 private.key
+          eval "$(ssh-agent -s)"
+          ssh-add private.key
+          rm private.key
+      - name: Configure Git
+        run: |
+          git config user.email "maintainers-python+travis@nuxeo.com"
+          git config user.name "GitHub Actions bot"
+          git fetch --unshallow --tags
+      - name: Bump Alpha Version
+        run: bash tools/bump-alpha-version.sh
+      - name: Run Build Script
+        run: bash tools/macos/travis.sh
+      - name: Cancel Release on Failure
+        if: failure()
+        run: bash tools/release.sh --cancel
+
+  build-windows:
+    name: Windows [.exe]
+    runs-on: windows-latest
+    env:
+      INNO_SETUP_VERSION: "6.1.2"
+      MSBUILD_PATH: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\BuildTools\\MSBuild\\15.0\\Bin"
+      SIGNING_ID: "Nuxeo"
+      SIGNTOOL_PATH: "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\x86"
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup SSH
+        run: |
+          echo "${{ secrets.SSH_PRIV_KEY }}" | base64 --decode > private.key
+          chmod 0600 private.key
+          eval "$(ssh-agent -s)"
+          ssh-add private.key
+          rm private.key
+      - name: Configure Git
+        run: |
+          git config user.email "maintainers-python+travis@nuxeo.com"
+          git config user.name "GitHub Actions bot"
+          git fetch --unshallow --tags
+      - name: Bump Alpha Version
+        run: bash tools/bump-alpha-version.sh
+      - name: Run Build Script
+        run: bash tools/windows/travis.sh
+      - name: Cancel Release on Failure
+        if: failure()
+        run: bash tools/release.sh --cancel
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup SSH
+        run: |
+          echo "${{ secrets.TRAVIS_DEPLOY_KEY }}" | base64 --decode > private.key
+          chmod 0600 private.key
+          eval "$(ssh-agent -s)"
+          ssh-add private.key
+          rm private.key
+      - name: Configure Git
+        run: |
+          git config user.email "maintainers-python+travis@nuxeo.com"
+          git config user.name "GitHub Actions bot"
+          git remote set-url origin git@github.com:nuxeo/nuxeo-drive.git
+      - name: Publish Release
+        run: bash tools/release.sh --publish "$RELEASE_TYPE"
+      - name: Create Release
+        run: bash tools/release.sh --create "$RELEASE_TYPE"
+      - name: Cancel Release on Failure
+        if: failure()
+        run: bash tools/release.sh --cancel
+```

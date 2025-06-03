@@ -1,0 +1,96 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  setup:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Setup MySQL repositories
+        run: |
+          wget -c 'https://repo.mysql.com/mysql-apt-config_0.8.13-1_all.deb'
+          echo "mysql-apt-config mysql-apt-config/select-server select $MYSQL_VERSION" | sudo debconf-set-selections
+          echo "mysql-apt-config mysql-apt-config/select-tools select Enabled" | sudo debconf-set-selections
+          echo "mysql-apt-config mysql-apt-config/select-product select Ok" | sudo debconf-set-selections
+          echo "mysql-apt-config mysql-apt-config/tools-component string mysql-tools" | sudo debconf-set-selections
+          sudo dpkg -i mysql-apt-config_0.8.13-1_all.deb
+          wget https://repo.percona.com/apt/percona-release_latest.$(lsb_release -sc)_all.deb
+          sudo dpkg -i percona-release_latest.$(lsb_release -sc)_all.deb
+          sudo percona-release enable-only tools
+          sudo apt update
+
+      - name: Install dependencies
+        run: |
+          sudo apt install -y libsnappy-dev
+          sudo apt-get install -q -y --allow-unauthenticated -o Dpkg::Options::=--force-confnew mysql-server percona-xtrabackup-80
+          mysqld --version
+          pip install -r requirements.txt
+          pip install -r requirements.dev.txt
+          pip install -e .
+
+  lint:
+    needs: setup
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: [3.6]
+        include:
+          - name: fmt
+            script: |
+              make fmt
+              if [ $(git diff --name-only --diff-filter=ACMR | wc -l ) != 0 ]; then
+                echo "Reformatting failed! Please run make fmt on your commits and resubmit!" 1>&2 ;
+                git diff ;
+                exit 1 ;
+              fi
+          - name: typecheck
+            script: make typecheck
+          - name: copyright
+            script: make copyright
+          - name: lint
+            script: make lint
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run ${{ matrix.name }}
+        run: ${{ matrix.script }}
+
+  unittest:
+    needs: setup
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run unittests
+        run: make unittest
+```

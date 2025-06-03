@@ -1,0 +1,43 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8, pypy3]
+        include:
+          - python-version: 3.7
+            env: TOX_SUFFIX: lint
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        openssl version
+        sudo apt-get install libgnutls28-dev
+        pip install tox-travis codecov
+        if [ "${{ matrix.env.TOX_SUFFIX }}" != "lint" ]; then python setup.py install; fi
+
+    - name: Run tests
+      run: tox
+
+    - name: Upload coverage to Codecov
+      if: success()
+      uses: codecov/codecov-action@v2
+```

@@ -14,18 +14,15 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', 'pypy-3.8']
-        include:
-          - python-version: '3.9'
-            allow-failure: true
-
+        python-version: [3.6, 3.7, 3.8, 3.9-dev, pypy3]
+        allow_failures:
+          - python-version: 3.9-dev
     steps:
-    - uses: actions/checkout@v2
-
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+        architecture: arm64
 
     - name: Install dependencies
       run: |

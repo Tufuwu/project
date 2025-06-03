@@ -1,0 +1,83 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.7', '3.8-dev']
+        allow_failures: ['3.8-dev']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libpng16-16 libssl1.1
+        make install
+        pip freeze
+
+    - name: Lint
+      run: make lint
+
+    - name: Test
+      run: make test
+
+    - name: Benchmark
+      run: make benchmark
+
+    - name: Check tag
+      run: ./tests/check_tag.py
+
+    - name: Print version
+      run: python -c "import pydf; print(pydf.get_version())"
+
+    - name: Upload coverage to Codecov
+      if: success()
+      run: bash <(curl -s https://codecov.io/bash)
+
+    - name: List files
+      if: success()
+      run: ls -lha
+
+  deploy:
+    runs-on: ubuntu-20.04
+    needs: build
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.6
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.6'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libpng16-16 libssl1.1
+        make install
+
+    - name: Build and publish
+      env:
+        TWINE_USERNAME: samuelcolvin
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        python setup.py sdist bdist_wheel
+        twine upload dist/*
+```

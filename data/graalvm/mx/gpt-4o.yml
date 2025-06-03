@@ -1,0 +1,46 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.6
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.6
+
+    - name: Install dependencies
+      run: |
+        pip install pylint==2.4
+        pylint --version
+
+    - name: Install OpenJDK 8
+      run: sudo apt-get install -y openjdk-8-jdk
+
+    - name: Download and extract Eclipse
+      run: |
+        ECLIPSE_TAR=$GITHUB_WORKSPACE/../eclipse.tar.gz
+        wget https://archive.eclipse.org/eclipse/downloads/drops4/R-4.5.2-201602121500/eclipse-SDK-4.5.2-linux-gtk-x86_64.tar.gz -O $ECLIPSE_TAR
+        tar -C $GITHUB_WORKSPACE/.. -xf $ECLIPSE_TAR
+        export ECLIPSE_EXE=$GITHUB_WORKSPACE/../eclipse/eclipse
+
+    - name: Download JDT
+      run: |
+        JDT=$GITHUB_WORKSPACE/ecj.jar
+        wget https://www.eclipse.org/downloads/download.php?file=/eclipse/downloads/drops4/R-4.5.2-201602121500/ecj-4.5.2.jar -O $JDT
+
+    - name: Run script
+      run: ./mx --strict-compliance gate --strict-mode
+```

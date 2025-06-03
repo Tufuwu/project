@@ -1,0 +1,50 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:stable-dind
+        options: --privileged
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.6
+
+    - name: Increase vm.max_map_count
+      run: sudo sysctl -w vm.max_map_count=262144
+
+    - name: Restart Docker
+      run: sudo service docker restart
+
+    - name: Pull CentOS 7 Docker image
+      run: docker pull centos:7
+
+    - name: List Docker images
+      run: docker images
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run tests
+      run: |
+        VERSION=$(curl -s https://crate.io/versions.json | grep crate_testing | tr -d '" ' | cut -d ":" -f2)
+        ./update.py --cratedb-version ${VERSION} > Dockerfile
+        PATH_TO_IMAGE=. zope-testrunner --path . -s tests --color
+```

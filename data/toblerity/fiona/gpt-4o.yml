@@ -1,0 +1,123 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        python-version: [2.7, 3.6, 3.7, 3.8]
+        gdal-version: [1.11.5, 2.0.3, 2.1.4, 2.2.4, 2.3.3, 2.4.4, 3.0.4, 3.1.3, master]
+        proj-version: [4.8.0, 4.9.3, 6.2.1, 6.3.2, 7.0.1]
+      exclude:
+        - python-version: 2.7
+          gdal-version: 1.11.5
+        - python-version: 2.7
+          gdal-version: 2.0.3
+        - python-version: 2.7
+          gdal-version: 2.1.4
+        - python-version: 2.7
+          gdal-version: 2.2.4
+        - python-version: 2.7
+          gdal-version: 2.3.3
+        - python-version: 2.7
+          gdal-version: 2.4.4
+        - python-version: 2.7
+          gdal-version: 3.0.4
+        - python-version: 3.7
+          gdal-version: 1.11.5
+        - python-version: 3.7
+          gdal-version: 2.0.3
+        - python-version: 3.7
+          gdal-version: 2.1.4
+        - python-version: 3.7
+          gdal-version: 2.2.4
+        - python-version: 3.7
+          gdal-version: 2.3.3
+        - python-version: 3.7
+          gdal-version: 2.4.4
+        - python-version: 3.7
+          gdal-version: 3.0.4
+        - python-version: 3.8
+          gdal-version: 1.11.5
+        - python-version: 3.8
+          gdal-version: 2.0.3
+        - python-version: 3.8
+          gdal-version: 2.1.4
+        - python-version: 3.8
+          gdal-version: 2.2.4
+        - python-version: 3.8
+          gdal-version: 2.3.3
+        - python-version: 3.8
+          gdal-version: 2.4.4
+        - python-version: 3.8
+          gdal-version: 3.0.4
+    env:
+      PIP_WHEEL_DIR: ${{ github.workspace }}/.cache/pip/wheels
+      PIP_FIND_LINKS: file://${{ github.workspace }}/.cache/pip/wheels
+      GDALINST: ${{ github.workspace }}/gdalinstall
+      GDALBUILD: ${{ github.workspace }}/gdalbuild
+      PROJINST: ${{ github.workspace }}/gdalinstall
+      PROJBUILD: ${{ github.workspace }}/projbuild
+      FILEGDB: ${{ github.workspace }}/gdalinstall/filegdb
+      CYTHON_COVERAGE: "true"
+      MAKEFLAGS: "-j 2"
+      CXXFLAGS: "-O0"
+      CFLAGS: "-O0"
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libatlas-dev libatlas-base-dev gfortran libsqlite3-dev sqlite3
+        python -m pip install -U pip
+        python -m pip install -r requirements-ci.txt
+        python -m pip wheel -r requirements-dev.txt
+        python -m pip install -r requirements-dev.txt
+    - name: Set environment variables
+      run: |
+        echo "PATH=${{ env.GDALINST }}/gdal-${{ matrix.gdal-version }}/bin:${{ env.GDALINST }}/proj-${{ matrix.proj-version }}/bin:$PATH" >> $GITHUB_ENV
+        echo "LD_LIBRARY_PATH=${{ env.GDALINST }}/gdal-${{ matrix.gdal-version }}/lib:${{ env.GDALINST }}/proj-${{ matrix.proj-version }}/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+    - name: Install GDAL and PROJ
+      run: |
+        . ./scripts/travis_proj_install.sh
+        . ./scripts/travis_filegdb_install.sh
+        . ./scripts/travis_gdal_install.sh
+        export GDAL_DATA=${{ env.GDALINST }}/gdal-${{ matrix.gdal-version }}/share/gdal
+        export PROJ_LIB=${{ env.GDALINST }}/gdal-${{ matrix.gdal-version }}/share/proj
+        gdal-config --version
+    - name: Install package
+      run: |
+        if [ "${{ matrix.gdal-version }}" = "master" ]; then echo "Using gdal master"; elif [ $(gdal-config --version) == $(sed 's/[a-zA-Z].*//g' <<< ${{ matrix.gdal-version }}) ]; then echo "Using gdal ${{ matrix.gdal-version }}"; else echo "NOT using gdal ${{ matrix.gdal-version }} as expected; aborting"; exit 1; fi
+        GDAL_CONFIG=${{ env.GDALINST }}/gdal-${{ matrix.gdal-version }}/bin/gdal-config python -m pip install --no-deps --force-reinstall --no-use-pep517 -e .
+        python -m pip freeze
+        fio --version
+        fio --gdal-version
+        python -c "import fiona; fiona.show_versions()"
+        python scripts/check_deprecated.py
+    - name: Run tests
+      run: python -m pytest -m "not wheel" --cov fiona --cov-report term-missing
+    - name: Clean up
+      run: python setup.py clean
+    - name: Upload coverage to Coveralls
+      run: coveralls || echo "!! intermittent coveralls failure"
+```

@@ -1,0 +1,93 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.8]
+        job: [UNITTEST, DOCS, LINT]
+        full-deps: [true, false]
+      exclude:
+        - python-version: 3.6
+          job: DOCS
+        - python-version: 3.6
+          job: LINT
+        - python-version: 3.8
+          job: LINT
+          full-deps: true
+        - python-version: 3.8
+          job: DOCS
+          full-deps: false
+        - python-version: 3.8
+          job: UNITTEST
+          full-deps: false
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Miniconda
+      shell: bash
+      run: |
+        wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+        bash miniconda.sh -b -p $HOME/miniconda
+        echo "$HOME/miniconda/bin" >> $GITHUB_PATH
+        conda config --set always_yes yes --set changeps1 no
+        conda update -q conda
+        conda info -a
+
+    - name: Create conda environment
+      shell: bash
+      run: |
+        conda create -q -n mizani-test python=${{ matrix.python-version }}
+        source activate mizani-test
+        if [ "${{ matrix.full-deps }}" = "true" ]; then
+          conda install scipy pandas matplotlib
+          pip install palettable
+        fi
+        if [ "${{ matrix.job }}" = "UNITTEST" ]; then
+          conda install pytest-cov
+          pip install coveralls
+        elif [ "${{ matrix.job }}" = "DOCS" ]; then
+          pip install -r requirements/doc.txt
+        elif [ "${{ matrix.job }}" = "LINT" ]; then
+          pip install flake8
+        fi
+        conda list
+        pip list
+
+    - name: Run script
+      shell: bash
+      run: |
+        source activate mizani-test
+        if [ "${{ matrix.job }}" = "UNITTEST" ]; then
+          coverage erase
+          make test
+        elif [ "${{ matrix.job }}" = "DOCS" ]; then
+          pushd doc
+          SPHINXOPTS=-W
+          make html && popd
+        elif [ "${{ matrix.job }}" = "LINT" ]; then
+          make lint
+
+    - name: Upload coverage to Coveralls
+      if: matrix.job == 'UNITTEST'
+      shell: bash
+      run: |
+        source activate mizani-test
+        coveralls --rcfile=.coveragerc
+```

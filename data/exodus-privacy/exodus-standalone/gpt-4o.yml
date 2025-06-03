@@ -8,13 +8,13 @@ on:
 
 jobs:
   flake8:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
-        python-version: ['3.7']
+        python-version: ["3.7"]
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
@@ -24,7 +24,7 @@ jobs:
         run: flake8
 
   dockerfile_lint:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
       - name: Lint Dockerfile

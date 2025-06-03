@@ -1,0 +1,80 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+        db-type: [postgres, mysql]
+    env:
+      PW_TEST_DB_PASS: ""
+      PW_TEST_DB_HOST: "localhost"
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+        options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=3
+        ports:
+          - 3306:3306
+      postgres:
+        image: postgres:9.6
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        pip install tox-travis
+        pip install codecov
+
+    - name: Create database
+      run: |
+        if [ "${{ matrix.db-type }}" == "mysql" ]; then
+          mysql -h 127.0.0.1 -P 3306 -u root -e "create database patchwork character set utf8;";
+        elif [ "${{ matrix.db-type }}" == "postgres" ]; then
+          psql -h 127.0.0.1 -p 5432 -U postgres -c "create database patchwork with ENCODING = 'UTF8';";
+        fi
+      env:
+        PW_TEST_DB_USER: ${{ matrix.db-type == 'mysql' && 'root' || 'postgres' }}
+
+    - name: Run tests
+      run: |
+        if [ "${{ matrix.db-type }}" == "mysql" ]; then
+          mysql -h 127.0.0.1 -P 3306 -u root -e "SELECT VERSION(), CURRENT_USER();" patchwork;
+        else
+          psql -h 127.0.0.1 -p 5432 -U postgres -c "SELECT VERSION(), CURRENT_USER, current_database()" patchwork;
+        fi
+        tox
+      env:
+        PW_TEST_DB_USER: ${{ matrix.db-type == 'mysql' && 'root' || 'postgres' }}
+
+    - name: Upload coverage to Codecov
+      run: codecov
+      if: success()
+```

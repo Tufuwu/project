@@ -1,0 +1,68 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6]
+        odoo-repo: ["odoo/odoo", "OCA/OCB"]
+    env:
+      VERSION: "14.0"
+      TESTS: "0"
+      LINT_CHECK: "0"
+      MAKEPOT: "0"
+      MQT_DEP: PIP
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Cache pre-commit
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pre-commit
+          key: ${{ runner.os }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pre-commit-
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y expect-dev
+          git clone --depth=1 https://github.com/OCA/maintainer-quality-tools.git $HOME/maintainer-quality-tools
+          echo "$HOME/maintainer-quality-tools/travis" >> $GITHUB_PATH
+          travis_install_nightly
+
+      - name: Run tests
+        env:
+          TESTS: "1"
+          ODOO_REPO: ${{ matrix.odoo-repo }}
+          MAKEPOT: ${{ matrix.odoo-repo == 'odoo/odoo' && '1' || '0' }}
+        run: travis_run_tests
+
+      - name: After success
+        if: success()
+        run: travis_after_tests_success
+```

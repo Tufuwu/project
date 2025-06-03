@@ -1,0 +1,48 @@
+```yaml
+name: CI
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
+        platform: [mac, windows]
+      exclude:
+        - os: macos-latest
+          platform: windows
+        - os: windows-latest
+          platform: mac
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Build PySoar
+      run: ./build_pysoar
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: PySoar/dist/${{ matrix.platform }}_pysoar.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
