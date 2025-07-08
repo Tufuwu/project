@@ -40,12 +40,12 @@ def creat_deepseek_model(api_token,prompt):
 def gpt_token():
 
     load_dotenv()
-    api_key = os.getenv("GITHUB_TOKEN")
+    api_key = os.getenv("OPENAI_API_KEY")
     return api_key
 
 def deepseek_token():
     
     load_dotenv()
-    api_key = os.getenv("GITHUB_TOKEN")
+    api_key = os.getenv("DEEPSEEK_API_KEY")
     return api_key
 
