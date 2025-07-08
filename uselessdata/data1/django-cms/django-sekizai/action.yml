@@ -1,3 +1,0 @@
-name: CodeCov tests
-
-on: [push, pull_request]

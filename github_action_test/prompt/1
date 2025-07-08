@@ -1,9 +1,0 @@
-This GitHub Actions workflow file produced the following error after execution. Please correct the configuration file.
-here are the contents of the GitHub Actions workflow file
-```
-{sourcefile_content}
-```
-here are the contents of the error message
-```
-{error_message}
-```
