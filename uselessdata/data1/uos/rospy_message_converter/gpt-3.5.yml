@@ -1,0 +1,33 @@
+name: ROS Message Converter
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        ros_distro: ['kinetic', 'melodic', 'noetic']
+        python_version: ['3.9', '3.10']
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python_version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python_version }}
+
+    - name: Set up ROS ${{ matrix.ros_distro }}
+      run: sudo sh -c "echo \"deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main\" > /etc/apt/sources.list.d/ros-latest.list"
+      
+    - name: Install ROS dependencies
+      run: sudo apt update && sudo apt install -y ros-${{ matrix.ros_distro }}-ros-base
+
+    - name: Build Docker image
+      run: docker build -t rospy_message_converter_${{ matrix.ros_distro }} -f Dockerfile-${{ matrix.ros_distro }} .
+
+    - name: Run tests
+      run: docker run rospy_message_converter_${{ matrix.ros_distro }} /bin/bash -c "source devel/setup.bash && CTEST_OUTPUT_ON_FAILURE=1 catkin_make test && roscd rospy_message_converter && '${{ matrix.python_version }}' src/rospy_message_converter/json_message_converter.py && '${{ matrix.python_version }}' src/rospy_message_converter/message_converter.py"

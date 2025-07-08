@@ -1,0 +1,50 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+    tags: true
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.7', '3.8', '3.9']
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: pip install .[test]
+
+      - name: Run script
+        run: echo hello world
+
+  deploy:
+    runs-on: ubuntu-18.04
+    needs: build
+    if: github.ref == 'refs/heads/master' && startsWith(github.ref, 'refs/tags/') && env.UPLOAD == 'True'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Deploy to PyPI
+        uses: pypa/gh-action-pypi-publish@v1.4.0
+        with:
+          username: mara-pypi-upload-account
+          password: ${{ secrets.PYPI_PASSWORD }}
+```

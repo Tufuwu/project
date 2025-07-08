@@ -1,0 +1,55 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install system dependencies
+      run: sudo apt-get update
+
+    - name: Install Miniconda
+      run: |
+        wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+        bash miniconda.sh -b -p $HOME/miniconda
+        echo "$HOME/miniconda/bin" >> $GITHUB_PATH
+
+    - name: Configure conda
+      run: |
+        conda config --set always_yes yes --set changeps1 no
+        conda update -q conda
+        conda info -a
+
+    - name: Create conda environment
+      run: |
+        conda create -q -n test-environment python=${{ matrix.python-version }} scipy>=0.19.0 numpy>=1.15.4 matplotlib>=3.0.2
+        source activate test-environment
+
+    - name: Install Python dependencies
+      run: |
+        pip install coverage coveralls hypothesis pytest pytest-cov
+        if [[ "${{ matrix.python-version }}" == '3.9' ]]; then pip install black; fi
+
+    - name: Run tests
+      run: |
+        python setup.py develop
+        pytest --cov=nashpy tests/
+        coverage report -m
+        if [[ "${{ matrix.python-version }}" == '3.9' ]]; then black -l 80 . --check; fi
+        python doctests.py
+
+    - name: Upload coverage to Coveralls
+      run: coveralls
+```

@@ -1,0 +1,49 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+    - main
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - name: Set up npm cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.npm"
+        key: "${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}"
+        restore-keys: "${{ runner.os }}-node-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.9'
+    - run: nvm install 10.23.0
+    - run: nvm use 10.23.0
+    - run: pip install -r dev-requirements.txt
+    - run: npm install
+    - run: wget --no-check-certificate "https://docs.google.com/uc?export=download&id=1E8zboqLDRdufXnXZJUrLnSLih_ATaekO" -O api.zip
+    - run: unzip api.zip
+    - run: psql -c 'create database travis_ci_test;' -U postgres
+    - run: flask sql init
+    - run: flask redis update
+    - run: npm run build
+    - run: pre-commit run --all-files --show-diff-on-failure
+    - run: pytest
+    services:
+      postgresql:
+        image: postgres
+      redis:
+        image: redis
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5

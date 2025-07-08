@@ -1,0 +1,24 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        TOXENV: [
+          py39-pip90-toml, py39-pip191-toml, py39-pip192-toml, py39-pip193-toml, py39-pip200-toml,
+          py39-pip201-toml, py39-piplatest-toml, py39-pipgit-toml, py39-pip90-pytoml,
+          py39-piplatest-pytoml, py39-pipgit-pytoml
+        ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Docker
+      run: docker pull fedorapython/fedora-python-tox
+
+    - name: Run tests
+      run: docker run --rm -it -v $PWD:/src -w /src -e TOXENV fedorapython/fedora-python-tox

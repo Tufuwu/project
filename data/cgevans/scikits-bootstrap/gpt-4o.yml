@@ -1,0 +1,62 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.5, 3.6, 3.7, 3.8, 3.9, pypy3]
+        include:
+          - python-version: 3.5
+            deps: numpy
+          - python-version: 3.6
+            deps: numpy
+          - python-version: 3.7
+            deps: numpy
+          - python-version: 3.7
+            deps: numpy pandas
+          - python-version: 3.8
+            deps: numpy
+          - python-version: 3.8
+            deps: numpy pandas
+          - python-version: 3.9
+            deps: numpy
+          - python-version: 3.9
+            deps: numpy pandas
+          - python-version: pypy3
+            deps: numpy
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        if [[ ${{ matrix.python-version }} != 'pypy3' ]]; then
+          python -m pip install --only-binary=numpy,scipy ${{ matrix.deps }}
+        else
+          python -m pip install ${{ matrix.deps }}
+          python -m pip install nose
+        fi
+    - name: Install package
+      run: python setup.py install
+    - name: Test with nosetests
+      run: |
+        if [[ ${{ matrix.python-version }} != 'pypy3' ]]; then
+          nosetests --nologcapture
+        else
+          python -mnose
+        fi
+```

@@ -1,0 +1,53 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+#     # This item has no matching transformer
+#     - apt:
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: ".tox"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.8
+    - run: sudo apt-get update -qq
+    - run: sudo apt-get install -qq $APT
+    - run: pip install pip wheel
+    - run: pip install tox-travis
+    - run: pip install -q coveralls flake8 tox
+    - run: env | sort
+    - run: tox
+    - run: flake8 --show-source --max-line-length=80 --exclude=.tox,docs,django_comments_xtd/tests,django_comments_xtd/__init__.py,django_comments_xtd/migrations django_comments_xtd/
+    - run: coveralls
+      if: "${{ success() }}"
+    - run: cat /home/travis/.pip/pip.log
+      if: "${{ failure() }}"
+    strategy:
+      matrix:
+        DJANGO:
+        - '2.0'
+        - '2.1'
+        - '2.2'
+        - '3.0'
+        - '3.1'
+    env:
+      DJANGO: "${{ matrix.DJANGO }}"

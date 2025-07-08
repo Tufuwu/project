@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -e .
+        pip install git+https://github.com/cortex-lab/phylib
+    - name: Prepare environment
+      run: |
+        echo "exec('from oneibl.one import ONE; ONE(silent=True)')" | python
+        echo "IBLFLATIRONPASS=${{ secrets.IBLFLATIRONPASS }}" >> $GITHUB_ENV
+        sed -i "s|null|\"${{ env.IBLFLATIRONPASS }}\"|g" ~/.one_params
+    - name: Run tests
+      run: |
+        bash ./run_tests
+        flake8 .

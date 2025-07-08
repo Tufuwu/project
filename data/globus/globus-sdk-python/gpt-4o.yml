@@ -1,0 +1,73 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: [2.7, 3.5, 3.6, 3.7, 3.8, pypy]
+        include:
+          - os: windows-latest
+            python-version: 2.7
+            env: TOXENV=py
+          - os: windows-latest
+            python-version: 3.8
+            env: TOXENV=py
+          - os: macos-latest
+            python-version: 2.7
+            env: TOXENV=py2
+          - os: macos-latest
+            python-version: 3.7
+            env: TOXENV=py3
+          - os: ubuntu-latest
+            python-version: 3.6
+            env: TOXENV=lint
+          - os: ubuntu-latest
+            python-version: 3.6
+            env: TOXENV=docs
+      exclude:
+        - os: ubuntu-latest
+          python-version: 2.7
+        - os: ubuntu-latest
+          python-version: 3.5
+        - os: ubuntu-latest
+          python-version: 3.6
+        - os: ubuntu-latest
+          python-version: 3.7
+        - os: ubuntu-latest
+          python-version: 3.8
+        - os: ubuntu-latest
+          python-version: pypy
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            choco install python${{ matrix.python-version }}
+            python -m pip install --upgrade pip wheel
+          fi
+          pip install -e '.[development]'
+
+      - name: Run tests
+        run: tox
+        env:
+          TOXENV: ${{ matrix.env }}
+```

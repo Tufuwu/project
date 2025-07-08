@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 10
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git build-essential automake libtool python3-dev gettext swig
+        pip install flake8
+
+    - name: Run flake8
+      run: |
+        flake8 --version
+        echo compiling AutoBouquetsMaker enigma2 plugin
+        python -m compileall .
+        find . -type f -name "*.po" -exec msgfmt {} -o {}.mo \;
+        flake8 --ignore=W191,E128,E501,E722 . --exit-zero
+        echo done.

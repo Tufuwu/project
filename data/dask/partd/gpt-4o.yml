@@ -1,0 +1,51 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.5, 3.6, 3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+        bash miniconda.sh -b -p $HOME/miniconda
+        export PATH="$HOME/miniconda/bin:$PATH"
+        conda config --set always_yes yes --set changeps1 no
+        conda update conda
+        conda create -n test-environment python=${{ matrix.python-version }}
+        source activate test-environment
+        conda install pytest locket numpy toolz pandas blosc pyzmq -c conda-forge
+        python setup.py install
+
+    - name: Test with pytest
+      run: |
+        source activate test-environment
+        if [ "${{ matrix.python-version }}" == "3.7" ]; then
+          py.test partd --doctest-modules --verbose
+        else
+          py.test partd --verbose
+        fi
+
+    - name: Disable email notifications
+      if: always()
+      run: echo "No email notifications configured"
+```

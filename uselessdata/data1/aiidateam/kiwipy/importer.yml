@@ -1,0 +1,68 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: "${{ matrix.python }}"
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - run: apt-get -y install rabbitmq-server
+    - run: pip install .[rmq,dev]
+    - run: pip install flake8
+    - run: pip install codecov
+    - run: flake8 . --count --select=E901,E999,F821,F822,F823 --show-source --statistics
+    - run: flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - run: pytest --cov=kiwipy -p no:nb_regression test
+    - run: coverage report
+      if: "${{ success() }}"
+    - run: codecov
+      if: "${{ success() }}"
+    strategy:
+      matrix:
+        python:
+        - 3.5
+        - 3.6
+        - 3.7
+        - 3.8
+  docs_test:
+    needs:
+    - test
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: apt-get -y install pandoc
+    - run: pip install .[rmq,dev,docs]
+    - run: pip install flake8
+    - run: flake8 . --count --select=E901,E999,F821,F822,F823 --show-source --statistics
+    - run: flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - run: sphinx-build -nT -b dummy docs/source build/html
+    - run: coverage report
+      if: "${{ success() }}"
+    - run: codecov
+      if: "${{ success() }}"

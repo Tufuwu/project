@@ -1,0 +1,76 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            gromacs_version: 4.6.5
+            python_version: '3.9'
+            numpy_version: stable
+          - os: ubuntu-latest
+            gromacs_version: 2018.6
+            python_version: '3.9'
+            numpy_version: stable
+          - os: ubuntu-latest
+            gromacs_version: 2019.1
+            python_version: '3.9'
+            numpy_version: stable
+          - os: ubuntu-latest
+            gromacs_version: 2019.1
+            python_version: '3.10'
+            numpy_version: stable
+          - os: ubuntu-latest
+            gromacs_version: 2018.6
+            python_version: '3.9'
+            numpy_version: stable
+            setup_cmd: "${PYTEST_FLAGS} --link-gmx-mpi --no-append-suffix"
+          - os: macos-latest
+            gromacs_version: 4.6.5
+            python_version: '3.9'
+            numpy_version: stable
+          - os: macos-latest
+            gromacs_version: 2019.1
+            python_version: '3.9'
+            numpy_version: stable
+          - os: macos-latest
+            gromacs_version: 2019.1
+            python_version: '3.10'
+            numpy_version: stable
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python_version }}
+
+      - name: Install dependencies
+        run: |
+          git clone --depth 1 git://github.com/astropy/ci-helpers.git
+          source ci-helpers/travis/setup_conda.sh
+          eval $BUILD_CMD
+
+      - name: Run tests
+        run: |
+          if [[ ${{ matrix.os }} == 'macos-latest' ]]; then ulimit -S -n 2048; fi
+          echo $MAIN_CMD $SETUP_CMD
+          eval $MAIN_CMD $SETUP_CMD
+
+      - name: Upload coverage to Codecov
+        if: success() && env.CODECOV == 'true'
+        uses: codecov/codecov-action@v2
+```

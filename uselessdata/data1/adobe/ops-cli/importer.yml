@@ -1,0 +1,44 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+    - master
+    - "/\\d+\\.\\d+/"
+    - "/\\d+\\.\\d+\\.\\d+/"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: pip install -r requirements.txt
+    - run: bash build_scripts/freeze_requirements.sh
+    - run: bash build_scripts/build_package.sh
+    - run: pip install --no-cache-dir dist/ops*.tar.gz && ops --verbose -h
+    - run: while sleep 5m; do echo "=====[ $SECONDS seconds still running ]====="; done &
+    - run: docker build -f build_scripts/Dockerfile -t ops .
+    - run: kill %1
+    - run: git add requirements.txt
+    - uses: softprops/action-gh-release@v0.1.15
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        GITHUB_REPOSITORY: "${{ github.repository }}"
+      with:
+        files: dist/**/*
+      if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+    - run: bash build_scripts/docker_push.sh
+      if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+    strategy:
+      matrix:
+        BOTO_CONFIG:
+        - "/dev/null"
+    services:
+#       # This item has no matching transformer
+#       docker:
+    env:
+      BOTO_CONFIG: "${{ matrix.BOTO_CONFIG }}"

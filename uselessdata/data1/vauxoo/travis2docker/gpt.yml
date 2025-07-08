@@ -1,0 +1,47 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        toxenv: [check, docs]
+        python-version: [3.9, 3.10, 3.11]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python --version
+        uname -a
+        lsb_release -a
+        pip install tox
+        virtualenv --version
+        easy_install --version
+        pip --version
+        tox --version
+    - name: Run tox
+      env:
+        LD_PRELOAD: /lib/x86_64-linux-gnu/libSegFault.so
+        SEGFAULT_SIGNALS: all
+        TOXENV: ${{ matrix.toxenv }}
+      run: tox -v
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: After failure
+      if: failure()
+      run: |
+        cat .tox/log/*
+        cat .tox/*/log/*

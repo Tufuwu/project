@@ -1,0 +1,450 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+    strategy:
+      matrix: {}
+#       # 'allow_failures' transformations are currently unsupported.
+  test_2:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '1.11'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '2.7'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_3:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '1.11'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.5'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_4:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '1.11'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_5:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '1.11'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_6:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '2.0'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.5'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_7:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '2.0'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_8:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '2.0'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_9:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '2.1'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.5'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_10:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '2.1'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_11:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '2.1'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_12:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '2.2'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.5'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_13:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '2.2'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_14:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '2.2'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_15:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '2.2'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_16:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '3.0'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_17:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '3.0'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_18:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '3.0'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_19:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '3.0'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.9'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_20:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '3.1'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_21:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '3.1'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_22:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '3.1'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_23:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '3.1'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.9'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_24:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '3.2'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_25:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '3.2'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_26:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '3.2'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_27:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '3.2'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.9'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_28:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '3.2'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.10'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_29:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '4.0'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_30:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '4.0'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.9'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_31:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: '4.0'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.10'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_32:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: master
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_33:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: master
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.9'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox
+  test_34:
+    runs-on: ubuntu-20.04
+    env:
+      DJANGO: master
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.10'
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then pip install -U importlib_metadata; fi
+    - run: pip install tox tox-venv tox-travis
+    - run: tox

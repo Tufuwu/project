@@ -1,0 +1,45 @@
+name: Python CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python: ['3.9', '3.10']
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Update apt-get repository sources
+        run: sudo apt-get update -qq
+
+      - name: Install Blender
+        run: sudo apt-get install blender
+
+      - name: Download Blender
+        run: |
+          mkdir tmp && cd tmp
+          wget https://mirrors.ocf.berkeley.edu/blender/release/Blender3.2/blender-3.2.0-linux-x64.tar.xz
+          tar -xf blender-3.2.0-linux-x64.tar.xz
+          mv blender-3.2.0-linux-x64 blender
+          rm blender-3.2.0-linux-x64
+          cd ..
+
+      - name: Install Phobos addon
+        run: |
+          python setup.py -t tmp/blender/3.2/scripts/addons/phobos -b tmp/blender
+          ls tmp/blender/3.2/scripts/addons/phobos
+
+      - name: Run test
+        run: python test/testrunner.py ./tmp/blender/blender

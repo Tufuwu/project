@@ -1,0 +1,409 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+env:
+  SDL_VIDEODRIVER: dummy
+  SDL_AUDIODRIVER: dummy
+  SDL_RENDER_DRIVER: software
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: |-
+          dlls
+          ${{ github.workspace }}/.cache/pip
+        key: "${{ runner.os }}-path"
+    - run: sudo apt-get -qq update
+    - run: sudo apt-get build-dep libsdl2 libsdl2-mixer libsdl2-ttf libsdl2-image libsdl2-gfx
+    - run: sudo apt-get install libmpg123-dev libopus-dev pulseaudio
+    - run: dbus-launch pulseaudio --start
+    - run: export SDL_AUDIODRIVER=pulse
+    - run: python -m pip install --upgrade pip
+    - run: if [[ -z "$(ls -A dlls)" ]]; then python .ci/getsdl2.py; fi
+    - run: export PYSDL2_DLL_PATH=$(pwd)/dlls
+    - run: python -m pip install --upgrade numpy pytest
+    - run: python -m pip install .
+    - run: python -B -m pytest -vvl -rxXP
+    strategy:
+      matrix: {}
+#       # 'allow_failures' transformations are currently unsupported.
+  test_2:
+    runs-on: ubuntu-latest
+    env:
+      PYSDL2_DLL_VERSION: 2.0.12
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: |-
+          dlls
+          ${{ github.workspace }}/.cache/pip
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 2.7
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: sudo apt-get -qq update
+    - run: sudo apt-get build-dep libsdl2 libsdl2-mixer libsdl2-ttf libsdl2-image libsdl2-gfx
+    - run: sudo apt-get install libmpg123-dev libopus-dev pulseaudio
+    - run: dbus-launch pulseaudio --start
+    - run: export SDL_AUDIODRIVER=pulse
+    - run: python -m pip install --upgrade pip
+    - run: if [[ -z "$(ls -A dlls)" ]]; then python .ci/getsdl2.py; fi
+    - run: export PYSDL2_DLL_PATH=$(pwd)/dlls
+    - run: python -m pip install --upgrade numpy pytest
+    - run: python -m pip install .
+    - run: python -B -m pytest -vvl -rxXP
+  test_3:
+    runs-on: ubuntu-latest
+    env:
+      PYSDL2_DLL_VERSION: 2.0.12
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: |-
+          dlls
+          ${{ github.workspace }}/.cache/pip
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.5
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: sudo apt-get -qq update
+    - run: sudo apt-get build-dep libsdl2 libsdl2-mixer libsdl2-ttf libsdl2-image libsdl2-gfx
+    - run: sudo apt-get install libmpg123-dev libopus-dev pulseaudio
+    - run: dbus-launch pulseaudio --start
+    - run: export SDL_AUDIODRIVER=pulse
+    - run: python -m pip install --upgrade pip
+    - run: if [[ -z "$(ls -A dlls)" ]]; then python .ci/getsdl2.py; fi
+    - run: export PYSDL2_DLL_PATH=$(pwd)/dlls
+    - run: python -m pip install --upgrade numpy pytest
+    - run: python -m pip install .
+    - run: python -B -m pytest -vvl -rxXP
+  test_4:
+    runs-on: ubuntu-latest
+    env:
+      PYSDL2_DLL_VERSION: 2.0.12
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: |-
+          dlls
+          ${{ github.workspace }}/.cache/pip
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: sudo apt-get -qq update
+    - run: sudo apt-get build-dep libsdl2 libsdl2-mixer libsdl2-ttf libsdl2-image libsdl2-gfx
+    - run: sudo apt-get install libmpg123-dev libopus-dev pulseaudio
+    - run: dbus-launch pulseaudio --start
+    - run: export SDL_AUDIODRIVER=pulse
+    - run: python -m pip install --upgrade pip
+    - run: if [[ -z "$(ls -A dlls)" ]]; then python .ci/getsdl2.py; fi
+    - run: export PYSDL2_DLL_PATH=$(pwd)/dlls
+    - run: python -m pip install --upgrade numpy pytest
+    - run: python -m pip install .
+    - run: python -B -m pytest -vvl -rxXP
+  test_5:
+    runs-on: ubuntu-latest
+    env:
+      PYSDL2_DLL_VERSION: 2.0.12
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: |-
+          dlls
+          ${{ github.workspace }}/.cache/pip
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: sudo apt-get -qq update
+    - run: sudo apt-get build-dep libsdl2 libsdl2-mixer libsdl2-ttf libsdl2-image libsdl2-gfx
+    - run: sudo apt-get install libmpg123-dev libopus-dev pulseaudio
+    - run: dbus-launch pulseaudio --start
+    - run: export SDL_AUDIODRIVER=pulse
+    - run: python -m pip install --upgrade pip
+    - run: if [[ -z "$(ls -A dlls)" ]]; then python .ci/getsdl2.py; fi
+    - run: export PYSDL2_DLL_PATH=$(pwd)/dlls
+    - run: python -m pip install --upgrade numpy pytest
+    - run: python -m pip install .
+    - run: python -B -m pytest -vvl -rxXP
+  test_6:
+    runs-on: ubuntu-latest
+    env:
+      PYSDL2_DLL_VERSION: 2.0.12
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: |-
+          dlls
+          ${{ github.workspace }}/.cache/pip
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.8
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: sudo apt-get -qq update
+    - run: sudo apt-get build-dep libsdl2 libsdl2-mixer libsdl2-ttf libsdl2-image libsdl2-gfx
+    - run: sudo apt-get install libmpg123-dev libopus-dev pulseaudio
+    - run: dbus-launch pulseaudio --start
+    - run: export SDL_AUDIODRIVER=pulse
+    - run: python -m pip install --upgrade pip
+    - run: if [[ -z "$(ls -A dlls)" ]]; then python .ci/getsdl2.py; fi
+    - run: export PYSDL2_DLL_PATH=$(pwd)/dlls
+    - run: python -m pip install --upgrade numpy pytest
+    - run: python -m pip install .
+    - run: python -B -m pytest -vvl -rxXP
+  test_7:
+    runs-on: ubuntu-latest
+    env:
+      PYSDL2_DLL_VERSION: 2.0.12
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: |-
+          dlls
+          ${{ github.workspace }}/.cache/pip
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: pypy
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: sudo apt-get -qq update
+    - run: sudo apt-get build-dep libsdl2 libsdl2-mixer libsdl2-ttf libsdl2-image libsdl2-gfx
+    - run: sudo apt-get install libmpg123-dev libopus-dev pulseaudio
+    - run: dbus-launch pulseaudio --start
+    - run: export SDL_AUDIODRIVER=pulse
+    - run: python -m pip install --upgrade pip
+    - run: if [[ -z "$(ls -A dlls)" ]]; then python .ci/getsdl2.py; fi
+    - run: export PYSDL2_DLL_PATH=$(pwd)/dlls
+    - run: python -m pip install --upgrade numpy pytest
+    - run: python -m pip install .
+    - run: python -B -m pytest -vvl -rxXP
+  test_8:
+    runs-on: ubuntu-latest
+    env:
+      PYSDL2_DLL_VERSION: 2.0.12
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: |-
+          dlls
+          ${{ github.workspace }}/.cache/pip
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: pypy3
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: sudo apt-get -qq update
+    - run: sudo apt-get build-dep libsdl2 libsdl2-mixer libsdl2-ttf libsdl2-image libsdl2-gfx
+    - run: sudo apt-get install libmpg123-dev libopus-dev pulseaudio
+    - run: dbus-launch pulseaudio --start
+    - run: export SDL_AUDIODRIVER=pulse
+    - run: python -m pip install --upgrade pip
+    - run: if [[ -z "$(ls -A dlls)" ]]; then python .ci/getsdl2.py; fi
+    - run: export PYSDL2_DLL_PATH=$(pwd)/dlls
+    - run: python -m pip install --upgrade numpy pytest
+    - run: python -m pip install .
+    - run: python -B -m pytest -vvl -rxXP
+  test_9:
+    runs-on:
+      - arm64
+      - ubuntu-latest
+    env:
+      PYSDL2_DLL_VERSION: 2.0.12
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: |-
+          dlls
+          ${{ github.workspace }}/.cache/pip
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.8
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: echo "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports xenial main universe multiverse restricted" | sudo tee -a /etc/apt/sources.list
+    - run: echo "deb-src http://archive.ubuntu.com/ubuntu xenial main universe multiverse restricted" | sudo tee -a /etc/apt/sources.list
+    - run: sudo dpkg --add-architecture arm64
+    - run: sudo apt-get -qq update
+    - run: sudo apt-get build-dep libsdl2 libsdl2-mixer libsdl2-ttf libsdl2-image libsdl2-gfx
+    - run: sudo apt-get install libmpg123-dev libopus-dev pulseaudio
+    - run: python -m pip install --upgrade pip
+    - run: if [[ -z "$(ls -A dlls)" ]]; then python .ci/getsdl2.py; fi
+    - run: export PYSDL2_DLL_PATH=$(pwd)/dlls
+    - run: python -m pip install --upgrade numpy pytest
+    - run: python -m pip install .
+    - run: python -B -m pytest -vvl -rxXP
+  test_10:
+    runs-on: ubuntu-latest
+    env:
+      PYSDL2_DLL_VERSION: 2.0.12
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: |-
+          dlls
+          ${{ github.workspace }}/.cache/pip
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.8
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: echo "deb [arch=ppc64le] http://ports.ubuntu.com/ubuntu-ports xenial main universe multiverse restricted" | sudo tee -a /etc/apt/sources.list
+    - run: echo "deb-src http://archive.ubuntu.com/ubuntu xenial main universe multiverse restricted" | sudo tee -a /etc/apt/sources.list
+    - run: sudo dpkg --add-architecture ppc64le
+    - run: sudo apt-get -qq update
+    - run: sudo apt-get build-dep libsdl2 libsdl2-mixer libsdl2-ttf libsdl2-image libsdl2-gfx
+    - run: sudo apt-get install libmpg123-dev libopus-dev pulseaudio
+    - run: python -m pip install --upgrade pip
+    - run: if [[ -z "$(ls -A dlls)" ]]; then python .ci/getsdl2.py; fi
+    - run: export PYSDL2_DLL_PATH=$(pwd)/dlls
+    - run: python -m pip install --upgrade numpy pytest
+    - run: python -m pip install .
+    - run: python -B -m pytest -vvl -rxXP
+  Python_3_7_on_macOS_w_latest_SDL2:
+    runs-on: macos-latest
+    env:
+      PYSDL2_DLL_VERSION: 2.0.12
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: |-
+          dlls
+          ${{ github.workspace }}/.cache/pip
+        key: "${{ runner.os }}-path"
+    - run: export PATH="/usr/local/opt/python/libexec/bin:/usr/local/bin:$PATH"
+    - run: python -m pip install --upgrade pip
+    - run: if [[ -z "$(ls -A dlls)" ]]; then python .ci/getsdl2.py; fi
+    - run: export PYSDL2_DLL_PATH=$(pwd)/dlls
+    - run: python -m pip install --upgrade numpy pytest
+    - run: python -m pip install .
+    - run: python -B -m pytest -vvl -rxXP
+  Python_2_7_on_macOS_w_latest_SDL2:
+    runs-on: macos-latest
+    env:
+      PYSDL2_DLL_VERSION: 2.0.12
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: |-
+          dlls
+          ${{ github.workspace }}/.cache/pip
+        key: "${{ runner.os }}-path"
+    - run: brew link python@2
+    - run: python -m pip install --upgrade pip
+    - run: if [[ -z "$(ls -A dlls)" ]]; then python .ci/getsdl2.py; fi
+    - run: export PYSDL2_DLL_PATH=$(pwd)/dlls
+    - run: python -m pip install --upgrade numpy pytest
+    - run: python -m pip install .
+    - run: python -B -m pytest -vvl -rxXP
+  Python_3_7_on_macOS_w_SDL2_2_0_10:
+    runs-on: macos-latest
+    env:
+      PYSDL2_DLL_VERSION: 2.0.10
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: |-
+          dlls
+          ${{ github.workspace }}/.cache/pip
+        key: "${{ runner.os }}-path"
+    - run: export PATH="/usr/local/opt/python/libexec/bin:/usr/local/bin:$PATH"
+    - run: python -m pip install --upgrade pip
+    - run: if [[ -z "$(ls -A dlls)" ]]; then python .ci/getsdl2.py; fi
+    - run: export PYSDL2_DLL_PATH=$(pwd)/dlls
+    - run: python -m pip install --upgrade numpy pytest
+    - run: python -m pip install .
+    - run: python -B -m pytest -vvl -rxXP
+  Python_3_7_on_macOS_w_SDL2_2_0_7:
+    runs-on: macos-latest
+    env:
+      PYSDL2_DLL_VERSION: 2.0.7
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: |-
+          dlls
+          ${{ github.workspace }}/.cache/pip
+        key: "${{ runner.os }}-path"
+    - run: export PATH="/usr/local/opt/python/libexec/bin:/usr/local/bin:$PATH"
+    - run: python -m pip install --upgrade pip
+    - run: if [[ -z "$(ls -A dlls)" ]]; then python .ci/getsdl2.py; fi
+    - run: export PYSDL2_DLL_PATH=$(pwd)/dlls
+    - run: python -m pip install --upgrade numpy pytest
+    - run: python -m pip install .
+    - run: python -B -m pytest -vvl -rxXP
+  Python_3_7_on_macOS_w_latest_Homebrew_SDL2:
+    runs-on: macos-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: |-
+          dlls
+          ${{ github.workspace }}/.cache/pip
+        key: "${{ runner.os }}-path"
+    - run: export PATH="/usr/local/opt/python/libexec/bin:/usr/local/bin:$PATH"
+    - run: brew install sdl2 sdl2_mixer sdl2_ttf sdl2_image sdl2_gfx
+    - run: python -m pip install --upgrade pip
+    - run: if [[ -z "$(ls -A dlls)" ]]; then python .ci/getsdl2.py; fi
+    - run: export PYSDL2_DLL_PATH=$(pwd)/dlls
+    - run: python -m pip install --upgrade numpy pytest
+    - run: python -m pip install .
+    - run: python -B -m pytest -vvl -rxXP

@@ -1,0 +1,71 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  release:
+    types: [created]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9']
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: pip install -U -e .[tests] black pyflakes isort
+    - name: Lint with pyflakes
+      run: pyflakes daphne tests
+    - name: Lint with black
+      run: black --check daphne tests
+    - name: Lint with isort
+      run: isort --check-only --diff daphne tests
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        twisted-version: ['twisted', 'twisted==18.7.0']
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: pip install ${{ matrix.twisted-version }} -e .[tests]
+    - name: Display installed packages
+      run: pip freeze
+    - name: Run tests
+      run: pytest
+
+  release:
+    if: github.event_name == 'release' && github.event.action == 'published'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - name: Build and publish
+      env:
+        TWINE_USERNAME: andrewgodwin_bot
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        pip install build twine
+        python -m build
+        twine upload dist/*
+```

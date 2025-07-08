@@ -1,0 +1,32 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+
+    - name: Install dependencies
+      run: |
+        pip install 'Django~=3.1.9' 'Django~=3.2.0' pyyaml coveralls pytest-django
+        pip install -e .
+
+    - name: Run tests
+      run: |
+        coverage run $VIRTUAL_ENV/bin/py.test --ds=test_settings typedmodels/tests.py
+
+    - name: Upload coverage to coveralls
+      run: coveralls

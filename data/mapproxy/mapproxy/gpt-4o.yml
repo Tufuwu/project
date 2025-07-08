@@ -1,0 +1,64 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      couchdb:
+        image: couchdb
+        ports:
+          - 5984:5984
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+      riak:
+        image: basho/riak-kv
+        ports:
+          - 8087:8087
+          - 8098:8098
+
+    strategy:
+      matrix:
+        python-version: ["2.7", "3.5", "3.6", "3.7", "3.8"]
+        include:
+          - python-version: "2.7"
+            env: USE_LATEST_PILLOW=1
+          - python-version: "3.8"
+            env: USE_LATEST_PILLOW=1
+
+    env:
+      MAPPROXY_TEST_COUCHDB: http://127.0.0.1:5984
+      MAPPROXY_TEST_REDIS: 127.0.0.1:6379
+      MAPPROXY_TEST_RIAK_HTTP: http://localhost:8098
+      MAPPROXY_TEST_RIAK_PBC: pbc://localhost:8087
+      BOTO_CONFIG: /doesnotexist
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y proj-bin libgeos-dev libgdal-dev libxslt1-dev libxml2-dev build-essential python-dev libjpeg-dev zlib1g-dev libfreetype6-dev protobuf-compiler libprotoc-dev
+        pip install -r requirements-tests.txt
+        if [[ $USE_LATEST_PILLOW == '1' ]]; then pip install -U Pillow; fi
+        pip freeze
+
+    - name: Run tests
+      run: pytest mapproxy
+```

@@ -1,0 +1,89 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  release:
+    types: [created]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.7']
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          pip install -r dev-requirements.txt
+          pip install -r requirements.txt
+          pip install .
+      - name: Run tests
+        run: python -m pytest --cov=. tests/
+      - name: Coverage report
+        run: coverage report
+      - name: Coveralls
+        uses: coverallsapp/github-action@v1
+
+  deploy:
+    if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 'lts/*'
+      - name: Set up Python '3.7'
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+      - name: Install dependencies
+        run: |
+          pip install -r dev-requirements.txt
+          pip install -r requirements.txt
+          npm install @semantic-release/exec
+      - name: Configure Git
+        run: |
+          git config --global user.email "releases@ladybug.tools"
+          git config --global user.name "ladybugbot"
+      - name: Semantic release
+        run: npx semantic-release
+
+  docs:
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python '3.7'
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+      - name: Install dependencies
+        run: |
+          pip install -r dev-requirements.txt
+          pip install -r requirements.txt
+          npm install -g redoc-cli
+      - name: Build docs
+        env:
+          CLEAN_TAG: ${{ github.ref_name }}
+        run: |
+          export CLEAN_TAG=$(echo $CLEAN_TAG | sed 's/v//g')
+          python docs.py --version $CLEAN_TAG
+          redoc-cli bundle ./docs/model_inheritance.json -o ./docs/model.html
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
+          publish_dir: ./docs
+```

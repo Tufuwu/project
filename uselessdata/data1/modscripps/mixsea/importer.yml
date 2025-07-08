@@ -1,0 +1,39 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+    - main
+    - stable
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: export MINICONDA=${{ github.workspace }}/miniconda
+    - run: export PATH="$MINICONDA/bin:$PATH"
+    - run: hash -r
+    - run: wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+    - run: bash miniconda.sh -b -f -p $MINICONDA
+    - run: conda config --set always_yes yes
+    - run: conda config --add channels conda-forge
+    - run: conda update -q conda
+    - run: conda info -a
+    - run: echo "Python version var"
+    - run: echo $TRAVIS_PYTHON_VERSION
+    - run: sed -i -E 's/(python=)(.*)/\1'$TRAVIS_PYTHON_VERSION'/' ./environment.yml
+    - run: conda env create -f environment.yml
+    - run: source activate mixsea
+    - run: python setup.py install
+    - run: python --version
+    - run: pytest
+    - run: black --check mixsea/

@@ -1,0 +1,184 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py35
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: rm -f ${{ github.workspace }}/.cache/pip/log/debug.log
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.5
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install coveralls
+    - run: pip install tox
+    - run: tox -vv
+#     # This item has no matching transformer
+#     - pypi:
+#         skip_cleanup: true
+#         provider: pypi
+#         user: pymoca.wheelbuilder
+#         password:
+#           secure: GZaxb109ZfDBjhFfpWnPxsfNeRMjq226MyNUB7K3ferXpR3+MBx2pOfzuYf+VF8ypOeZ9DsCwVn2x+33eJEOoXUAS4HaCz1EYEgHvEsAGf6nZI9MlGP9AWgKTqvQBj6m/VrizuaXU9gs4sAWm6udH+nqzstmrp6XVZknNfADRRA=
+#         distributions: sdist bdist_wheel
+#         'on':
+#           tags: true
+#           condition: "$DEPLOY = true"
+#       if: "${{ github.event_name == 'push' && $DEPLOY == true && ${{ github.ref }} }}"
+  test_2:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py36
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: rm -f ${{ github.workspace }}/.cache/pip/log/debug.log
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install coveralls
+    - run: pip install tox
+    - run: tox -vv
+#     # This item has no matching transformer
+#     - pypi:
+#         skip_cleanup: true
+#         provider: pypi
+#         user: pymoca.wheelbuilder
+#         password:
+#           secure: GZaxb109ZfDBjhFfpWnPxsfNeRMjq226MyNUB7K3ferXpR3+MBx2pOfzuYf+VF8ypOeZ9DsCwVn2x+33eJEOoXUAS4HaCz1EYEgHvEsAGf6nZI9MlGP9AWgKTqvQBj6m/VrizuaXU9gs4sAWm6udH+nqzstmrp6XVZknNfADRRA=
+#         distributions: sdist bdist_wheel
+#         'on':
+#           tags: true
+#           condition: "$DEPLOY = true"
+#       if: "${{ github.event_name == 'push' && $DEPLOY == true && ${{ github.ref }} }}"
+  test_3:
+    runs-on: ubuntu-16.04
+    env:
+      TOXENV: py37
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: rm -f ${{ github.workspace }}/.cache/pip/log/debug.log
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install coveralls
+    - run: pip install tox
+    - run: tox -vv
+#     # This item has no matching transformer
+#     - pypi:
+#         skip_cleanup: true
+#         provider: pypi
+#         user: pymoca.wheelbuilder
+#         password:
+#           secure: GZaxb109ZfDBjhFfpWnPxsfNeRMjq226MyNUB7K3ferXpR3+MBx2pOfzuYf+VF8ypOeZ9DsCwVn2x+33eJEOoXUAS4HaCz1EYEgHvEsAGf6nZI9MlGP9AWgKTqvQBj6m/VrizuaXU9gs4sAWm6udH+nqzstmrp6XVZknNfADRRA=
+#         distributions: sdist bdist_wheel
+#         'on':
+#           tags: true
+#           condition: "$DEPLOY = true"
+#       if: "${{ github.event_name == 'push' && $DEPLOY == true && ${{ github.ref }} }}"
+    - run: tox -e coverage-report
+      if: "${{ success() }}"
+    - run: coveralls
+      if: "${{ success() }}"
+  test_4:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: flake8
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: rm -f ${{ github.workspace }}/.cache/pip/log/debug.log
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install coveralls
+    - run: pip install tox
+    - run: tox -vv
+#     # This item has no matching transformer
+#     - pypi:
+#         skip_cleanup: true
+#         provider: pypi
+#         user: pymoca.wheelbuilder
+#         password:
+#           secure: GZaxb109ZfDBjhFfpWnPxsfNeRMjq226MyNUB7K3ferXpR3+MBx2pOfzuYf+VF8ypOeZ9DsCwVn2x+33eJEOoXUAS4HaCz1EYEgHvEsAGf6nZI9MlGP9AWgKTqvQBj6m/VrizuaXU9gs4sAWm6udH+nqzstmrp6XVZknNfADRRA=
+#         distributions: sdist bdist_wheel
+#         'on':
+#           tags: true
+#           condition: "$DEPLOY = true"
+#       if: "${{ github.event_name == 'push' && $DEPLOY == true && ${{ github.ref }} }}"
+  deploy:
+    needs:
+    - test
+    - test_2
+    - test_3
+    - test_4
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY: 'true'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: rm -f ${{ github.workspace }}/.cache/pip/log/debug.log
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: true
+    - run: true
+    - run: true
+#     # This item has no matching transformer
+#     - pypi:
+#         skip_cleanup: true
+#         provider: pypi
+#         user: pymoca.wheelbuilder
+#         password:
+#           secure: GZaxb109ZfDBjhFfpWnPxsfNeRMjq226MyNUB7K3ferXpR3+MBx2pOfzuYf+VF8ypOeZ9DsCwVn2x+33eJEOoXUAS4HaCz1EYEgHvEsAGf6nZI9MlGP9AWgKTqvQBj6m/VrizuaXU9gs4sAWm6udH+nqzstmrp6XVZknNfADRRA=
+#         distributions: sdist bdist_wheel
+#         'on':
+#           tags: true
+#           condition: "$DEPLOY = true"
+#       if: "${{ github.event_name == 'push' && $DEPLOY == true && ${{ github.ref }} }}"

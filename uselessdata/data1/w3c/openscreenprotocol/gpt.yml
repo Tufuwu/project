@@ -1,0 +1,26 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install bikeshed Pygments
+        bikeshed update
+    - name: Deploy script
+      run: bash ./scripts/deploy.sh
+      env:
+        ENCRYPTION_LABEL: "6c9ad971e3e1"

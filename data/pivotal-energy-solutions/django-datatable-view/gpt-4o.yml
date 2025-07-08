@@ -1,0 +1,55 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9, '3.10-dev']
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: pip install tox-travis pyyaml python-coveralls
+
+    - name: Run tests with tox
+      run: tox
+
+    - name: Upload coverage to Coveralls
+      if: success()
+      run: coveralls
+
+    - name: Slack Notification
+      if: success()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+```

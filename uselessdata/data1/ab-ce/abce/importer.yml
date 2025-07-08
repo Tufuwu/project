@@ -1,0 +1,106 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+env:
+  CI: 'true'
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: |-
+          ${{ github.workspace }}/Library/Caches/pip
+          ${{ github.workspace }}/.cache
+          ${{ github.workspace }}/.ccache
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: pip install -r requirements-dev.txt
+    - run: pip install flake8
+    - run: pip install .
+    - run: flake8 . --ignore=F403,E501,E123,E128,F401,F405,E402,F821,F841,E721,E265,F811,W504 --exclude=docs,build,env
+    - run: cd unittest
+    - run: python start.py
+#     # This item has no matching transformer
+#     - email: false
+  test_2:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: |-
+          ${{ github.workspace }}/Library/Caches/pip
+          ${{ github.workspace }}/.cache
+          ${{ github.workspace }}/.ccache
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: pypy3
+    - run: pip install -r requirements-dev.txt
+    - run: pip install flake8
+    - run: pip install .
+    - run: flake8 . --ignore=F403,E501,E123,E128,F401,F405,E402,F821,F841,E721,E265,F811,W504 --exclude=docs,build,env
+    - run: cd unittest
+    - run: python start.py
+#     # This item has no matching transformer
+#     - email: false
+  test_3:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: maxim-lobanov/setup-xcode@v1.6.0
+      with:
+        xcode-version: '10'
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: |-
+          ${{ github.workspace }}/Library/Caches/pip
+          ${{ github.workspace }}/.cache
+          ${{ github.workspace }}/.ccache
+        key: "${{ runner.os }}-path"
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install virtualenv
+    - run: virtualenv env -p python3
+    - run: source env/bin/activate
+    - run: pip install -r requirements-dev.txt
+    - run: pip install flake8
+    - run: pip install .
+    - run: flake8 . --ignore=F403,E501,E123,E128,F401,F405,E402,F821,F841,E721,E265,F811,W504 --exclude=docs,build,env
+    - run: cd unittest
+    - run: python start.py
+#     # This item has no matching transformer
+#     - email: false

@@ -1,0 +1,51 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Miniconda
+      run: |
+        wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+        bash miniconda.sh -b -p $HOME/miniconda
+        echo "$HOME/miniconda/bin" >> $GITHUB_PATH
+
+    - name: Update conda
+      run: |
+        conda config --set always_yes yes --set changeps1 no
+        conda update conda
+
+    - name: Create test environment
+      run: |
+        conda create -n test-environment python=${{ matrix.python-version }}
+        source activate test-environment
+
+    - name: Install dependencies
+      run: |
+        conda install pytest locket numpy toolz pandas blosc pyzmq -c conda-forge
+
+    - name: Install partd
+      run: |
+        python setup.py install
+
+    - name: Run tests
+      run: |
+        if [[ ${{ matrix.python-version }} == '3.9' ]]; then
+          py.test partd --doctest-modules --verbose
+        else
+          py.test partd --verbose
+        fi
+```

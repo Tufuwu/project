@@ -1,0 +1,53 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  release:
+    types:
+      - published
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          pip install -e .
+          pip install astroid>=2.0
+          pip install pylint>=2.0
+      - name: Run pylint
+        run: pylint --rcfile=.pylintrc infinisdk setup.py
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'release' && github.event.action == 'published'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: |
+          pip install -e .
+          pip install twine
+      - name: Build and publish
+        run: |
+          python setup.py sdist bdist_wheel
+          twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{ secrets.PYPI_PASSWORD }} dist/*
+```

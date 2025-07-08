@@ -1,0 +1,74 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: qgis/qgis:latest
+        options: --entrypoint /bin/sh
+
+    strategy:
+      matrix:
+        qgis_version_tag: [latest, release-3_4]
+
+    env:
+      IMAGE: qgis/qgis
+      QGIS_VERSION_TAG: ${{ matrix.qgis_version_tag }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.6'
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install --upgrade pylint
+        pip install --upgrade pycodestyle
+
+    - name: Pull Docker image
+      run: docker pull ${{ env.IMAGE }}:${{ env.QGIS_VERSION_TAG }}
+
+    - name: Run Docker container
+      run: |
+        docker run -d --name qgis-testing-environment -v ${{ github.workspace }}:/tests_directory -e DISPLAY=:99 ${{ env.IMAGE }}:${{ env.QGIS_VERSION_TAG }}
+        sleep 10
+        docker exec -it qgis-testing-environment sh -c "qgis_setup.sh processing_r"
+        docker exec -it qgis-testing-environment sh -c "rm -f /root/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_r"
+        docker exec -it qgis-testing-environment sh -c "ln -s /tests_directory/processing_r /root/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_r"
+        docker exec -it qgis-testing-environment sh -c "pip3 install -r /tests_directory/REQUIREMENTS_TESTING.txt"
+        docker exec -it qgis-testing-environment sh -c "apt-get update"
+        docker exec -it qgis-testing-environment sh -c "apt-get install -y r-base"
+
+    - name: Run tests
+      run: docker exec -it qgis-testing-environment sh -c "qgis_testrunner.sh processing_r.test_suite.test_package"
+
+    - name: Run pylint
+      run: make pylint
+
+    - name: Run pycodestyle
+      run: make pycodestyle
+```

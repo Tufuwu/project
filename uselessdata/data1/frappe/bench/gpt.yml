@@ -1,0 +1,58 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y wget libmariadb-dev
+        wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.focal_amd64.deb
+        sudo dpkg -i wkhtmltox_0.12.6-1.focal_amd64.deb
+        sudo apt-get -f install -y
+
+    - name: Install Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Setup MariaDB
+      run: |
+        sudo apt-get install -y mariadb-server
+        sudo systemctl start mariadb
+        sudo mysql -uroot -e "UPDATE mysql.user SET Password=PASSWORD('travis') WHERE User='root';"
+        sudo mysql -uroot -ptravis -e "SET GLOBAL character_set_server = 'utf8mb4';"
+        sudo mysql -uroot -ptravis -e "SET GLOBAL collation_server = 'utf8mb4_unicode_ci';"
+        sudo mysql -uroot -ptravis -e "FLUSH PRIVILEGES;"
+
+    - name: Install Python dependencies
+      run: |
+        mkdir -p ~/.bench
+        cp -r $GITHUB_WORKSPACE/* ~/.bench
+        python -m pip install -U --no-cache-dir --force-reinstall urllib3 pyOpenSSL ndg-httpsclient pyasn1 wheel setuptools pip
+        python -m pip install -U -e ~/.bench
+
+    - name: Run tests
+      run: |
+        python -m unittest -v bench/tests/test_utils && python -m unittest -v bench/tests/test_init
+
+    - name: Run specific tests for Python ${{ matrix.python-version }}
+      if: matrix.python-version == '3.9' || matrix.python-version == '3.10'
+      run: |
+        python bench/tests/test_init.py TestBenchInit.basic
+        python bench/tests/test_setup_production.py TestSetupProduction.production

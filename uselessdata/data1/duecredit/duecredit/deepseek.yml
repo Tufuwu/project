@@ -1,0 +1,39 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e '.[tests]'
+        pip install --upgrade flake8 pytest coverage coveralls codecov
+
+    - name: Run tests
+      run: |
+        coverage run --source duecredit -m py.test
+        python setup.py install
+
+    - name: Run flake8
+      run: flake8 duecredit/stub.py
+
+    - name: Upload coverage to Coveralls
+      run: coveralls
+
+    - name: Upload coverage to Codecov
+      run: codecov
+```

@@ -1,0 +1,32 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python: ['3.9', '3.10']
+
+    services:
+      docker:
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+
+    - name: Install dependencies
+      run: docker-compose -f test/docker-compose.yml -p brainzutils_test build
+
+    - name: Run tests
+      run: |
+        docker-compose -f test/docker-compose.yml -p brainzutils_test up -d redis musicbrainz_db
+        docker-compose -f test/docker-compose.yml -p brainzutils_test run --rm test
+        docker-compose -f test/docker-compose.yml -p brainzutils_test down

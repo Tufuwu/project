@@ -1,0 +1,44 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:stable-dind
+        options: --privileged
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install Docker
+      run: |
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+        sudo apt-get update
+        sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+
+    - name: Build Docker image
+      run: docker build -t draft-kings-fun .
+
+    - name: Run Flake8
+      run: docker run draft-kings-fun flake8 draftfast
+
+    - name: Run Tests
+      run: docker run draft-kings-fun nosetests --with-coverage --cover-package=.
+```

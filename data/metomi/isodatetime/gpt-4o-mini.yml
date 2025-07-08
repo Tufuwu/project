@@ -1,0 +1,66 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python-version: ['3.5', '3.6', '3.7', '3.8', '3.8', '3.9']
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - python-version: '3.8'
+            run-coverage: true
+          - python-version: '3.8'
+            run-coverage: false
+            tz: 'XXX-05:30'
+          - python-version: '3.9-dev'
+            run-coverage: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip setuptools
+          pip install -e .[all]
+          pip install pytest-xdist pycodestyle
+
+      - name: Run flake8
+        run: flake8 metomi/isodatetime
+
+      - name: Run tests
+        run: |
+          PYTEST_ARGS=('-n' '2')
+          if [ "${{ matrix.run-coverage }}" = "true" ]; then
+            PYTEST_ARGS+=('--cov=metomi/isodatetime')
+          fi
+
+          pytest "${PYTEST_ARGS[@]}" &
+          TEST_PID="$!"
+          minutes=0
+          limit=50
+          while ps -p "${TEST_PID}" >/dev/null 2>&1; do
+            echo -n -e " \b"
+            if ((minutes == limit)); then
+              exit 1
+            fi
+            minutes=$((minutes + 1))
+            sleep 60
+          done
+          wait "${TEST_PID}"
+
+      - name: Upload coverage
+        if: ${{ matrix.run-coverage }}
+        run: |
+          coverage xml --ignore-errors
+          bash <(curl -s https://codecov.io/bash)
+```

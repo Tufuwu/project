@@ -1,0 +1,66 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  3_6_Unit_Test:
+    runs-on: ubuntu-latest
+    env:
+      exclude_file_pattern: 3_7_and_up
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6-dev
+    - run: python3 -m pip install pylint
+    - run: python3 -m pip install mypy
+    - run: python3 -m pip install .
+    - run: python3 --version
+    - run: find undictify -iname "*.py" | grep -v -e "__init__.py" -e ${exclude_file_pattern} | xargs -L 1 pylint
+    - run: find undictify -iname "*.py" | grep -v -e "__init__.py" -e ${exclude_file_pattern} | xargs -L 1 mypy --strict
+    - run: find undictify -iname "*.py" | grep -v -e "__init__.py" -e ${exclude_file_pattern} | xargs -L 1 python3 -m unittest
+    - run: python3 examples/readme_examples.py
+  3_7_Unit_Test:
+    runs-on: ubuntu-16.04
+    env:
+      exclude_file_pattern: nothing
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: python3 -m pip install pylint
+    - run: python3 -m pip install mypy
+    - run: python3 -m pip install .
+    - run: python3 --version
+    - run: find undictify -iname "*.py" | grep -v -e "__init__.py" -e ${exclude_file_pattern} | xargs -L 1 pylint
+    - run: find undictify -iname "*.py" | grep -v -e "__init__.py" -e ${exclude_file_pattern} | xargs -L 1 mypy --strict
+    - run: find undictify -iname "*.py" | grep -v -e "__init__.py" -e ${exclude_file_pattern} | xargs -L 1 python3 -m unittest
+    - run: python3 examples/readme_examples.py
+  3_8_Unit_Test:
+    runs-on: ubuntu-16.04
+    env:
+      exclude_file_pattern: nothing
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: python3 -m pip install pylint
+    - run: python3 -m pip install mypy
+    - run: python3 -m pip install .
+    - run: python3 --version
+    - run: find undictify -iname "*.py" | grep -v -e "__init__.py" -e ${exclude_file_pattern} | xargs -L 1 pylint
+    - run: find undictify -iname "*.py" | grep -v -e "__init__.py" -e ${exclude_file_pattern} | xargs -L 1 mypy --strict
+    - run: find undictify -iname "*.py" | grep -v -e "__init__.py" -e ${exclude_file_pattern} | xargs -L 1 python3 -m unittest
+    - run: python3 examples/readme_examples.py

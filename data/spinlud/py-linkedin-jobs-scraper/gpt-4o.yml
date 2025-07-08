@@ -1,0 +1,48 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    services:
+      docker:
+        image: docker:latest
+    strategy:
+      matrix:
+        python-version: ['3.6']
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run tests
+        run: ./tests/run_tests.sh
+
+  deploy:
+    runs-on: ubuntu-20.04
+    needs: test
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.6
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Build package
+        run: python setup.py install_egg_info sdist bdist_wheel
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@v1.5.0
+        with:
+          password: ${{ secrets.PYPI_TOKEN }}
+```

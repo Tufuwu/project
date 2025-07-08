@@ -1,0 +1,41 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -U setuptools six
+        pip install --pre -e .[dev] Django==$DJANGO_VERSION
+
+    - name: Set up PostgreSQL
+      run: |
+        sudo apt-get install postgresql-10 postgresql-10-postgis-2.5
+        psql -c "CREATE USER test with PASSWORD 'test' CREATEDB SUPERUSER;" -U postgres
+        psql -c "CREATE DATABASE test;" -U postgres
+        psql -c "CREATE EXTENSION postgis;" -U postgres -d test
+
+    - name: Run tests
+      run: |
+        ./run-tests.sh
+        flake8
+
+    - name: Upload coverage to coveralls
+      run: coveralls

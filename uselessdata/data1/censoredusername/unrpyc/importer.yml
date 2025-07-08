@@ -1,0 +1,43 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '2.7'
+    - run: pip install -r requirements.txt
+    - run: "./unrpyc.py --clobber testcases/script.rpyc"
+    - run: diff -u testcases/script.orig.rpy testcases/script.rpy
+    - run: cd un.rpyc
+    - run: "./compile.py -p 1"
+    - run: cd ..
+    - run: "./make-bintray-json.sh"
+#     # This item has no matching transformer
+#     - bintray:
+#         skip_cleanup: true
+#         'on':
+#           all_branches: true
+#         provider: bintray
+#         file: bintray.json
+#         user: jackmcbarn
+#         key:
+#           secure: g9uz4gG8Dmb9cTG4hNNmuzQvKON00NTON2lOfQH6HbYkFYySwCJ76Kq1D11d7luav2s/bPytuNSrIUCTwGZf64eMGDuZbbpFR4dGEIuxYmSKbCqTL9getd5EapwxffQPoridG/SZGOBRLgI+zw0XRlNMDfBJQxp+B8Zs7u7+xMg=
+#       if: "${{ github.event_name == 'push' }}"
+    - uses: softprops/action-gh-release@v0.1.15
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        GITHUB_REPOSITORY: "${{ github.repository }}"
+      with:
+        files: un.rpyc/un.rpyc
+      if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"

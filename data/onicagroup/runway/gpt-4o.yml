@@ -1,0 +1,97 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [2.7, 3.5, 3.6, 3.7]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          ./.travis/install.sh
+      - name: Run tests
+        env:
+          PIP: pip
+          PYTHON_VERSION: ${{ matrix.python-version }}
+        run: make travistest clean
+
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          ./.travis/install.sh
+      - name: Install dependencies on macOS
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install jq
+      - name: Install dependencies on Windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          choco install python --version=3.7.4
+          choco install make sed jq
+      - name: Build
+        env:
+          PIP: pip3
+          PYTHON_VERSION: 3.7
+          DEPLOY: true
+        run: |
+          if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+            make travisbuild_file
+            make travisbuild_folder
+          elif [ "${{ matrix.os }}" == "macos-latest" ]; then
+            make travisbuild_file
+            make travisbuild_folder
+          elif [ "${{ matrix.os }}" == "windows-latest" ]; then
+            make travisbuild_file
+            make travisbuild_folder
+          fi
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref_type == 'tag' || env.FORKED == 'true')
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install AWS CLI
+        if: env.AWS_ACCESS_KEY_ID
+        run: |
+          pip install awscli
+          mkdir -p src
+          make npm_prep
+          aws s3 sync s3://${{ secrets.AWS_BUCKET }}/${{ secrets.AWS_BUCKET_PREFIX }}/$(cat tmp/version.txt)/npm ./src/
+      - name: Publish to npm
+        if: env.PUBLISH
+        run: |
+          npm publish
+        env:
+          NPM_EMAIL: ${{ secrets.NPM_EMAIL }}
+          NPM_API_KEY: ${{ secrets.NPM_API_KEY }}
+```

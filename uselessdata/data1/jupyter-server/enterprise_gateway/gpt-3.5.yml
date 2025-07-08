@@ -1,0 +1,55 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    services:
+      docker:
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install setuptools websocket-client flake8
+        make clean dist enterprise-gateway-demo
+        pip install dist/*.whl coverage
+
+    - name: Run tests
+      run: |
+        jupyter enterprisegateway --help
+        flake8 enterprise_gateway
+        nosetests -x --process-restartworker --with-coverage --cover-package=enterprise_gateway enterprise_gateway.tests
+        make itest-yarn
+        pip uninstall -y jupyter_enterprise_gateway
+
+    - name: Check Python version
+      run: python --version
+
+    - name: Check pip version
+      run: pip --version
+
+    - name: List installed packages
+      run: pip list
+
+    - name: Check docker logs
+      run: docker logs itest-yarn
+
+    - name: Install codecov
+      run: pip install codecov
+
+    - name: Run codecov
+      run: codecov

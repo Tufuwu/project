@@ -1,0 +1,31 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python --version
+        pip install -U pip
+        pip install -r dev-requirements.txt
+    - name: Run tests
+      env:
+        COV_THRESHOLD: 95
+      run: |
+        pytest sklearn_genetic/ --verbose --color=yes --assert=plain --cov-fail-under=$COV_THRESHOLD --cov-config=.coveragerc --cov=./ -p no:warnings
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v2
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}

@@ -1,0 +1,117 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  setup:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.6
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install verilator libevent-dev libjson-c-dev
+          pip install pexpect numpy matplotlib pandas jinja2
+
+      - name: Get Migen / LiteX / Cores
+        run: |
+          wget https://raw.githubusercontent.com/enjoy-digital/litex/master/litex_setup.py
+          python3 litex_setup.py init install
+
+      - name: Install the version being tested
+        run: python3 setup.py install
+
+      - name: Get RISC-V toolchain
+        run: |
+          wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-20171231-x86_64-linux-centos6.tar.gz
+          tar -xvf riscv64-unknown-elf-gcc-20171231-x86_64-linux-centos6.tar.gz
+          echo "$PWD/riscv64-unknown-elf-gcc-20171231-x86_64-linux-centos6/bin/" >> $GITHUB_PATH
+
+  unit_tests:
+    runs-on: ubuntu-20.04
+    needs: setup
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run unit tests
+        run: python setup.py test
+
+  simulations:
+    runs-on: ubuntu-20.04
+    needs: setup
+    strategy:
+      matrix:
+        sdram_module:
+          - IS42S16160
+          - IS42S16320
+          - MT48LC4M16
+          - MT48LC16M16
+          - AS4C16M16
+          - AS4C32M16
+          - AS4C32M8
+          - M12L64322A
+          - M12L16161A
+          - MT46V32M16
+          - MT46H32M16
+          - MT46H32M32
+          - MT47H128M8
+          - MT47H32M16
+          - MT47H64M16
+          - P3R1GE4JGF
+          - MT41K64M16
+          - MT41J128M16
+          - MT41J256M16
+          - K4B1G0446F
+          - K4B2G1646F
+          - H5TC4G63CFR
+          - IS43TR16128B
+          - MT8JTF12864
+          - MT8KTF51264
+          - MT18KSF1G72HZ
+          - AS4C256M16D3A
+          - MT16KTF1G64HZ
+          - EDY4016A
+          - MT40A1G8
+          - MT40A512M16
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run simulations
+        run: ./.sim-test.py --sdram-module="${{ matrix.sdram_module }}"
+
+  benchmarks:
+    runs-on: ubuntu-20.04
+    needs: setup
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run benchmarks
+        run: |
+          python3 -m test.run_benchmarks test/benchmarks.yml --results-cache cache.json --html --heartbeat 60 --timeout 540
+          mkdir -p gh-pages
+          mv html/summary.html gh-pages/index.html
+          mv cache.json gh-pages/cache.json
+          touch gh-pages/.nojekyll
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: gh-pages
+          publish_branch: gh-pages
+```

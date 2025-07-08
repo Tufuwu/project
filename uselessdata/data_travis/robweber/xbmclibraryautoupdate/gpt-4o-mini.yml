@@ -1,0 +1,38 @@
+```yaml
+name: CI
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+
+      - name: Install dependencies
+        run: |
+          pip install flake8 flake8_polyfill kodi-addon-checker git+https://github.com/romanvm/kodi-addon-submitter.git
+
+      - name: Configure git
+        run: git config core.quotepath false
+
+      - name: Run flake8
+        run: flake8 ./ --statistics --show-source --ignore=E501 --exclude=croniter.py
+
+      - name: Run kodi-addon-checker
+        run: kodi-addon-checker --branch=matrix --allow-folder-id-mismatch
+
+      - name: Deploy
+        if: startsWith(github.ref, 'refs/tags/')
+        run: submit-addon -r repo-scripts -b matrix --push-branch service.libraryautoupdate
+```

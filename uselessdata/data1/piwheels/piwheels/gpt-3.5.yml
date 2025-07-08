@@ -1,0 +1,39 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt build-dep -y python3-apt
+        DEBVER=$PYTHON_APT_VER
+        pip install git+https://salsa.debian.org/apt-team/python-apt.git@$(echo $PYTHON_APT_VER | sed -e 's/~/_/')
+        pip install -r $REQUIREMENTS
+        pip install codecov -e .[master,slave,logger,test]
+
+    - name: Create PostgreSQL user and database
+      run: |
+        psql -U postgres -c "create user piwheels password 'piwheels'"
+        psql -U postgres -c "create database piwheels_test"
+
+    - name: Run tests
+      run: make test
+
+    - name: Upload coverage report
+      run: codecov

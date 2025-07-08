@@ -1,0 +1,45 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: [3.6.12, 3.7.9, 3.8.6, 3.9.1, pypy3]
+        include:
+          - python-version: 3.9.1
+            env: TOX_ENV: lint
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -U -r requirements-dev.txt
+        pip install .
+    - name: Run Tox
+      env:
+        TOX_ENV: ${{ matrix.env.TOX_ENV }}
+      run: |
+        tox -e $TOX_ENV
+        pytest --dead-fixtures
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements-dev.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+```

@@ -1,0 +1,91 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.7', '3.8', 'pypy3.6-7.3.1']
+        env: [unit]
+    env:
+      PYTHONUNBUFFERED: yes
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          pip install -U pip setuptools wheel
+          pip install -U tox tox-docker
+          python setup.py develop
+      - name: Run tests
+        run: tox -e ${{ matrix.python-version }}-${{ matrix.env }} -v -- -v
+
+  integration:
+    runs-on: ubuntu-20.04
+    needs: test
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.7', '3.8', 'pypy3.6-7.3.1']
+        env: [integration-rabbitmq, integration-rabbitmq CELERY_ENABLE_SPEEDUPS=1]
+    services:
+      docker:
+        image: docker:19.03.12
+        options: --privileged
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          pip install -U pip setuptools wheel
+          pip install -U tox tox-docker
+          python setup.py develop
+      - name: Build Docker image
+        run: docker build -t rabbitmq:tls .
+      - name: Run integration tests
+        run: tox -e ${{ matrix.python-version }}-${{ matrix.env }} -v -- -v
+
+  lint:
+    runs-on: ubuntu-20.04
+    needs: test
+    strategy:
+      matrix:
+        env: [flake8, pydocstyle, apicheck]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          pip install -U pip setuptools wheel
+          pip install -U tox tox-docker
+          python setup.py develop
+      - name: Run linter
+        run: tox -e ${{ matrix.env }} -v -- -v
+
+  coverage:
+    runs-on: ubuntu-20.04
+    needs: [test, integration, lint]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Upload coverage to Codecov
+        run: |
+          .tox/${{ matrix.python-version }}/bin/coverage xml
+          .tox/${{ matrix.python-version }}/bin/codecov -e TOXENV
+```

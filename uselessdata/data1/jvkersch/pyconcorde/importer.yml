@@ -1,0 +1,156 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+env:
+  INSTALL_EDM_VERSION: 1.9.2 PYTHONUNBUFFERED=1
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      RUNTIME: '2.7'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache"
+        key: "${{ runner.os }}-path"
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: mkdir -p ~/.cache/download
+    - run: if [[ ${{ runner.os }} == "linux" ]]; then tools/install_edm_linux.sh; export PATH="${{ github.workspace }}/edm/bin:${PATH}"; fi
+    - run: if [[ ${{ runner.os }} == "osx" ]]; then tools/install_edm_osx.sh; export PATH="${PATH}:/usr/local/bin"; fi
+    - run: edm envs create travisci --version ${RUNTIME}
+    - run: edm install -e travisci -y cython numpy
+    - run: edm run -e travisci -- python setup.py develop
+    - run: edm run -e travisci -- python -m unittest discover -v concorde
+    - run: edm run -- pip install codecov
+      if: "${{ success() }}"
+    - run: edm run -- codecov
+      if: "${{ success() }}"
+  test_2:
+    runs-on: ubuntu-latest
+    env:
+      RUNTIME: '3.5'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache"
+        key: "${{ runner.os }}-path"
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: mkdir -p ~/.cache/download
+    - run: if [[ ${{ runner.os }} == "linux" ]]; then tools/install_edm_linux.sh; export PATH="${{ github.workspace }}/edm/bin:${PATH}"; fi
+    - run: if [[ ${{ runner.os }} == "osx" ]]; then tools/install_edm_osx.sh; export PATH="${PATH}:/usr/local/bin"; fi
+    - run: edm envs create travisci --version ${RUNTIME}
+    - run: edm install -e travisci -y cython numpy
+    - run: edm run -e travisci -- python setup.py develop
+    - run: edm run -e travisci -- python -m unittest discover -v concorde
+    - run: edm run -- pip install codecov
+      if: "${{ success() }}"
+    - run: edm run -- codecov
+      if: "${{ success() }}"
+  test_3:
+    runs-on: ubuntu-latest
+    env:
+      RUNTIME: '3.6'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache"
+        key: "${{ runner.os }}-path"
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: mkdir -p ~/.cache/download
+    - run: if [[ ${{ runner.os }} == "linux" ]]; then tools/install_edm_linux.sh; export PATH="${{ github.workspace }}/edm/bin:${PATH}"; fi
+    - run: if [[ ${{ runner.os }} == "osx" ]]; then tools/install_edm_osx.sh; export PATH="${PATH}:/usr/local/bin"; fi
+    - run: edm envs create travisci --version ${RUNTIME}
+    - run: edm install -e travisci -y cython numpy
+    - run: edm run -e travisci -- python setup.py develop
+    - run: edm run -e travisci -- python -m unittest discover -v concorde
+    - run: edm run -- pip install codecov
+      if: "${{ success() }}"
+    - run: edm run -- codecov
+      if: "${{ success() }}"
+  test_4:
+    runs-on: macos-latest
+    env:
+      RUNTIME: '2.7'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache"
+        key: "${{ runner.os }}-path"
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: mkdir -p ~/.cache/download
+    - run: if [[ ${{ runner.os }} == "linux" ]]; then tools/install_edm_linux.sh; export PATH="${{ github.workspace }}/edm/bin:${PATH}"; fi
+    - run: if [[ ${{ runner.os }} == "osx" ]]; then tools/install_edm_osx.sh; export PATH="${PATH}:/usr/local/bin"; fi
+    - run: edm envs create travisci --version ${RUNTIME}
+    - run: edm install -e travisci -y cython numpy
+    - run: edm run -e travisci -- python setup.py develop
+    - run: edm run -e travisci -- python -m unittest discover -v concorde
+    - run: edm run -- pip install codecov
+      if: "${{ success() }}"
+    - run: edm run -- codecov
+      if: "${{ success() }}"
+  test_5:
+    runs-on: macos-latest
+    env:
+      RUNTIME: '3.5'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache"
+        key: "${{ runner.os }}-path"
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: mkdir -p ~/.cache/download
+    - run: if [[ ${{ runner.os }} == "linux" ]]; then tools/install_edm_linux.sh; export PATH="${{ github.workspace }}/edm/bin:${PATH}"; fi
+    - run: if [[ ${{ runner.os }} == "osx" ]]; then tools/install_edm_osx.sh; export PATH="${PATH}:/usr/local/bin"; fi
+    - run: edm envs create travisci --version ${RUNTIME}
+    - run: edm install -e travisci -y cython numpy
+    - run: edm run -e travisci -- python setup.py develop
+    - run: edm run -e travisci -- python -m unittest discover -v concorde
+    - run: edm run -- pip install codecov
+      if: "${{ success() }}"
+    - run: edm run -- codecov
+      if: "${{ success() }}"
+  test_6:
+    runs-on: macos-latest
+    env:
+      RUNTIME: '3.6'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache"
+        key: "${{ runner.os }}-path"
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: mkdir -p ~/.cache/download
+    - run: if [[ ${{ runner.os }} == "linux" ]]; then tools/install_edm_linux.sh; export PATH="${{ github.workspace }}/edm/bin:${PATH}"; fi
+    - run: if [[ ${{ runner.os }} == "osx" ]]; then tools/install_edm_osx.sh; export PATH="${PATH}:/usr/local/bin"; fi
+    - run: edm envs create travisci --version ${RUNTIME}
+    - run: edm install -e travisci -y cython numpy
+    - run: edm run -e travisci -- python setup.py develop
+    - run: edm run -e travisci -- python -m unittest discover -v concorde
+    - run: edm run -- pip install codecov
+      if: "${{ success() }}"
+    - run: edm run -- codecov
+      if: "${{ success() }}"

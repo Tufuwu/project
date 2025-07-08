@@ -1,0 +1,74 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ['3.9', '3.10']
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install pre-commit setuptools wheel
+        python -m pip install -r requirements.txt
+        python setup.py install
+    - name: Run pre-commit
+      run: pre-commit run --all-files --show-diff-on-failure
+    - name: Run tests
+      run: python -m unittest --verbose
+    - name: Build
+      run: |
+        mkdir html
+        git fetch --all
+        python -I -m sphinx_multiversion -W docs html
+        python setup.py build sdist bdist_wheel
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install setuptools wheel
+        python -m pip install -r requirements.txt
+        python setup.py install
+    - name: Prepare for deployment
+      run: |
+        touch html/.nojekyll
+        cp assets/gh-pages-redirect.html html/index.html
+    - name: Deploy to PyPI
+      uses: pypa/gh-action-pypi-publish@v1.8.6
+      with:
+        password: ${{ secrets.PYPI_TOKEN }}
+    - name: Deploy to GitHub Releases
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Deploy documentation
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./html
+```

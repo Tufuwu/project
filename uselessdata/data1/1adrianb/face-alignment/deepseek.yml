@@ -1,0 +1,73 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gfortran cmake libboost-python-dev
+
+    - name: Install Miniconda
+      run: |
+        wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+        bash miniconda.sh -b -p $HOME/miniconda
+        echo "$HOME/miniconda/bin" >> $GITHUB_PATH
+
+    - name: Set up conda
+      run: |
+        conda config --set always_yes yes --set changeps1 no
+        conda update -q conda
+        conda info -a
+
+    - name: Create conda environment
+      run: |
+        conda create -q -n test-environment python=${{ matrix.python-version }} pytorch cpuonly -c pytorch
+        source activate test-environment
+
+    - name: Upgrade pip, setuptools, and wheel
+      run: |
+        pip install --upgrade pip setuptools wheel
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        python setup.py install
+        pip install --upgrade pytest
+
+    - name: Run tests
+      run: |
+        pytest test/
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install flake8
+      run: |
+        pip install flake8
+
+    - name: Run flake8
+      run: |
+        flake8
+```

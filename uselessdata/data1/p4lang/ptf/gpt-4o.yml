@@ -1,0 +1,56 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    services:
+      docker:
+        image: docker:stable
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ethtool cmake libffi-dev
+        sudo apt-get remove -y python-scapy
+        git clone https://github.com/p4lang/scapy-vxlan.git
+        cd scapy-vxlan
+        sudo python setup.py install
+        cd ..
+        bash CI/travis/install-nanomsg.sh
+        sudo ldconfig
+        bash CI/travis/install-nnpy.sh
+        sudo pip3 install nose2
+
+    - name: Install package
+      run: sudo python setup.py install
+
+    - name: Set up veth
+      run: |
+        cd ptf_nn/
+        sudo ./veth_setup.sh
+        cd ..
+
+    - name: Run tests
+      run: |
+        python CI/travis/check-nnpy.py
+        ./CI/travis/run_tests.sh
+        sudo python3 /usr/local/bin/nose2 utests.tests
+```

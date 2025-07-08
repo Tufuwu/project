@@ -1,0 +1,45 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-16.04
+    services:
+      docker:
+        image: docker:stable-dind
+
+    strategy:
+      matrix:
+        python-version: [3.6]
+        test-mode: [INTEGRATION_TESTS, FLAKE8, TF2]
+
+    steps:
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Build Docker image
+      run: docker build -f tests/Dockerfile -t test_image --build-arg PY_VERSION=${{ matrix.python-version }} .
+
+    - name: Run tests
+      run: |
+        if [ "${{ matrix.test-mode }}" == "INTEGRATION_TESTS" ]; then
+          docker run -t test_image py.test tests/integration_tests;
+        elif [ "${{ matrix.test-mode }}" == "FLAKE8" ]; then
+          docker run -t test_image flake8;
+        else
+          docker run -t test_image py.test tests/kerastuner --cov-config .coveragerc --cov=kerastuner;
+        fi
+```

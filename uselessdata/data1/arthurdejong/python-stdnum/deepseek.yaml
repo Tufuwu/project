@@ -1,0 +1,29 @@
+name: Python package
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12', 'pypy-3.9', 'pypy-3.10']
+        include:
+          - python-version: '3.9'
+            toxenv: flake8
+          - python-version: '3.9'
+            toxenv: docs
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install tox
+      - run: tox -e "${TOXENV:-$(echo py${{ matrix.python-version }} | tr -d . | tr -d '-' | sed -e 's/pypypy/pypy/')}" --skip-missing-interpreters false
+        env:
+          TOXENV: ${{ matrix.toxenv }}

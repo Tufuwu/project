@@ -1,0 +1,50 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: "${{ matrix.python }}"
+    - run: apt-get -y install libkeyutils-dev libgirepository1.0-dev
+    - run: python setup.py sdist bdist_wheel
+    - run: pip install dist/*.whl keyutils
+    - run: pip install twine flake8
+    - run: twine check dist/*
+    - run: flake8
+    - run: nosetests
+    strategy:
+      matrix:
+        python:
+        - '3.6'
+        - '3.7'
+        - '3.8'
+        - '3.9'
+  Upload_release_to_PyPI:
+    needs:
+    - test
+    runs-on: ubuntu-20.04
+    env:
+      TWINE_USERNAME: coldfix-deploy
+    if: ${{ github.ref }}
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: apt-get -y install libkeyutils-dev libgirepository1.0-dev
+    - run: python setup.py sdist bdist_wheel
+    - run: pip install dist/*.whl keyutils
+    - run: pip install twine flake8
+    - run: twine upload dist/*

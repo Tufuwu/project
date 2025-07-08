@@ -1,0 +1,69 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - 'refs/tags/*'
+  pull_request:
+    branches:
+      - master
+
+env:
+  BOTO_CONFIG: /dev/null
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:stable-dind
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Build
+      run: bash build_scripts/freeze_requirements.sh
+
+    - name: Build Package
+      run: bash build_scripts/build_package.sh
+
+    - name: Dry Run
+      run: |
+        pip install --no-cache-dir dist/ops*.tar.gz
+        ops --verbose -h
+
+    - name: Keep alive
+      run: |
+        while sleep 5m; do echo "=====[ $SECONDS seconds still running ]====="; done &
+        sleep 10
+        kill %1
+
+    - name: Build Docker Image
+      run: docker build -f build_scripts/Dockerfile -t ops .
+
+    - name: Git Add Requirements
+      run: git add requirements.txt
+
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: dist/**
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Docker Push
+      if: startsWith(github.ref, 'refs/tags/')
+      run: bash build_scripts/docker_push.sh
+```

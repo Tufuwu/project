@@ -1,0 +1,33 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches-ignore:
+      - gh-pages
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        django: ['2.2', '3.0', '3.1']
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install -U pip
+        pip install -U setuptools tox-travis codecov
+    - name: Run tests
+      run: tox
+    - name: Upload coverage to Codecov
+      env:
+        DJANGO: ${{ matrix.django }}
+      run: codecov -e DJANGO
+```

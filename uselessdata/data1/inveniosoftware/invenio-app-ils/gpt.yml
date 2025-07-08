@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+        es-version: [6, 7]
+        requirements: [release, lowest]
+        include:
+          - python-version: 3.9
+            es-version: 7
+            requirements: release
+            extras: all,postgresql,elasticsearch7
+            test-suite: acquisition
+          - python-version: 3.9
+            es-version: 7
+            requirements: release
+            extras: all,postgresql,elasticsearch7
+            test-suite: circulation
+          - python-version: 3.9
+            es-version: 7
+            requirements: release
+            extras: all,postgresql,elasticsearch7
+            test-suite: document_requests
+          - python-version: 3.9
+            es-version: 7
+            requirements: release
+            extras: all,postgresql,elasticsearch7
+            test-suite: ill
+          - python-version: 3.9
+            es-version: 7
+            requirements: release
+            extras: all,postgresql,elasticsearch7
+            test-suite: ils
+          - python-version: 3.9
+            es-version: 7
+            requirements: lowest
+            extras: all,postgresql,elasticsearch7
+            test-suite: acquisition
+          - python-version: 3.9
+            es-version: 7
+            requirements: lowest
+            extras: all,postgresql,elasticsearch7
+            test-suite: circulation
+          - python-version: 3.9
+            es-version: 7
+            requirements: lowest
+            extras: all,postgresql,elasticsearch7
+            test-suite: document_requests
+          - python-version: 3.9
+            es-version: 7
+            requirements: lowest
+            extras: all,postgresql,elasticsearch7
+            test-suite: ill
+          - python-version: 3.9
+            es-version: 7
+            requirements: lowest
+            extras: all,postgresql,elasticsearch7
+            test-suite: ils
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        pip install -r requirements-${{ matrix.requirements }}.txt
+        pip install -e .[${{ matrix.extras }}]
+    - name: Download Elasticsearch
+      run: |
+        mkdir /tmp/elasticsearch
+        wget -O - https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${{ matrix.es-version }}.x-linux-x86_64.tar.gz | tar xz --directory=/tmp/elasticsearch --strip-components=1
+        /tmp/elasticsearch/bin/elasticsearch --quiet &
+    - name: Run style checks
+      run: ./run-style-checks.sh
+    - name: Run tests
+      run: ./run-tests.sh ${{ matrix.test-suite }}

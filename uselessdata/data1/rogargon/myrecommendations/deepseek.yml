@@ -1,0 +1,63 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - development
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libpq-dev
+
+    - name: Install ChromeDriver
+      run: |
+        LATEST_CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_89")
+        curl "https://chromedriver.storage.googleapis.com/${LATEST_CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" -O
+        unzip chromedriver_linux64.zip -d ~/bin
+
+    - name: Install pipenv
+      run: pip install pipenv
+
+    - name: Install dependencies
+      run: pipenv install
+
+    - name: Run tests
+      run: python manage.py test
+
+    - name: Collect static files
+      run: python manage.py collectstatic --noinput
+
+    - name: Run behave tests
+      run: python manage.py behave
+
+    - name: Build and push Docker image to Heroku
+      if: github.ref == 'refs/heads/master'
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        PROJECT: myrecommendations
+      run: |
+        docker build -f Dockerfile -t registry.heroku.com/$PROJECT/web .
+        echo "$HEROKU_API_KEY" | docker login --username=_ --password-stdin registry.heroku.com
+        docker push registry.heroku.com/$PROJECT/web
+        wget -qO- https://toolbelt.heroku.com/install.sh | sh
+        heroku container:release web --app $PROJECT
+```

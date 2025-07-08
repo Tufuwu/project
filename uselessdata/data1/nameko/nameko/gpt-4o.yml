@@ -1,0 +1,193 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox
+          
+      - name: Start RabbitMQ
+        run: |
+          docker run -d --rm -p 15672:15672 -p 5672:5672 -p 5671:5671 --name nameko-rabbitmq nameko/nameko-rabbitmq:3.6.6
+          docker cp nameko-rabbitmq:/srv/ssl certs
+
+      - name: Install Toxiproxy
+        run: |
+          mkdir $GITHUB_WORKSPACE/bin
+          wget -O $GITHUB_WORKSPACE/bin/toxiproxy-server https://github.com/Shopify/toxiproxy/releases/download/v2.0.0/toxiproxy-server-linux-amd64
+          chmod +x $GITHUB_WORKSPACE/bin/toxiproxy-server
+          echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
+
+      - name: Remove boto.cfg
+        run: sudo rm -f /etc/boto.cfg
+
+  static:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        env: [py39-static, py310-static]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox
+
+      - name: Run static analysis
+        env:
+          TOX_ENV: ${{ matrix.env }}
+        run: tox -e $TOX_ENV
+
+  docs:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        env: [docs]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox
+
+      - name: Build docs
+        env:
+          TOX_ENV: ${{ matrix.env }}
+        run: tox -e $TOX_ENV
+
+  examples:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        env: [py39-examples, py310-examples]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox
+
+      - name: Run examples
+        env:
+          TOX_ENV: ${{ matrix.env }}
+        run: tox -e $TOX_ENV
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        env: [py39-oldest-lib, py39-pinned-lib, py39-latest-lib, py39-extra-lib, py310-oldest-lib, py310-pinned-lib, py310-latest-lib, py310-extra-lib]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox
+
+      - name: Run tests
+        env:
+          TOX_ENV: ${{ matrix.env }}
+        run: tox -e $TOX_ENV
+
+  mastereventlet:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        env: [py39-mastereventlet, py310-mastereventlet]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox
+
+      - name: Run mastereventlet tests
+        env:
+          TOX_ENV: ${{ matrix.env }}
+        run: tox -e $TOX_ENV
+
+  branchcoverage:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        env: [py39-branchcoverage-lib, py310-branchcoverage-lib]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox
+
+      - name: Run branch coverage
+        env:
+          TOX_ENV: ${{ matrix.env }}
+        run: tox -e $TOX_ENV
+```

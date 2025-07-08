@@ -1,0 +1,90 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-16.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '2.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: deactivate
+    - run: sudo apt-get update -qq
+    - run: sudo apt-get install -qq python-numpy python-nose python-vtk
+    - run: virtualenv --system-site-packages ~/virtualenv/this
+    - run: source ~/virtualenv/this/bin/activate
+    - run: pip install codecov --user
+    - run: pip install -r requirements.txt --user
+    - run: python setup.py build_ext --inplace
+    - run: nosetests -v --with-coverage
+    - run: codecov -t 08147902-b78a-44fc-bb10-9b5ee0b2ad7b
+      if: "${{ success() }}"
+  test_2:
+    runs-on: ubuntu-16.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.5'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: deactivate
+    - run: sudo apt-get update -qq
+    - run: sudo apt-get install -qq python-numpy python-nose python-vtk
+    - run: virtualenv --system-site-packages ~/virtualenv/this
+    - run: source ~/virtualenv/this/bin/activate
+    - run: pip install codecov --user
+    - run: pip install -r requirements.txt --user
+    - run: python setup.py build_ext --inplace
+    - run: nosetests -v --with-coverage
+    - run: codecov -t 08147902-b78a-44fc-bb10-9b5ee0b2ad7b
+      if: "${{ success() }}"
+  test_3:
+    runs-on: ubuntu-16.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: deactivate
+    - run: sudo apt-get update -qq
+    - run: sudo apt-get install -qq python-numpy python-nose python-vtk
+    - run: virtualenv --system-site-packages ~/virtualenv/this
+    - run: source ~/virtualenv/this/bin/activate
+    - run: pip install codecov --user
+    - run: pip install -r requirements.txt --user
+    - run: python setup.py build_ext --inplace
+    - run: nosetests -v --with-coverage
+    - run: codecov -t 08147902-b78a-44fc-bb10-9b5ee0b2ad7b
+      if: "${{ success() }}"
+  test_4:
+    runs-on: ubuntu-16.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: deactivate
+    - run: sudo apt-get update -qq
+    - run: sudo apt-get install -qq python-numpy python-nose python-vtk
+    - run: virtualenv --system-site-packages ~/virtualenv/this
+    - run: source ~/virtualenv/this/bin/activate
+    - run: pip install codecov --user
+    - run: pip install -r requirements.txt --user
+    - run: python setup.py build_ext --inplace
+    - run: nosetests -v --with-coverage
+    - run: codecov -t 08147902-b78a-44fc-bb10-9b5ee0b2ad7b
+      if: "${{ success() }}"

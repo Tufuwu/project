@@ -1,0 +1,26 @@
+name: Linux
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  tests:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        dist:
+          - py3_casacore_master
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Needed for `setuptools-scm`
+          fetch-depth: 0
+
+      - name: Build container
+        run: docker build . -t ${{ matrix.dist }} -f .github/workflows/${{ matrix.dist }}.docker
+
+

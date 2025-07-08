@@ -1,0 +1,31 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements-dev.txt
+        pip install PyVCF==0.6.8 XlsxWriter===0.9.3
+
+    - name: Run tests
+      run: |
+        stty cols 80
+        nosetests -e test_solvebio_auth -e recipes
+        pytest recipes/tests/test_recipes_sync.py
+        flake8 solvebio

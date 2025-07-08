@@ -1,0 +1,51 @@
+name: Python package CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    services:
+      - docker
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          pip install -U pip tox
+          pip install https://github.com/ome/zeroc-ice-py-manylinux/releases/download/0.2.0/zeroc_ice-3.6.5-cp36-cp36m-manylinux2010_x86_64.whl
+          python -c "import Ice; print(Ice.stringVersion())"
+
+      - name: Build and test
+        run: |
+          python setup.py sdist
+          pip install dist/omero-web*gz
+          python -c "import omeroweb.version as owv; print(owv.omeroweb_version)"
+          tox -e travis
+
+      - name: Deploy to PyPI
+        if: github.event_name == 'push' && github.ref == 'refs/tags/*'
+        run: |
+          echo "$PYPI_PASSWORD" | twine login --username $PYPI_USER --password-stdin
+          python -m pip install --upgrade pip
+          python setup.py sdist bdist_wheel
+          twine upload dist/*
+```

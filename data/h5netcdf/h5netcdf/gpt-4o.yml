@@ -1,0 +1,62 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+        h5pyd-version: [v0.6.0]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Miniconda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-update-conda: true
+        activate-environment: test_env
+        environment-file: environment.yml
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        conda create -c conda-forge --yes -n test_env python=${{ matrix.python-version }} pip pytest h5py cython netCDF4
+        source activate test_env
+        python setup.py install
+        curl ${HS_ENDPOINT}/about && export WITHRESTAPI=--restapi
+        if [ -n "${WITHRESTAPI}" ]; then
+          pip install requests pytz
+          pip install git+https://github.com/HDFGroup/h5pyd.git@${{ matrix.h5pyd-version }}
+          export H5PYD_TEST_FOLDER=${TEST_BASE_DIR}/h5pyd_test/${{ matrix.python-version }}
+        fi
+        conda list
+
+    - name: Run tests
+      run: |
+        echo python_version ${{ matrix.python-version }}
+        echo endpoint ${HS_ENDPOINT}
+        echo test folder ${H5PYD_TEST_FOLDER}
+        if [ -n "${HS_USERNAME}" ]; then
+          echo username IS defined
+        else
+          echo username IS NOT defined
+        fi
+        if [ -n "${HS_PASSWORD}" ]; then
+          echo password IS defined
+        else
+          echo password IS NOT defined
+        fi
+        echo withrestapi ${WITHRESTAPI}
+        py.test -v h5netcdf/
+```

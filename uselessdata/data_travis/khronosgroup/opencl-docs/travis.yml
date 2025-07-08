@@ -1,0 +1,5 @@
+dist: focal
+
+language: ruby
+
+git:

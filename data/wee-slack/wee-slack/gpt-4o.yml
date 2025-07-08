@@ -1,0 +1,53 @@
+```yaml
+name: Python application
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        python-version: [2.7, 3.7]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/Pipfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        pip install pipenv
+        pipenv install --dev --system
+
+    - name: Lint with flake8
+      run: |
+        flake8 .
+        flake8 . --exit-zero --select=C,E,F,W
+
+    - name: Test with pytest
+      run: pytest
+
+  notifications:
+    irc:
+      channels: "chat.freenode.net#wee-slack-dev"
+    email:
+      if: failure()
+```

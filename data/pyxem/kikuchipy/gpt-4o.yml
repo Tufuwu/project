@@ -1,0 +1,62 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.7]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Miniconda
+      shell: bash
+      run: |
+        wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+        chmod +x miniconda.sh
+        ./miniconda.sh -b -p $HOME/miniconda
+        source $HOME/miniconda/bin/activate
+        conda update --yes conda
+        conda config --append channels conda-forge
+        conda create --name testenv --yes python=${{ matrix.python-version }}
+        conda activate testenv
+        conda info -a
+        df -h
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        source $HOME/miniconda/bin/activate testenv
+        conda install --yes hyperspy pyxem pytest pytest-cov coveralls
+        pip install .
+
+    - name: Test with pytest
+      shell: bash
+      run: |
+        source $HOME/miniconda/bin/activate testenv
+        export MPLBACKEND=Agg
+        pytest --cov=kikuchipy
+
+    - name: Coveralls
+      if: success()
+      shell: bash
+      run: |
+        source $HOME/miniconda/bin/activate testenv
+        coveralls
+```

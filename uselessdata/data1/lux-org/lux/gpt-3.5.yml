@@ -1,0 +1,31 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        pip install jupyter-client==6.1.6
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+    - name: Run tests
+      run: |
+        black --target-version py37 --line-length 105 --check .
+        python -m pytest tests/*.py
+        pytest --cov-report term --cov=lux tests/
+    - name: Upload coverage to Codecov
+      run: bash <(curl -s https://codecov.io/bash)

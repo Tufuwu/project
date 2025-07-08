@@ -1,0 +1,53 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    services:
+      mongo:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+        options: --name mongodb
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7.6
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get -y install gfortran swig
+        python setup.py egg_info
+        pip install -r photonai.egg-info/requires.txt
+        pip install -r photonai/optimization/smac/requirements.txt
+        pip install -r photonai/optimization/nevergrad/requirements.txt
+        pip install tensorflow
+        pip install pytest
+        pip install pytest-cov
+        pip install coveralls
+
+    - name: Run tests
+      env:
+        PYTHONPATH: ./
+      run: pytest ./test --cov=./photonai
+
+    - name: Coveralls
+      uses: coverallsapp/github-action@v2
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+```

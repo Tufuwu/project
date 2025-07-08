@@ -1,0 +1,62 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [2.7, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, pypy-2.7, pypy-3.6]
+        include:
+          - python-version: 2.7
+            env: PYTEST_VERSION=4.3.1
+          - python-version: 2.7
+            env: CDECIMAL=m3-cdecimal PYTEST_VERSION=4.3.1
+          - python-version: pypy-2.7
+            env: PYTEST_VERSION=4.3.1
+          - python-version: pypy-3.6
+            env: PYTEST_VERSION=6.1.2
+          - python-version: 3.4
+            env: PYTEST_VERSION=4.3.1
+          - python-version: 3.5
+            env: PYTHON_TEST_FLAGS=-bb PYTEST_VERSION=6.1.2
+          - python-version: 3.6
+            env: PYTEST_VERSION=6.1.2
+          - python-version: 3.7
+            env: PYTEST_VERSION=6.1.2
+          - python-version: 3.8
+            env: PYTEST_VERSION=6.1.2
+          - python-version: 3.9
+            env: PYTEST_VERSION=6.1.2
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Install dependencies
+      run: |
+        bash .ci/deps.linux.sh
+        pip install --upgrade pip
+        pip install --upgrade $CDECIMAL pytest==$PYTEST_VERSION pytest-cov freezegun==0.3.12 'backports.zoneinfo;python_version>="3.6" and python_version<"3.9"'
+        pip install --editable .
+    - name: Run tests
+      run: make test-cov
+    - name: Deploy
+      run: bash .ci/deploy.linux.sh
+```

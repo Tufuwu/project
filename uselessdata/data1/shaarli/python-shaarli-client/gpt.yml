@@ -1,0 +1,31 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+        toxenv: [docs, py39, py310, py311]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements/ci.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Install dependencies
+      run: pip install -r requirements/ci.txt
+    - name: Run tox
+      run: tox -e ${{ matrix.toxenv }}
+      env:
+        TOXENV: ${{ matrix.toxenv }}

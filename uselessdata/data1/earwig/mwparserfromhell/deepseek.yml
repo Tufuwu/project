@@ -1,0 +1,32 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        arch: [amd64, ppc64le]
+        without_extension: [0, 1]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        pip install coveralls pytest
+        python setup.py develop
+    - name: Run tests
+      env:
+        WITHOUT_EXTENSION: ${{ matrix.without_extension }}
+      run: |
+        coverage run --source=mwparserfromhell -m pytest
+    - name: Upload coverage to Coveralls
+      run: |
+        coveralls
+```

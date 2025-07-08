@@ -1,0 +1,70 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: macos-latest
+    env:
+      PYTHON: '2.7'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: if [[ "${{ runner.os }}" == "linux" ]]; then PYTHON_VERSIONS=$TRAVIS_PYTHON_VERSION ; curl https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -o miniconda.sh ; fi
+    - run: if [[ "${{ runner.os }}" == "osx" ]]; then PYTHON_VERSIONS=$PYTHON ; curl https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -o miniconda.sh ; fi
+    - run: bash miniconda.sh -b -p ${{ github.workspace }}/miniconda
+    - run: export PATH="${{ github.workspace }}/miniconda/bin:$PATH"
+    - run: hash -r
+    - run: conda config --set always_yes yes --set changeps1 no
+    - run: conda update -q conda
+    - run: conda info -a
+    - run: for VERSION in $PYTHON_VERSIONS ; do conda create --name $VERSION --yes python=$VERSION --file requirements.txt ; source activate $VERSION ; pip install -e . ; done
+    - run: for VERSION in $PYTHON_VERSIONS ; do source activate $VERSION ; make test_travis_subset ; done
+    - run: coveralls
+      if: "${{ success() }}"
+  test_2:
+    runs-on: macos-latest
+    env:
+      PYTHON: '3.6'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: if [[ "${{ runner.os }}" == "linux" ]]; then PYTHON_VERSIONS=$TRAVIS_PYTHON_VERSION ; curl https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -o miniconda.sh ; fi
+    - run: if [[ "${{ runner.os }}" == "osx" ]]; then PYTHON_VERSIONS=$PYTHON ; curl https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -o miniconda.sh ; fi
+    - run: bash miniconda.sh -b -p ${{ github.workspace }}/miniconda
+    - run: export PATH="${{ github.workspace }}/miniconda/bin:$PATH"
+    - run: hash -r
+    - run: conda config --set always_yes yes --set changeps1 no
+    - run: conda update -q conda
+    - run: conda info -a
+    - run: for VERSION in $PYTHON_VERSIONS ; do conda create --name $VERSION --yes python=$VERSION --file requirements.txt ; source activate $VERSION ; pip install -e . ; done
+    - run: for VERSION in $PYTHON_VERSIONS ; do source activate $VERSION ; make test_travis_subset ; done
+    - run: coveralls
+      if: "${{ success() }}"
+  test_3:
+    runs-on: macos-latest
+    env:
+      PYTHON: '3.7'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: if [[ "${{ runner.os }}" == "linux" ]]; then PYTHON_VERSIONS=$TRAVIS_PYTHON_VERSION ; curl https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -o miniconda.sh ; fi
+    - run: if [[ "${{ runner.os }}" == "osx" ]]; then PYTHON_VERSIONS=$PYTHON ; curl https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -o miniconda.sh ; fi
+    - run: bash miniconda.sh -b -p ${{ github.workspace }}/miniconda
+    - run: export PATH="${{ github.workspace }}/miniconda/bin:$PATH"
+    - run: hash -r
+    - run: conda config --set always_yes yes --set changeps1 no
+    - run: conda update -q conda
+    - run: conda info -a
+    - run: for VERSION in $PYTHON_VERSIONS ; do conda create --name $VERSION --yes python=$VERSION --file requirements.txt ; source activate $VERSION ; pip install -e . ; done
+    - run: for VERSION in $PYTHON_VERSIONS ; do source activate $VERSION ; make test_travis_subset ; done
+    - run: coveralls
+      if: "${{ success() }}"

@@ -1,0 +1,47 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+        django: ['2.0', '2.1', '2.2', '3.0', '3.1']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -qq
+        pip install pip wheel
+        pip install tox-travis
+        pip install -q coveralls flake8 tox
+
+    - name: Run tests
+      env:
+        DJANGO: ${{ matrix.django }}
+      run: |
+        env | sort
+        tox
+        flake8 --show-source --max-line-length=80 --exclude=.tox,docs,django_comments_xtd/tests,django_comments_xtd/__init__.py,django_comments_xtd/migrations django_comments_xtd/
+
+    - name: Coveralls
+      if: success()
+      run: coveralls
+```

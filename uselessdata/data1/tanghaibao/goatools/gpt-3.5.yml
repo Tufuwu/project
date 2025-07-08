@@ -1,0 +1,66 @@
+name: Python CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python: ['3.9', '3.10']
+
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install dependencies
+        run: |
+          if [ "${{ runner.os }}" == "Linux" ]; then
+            PYTHON_VERSIONS="${{ matrix.python }}" ;
+            curl https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o miniconda.sh ;
+          fi
+          if [ "${{ runner.os }}" == "macOS" ]; then
+            PYTHON_VERSIONS="${{ matrix.python }}" ;
+            curl https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -o miniconda.sh ;
+          fi
+          bash miniconda.sh -b -p $HOME/miniconda
+          export PATH="$HOME/miniconda/bin:$PATH"
+          hash -r
+          conda config --set always_yes yes --set changeps1 no
+          conda update -q conda
+          conda info -a
+          for VERSION in $PYTHON_VERSIONS ; do
+            conda create --name $VERSION --yes python=$VERSION --file requirements.txt ;
+            source activate $VERSION ;
+            pip install -e . ;
+          done
+
+      - name: Run tests
+        run: |
+          for VERSION in $PYTHON_VERSIONS ; do
+            source activate $VERSION ;
+            make test_travis_subset ;
+          done
+
+      - name: Upload coverage
+        run: coveralls
+
+      - name: Set up coveralls
+        run: pip install coveralls
+
+      - name: Set up environment variables
+        run: |
+          echo "PYTHON_VERSIONS=${PYTHON_VERSIONS}" >> $GITHUB_ENV
+
+      - name: Finalize
+        run: echo "All steps completed successfully"

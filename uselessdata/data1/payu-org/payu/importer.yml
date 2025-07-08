@@ -1,0 +1,30 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: "${{ matrix.python }}"
+    - run: pip install .
+    - run: pip install -r test/requirements_test.txt
+    - run: payu list
+    - run: pylint --extension-pkg-whitelist=netCDF4 -E payu
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.6 || $TRAVIS_PYTHON_VERSION == 3.7 ]]; then PYTHONPATH=. pytest --cov=payu -s test; fi;
+    - run: if [[ $TRAVIS_PYTHON_VERSION == 3.6 || $TRAVIS_PYTHON_VERSION == 3.7 ]]; then coveralls; fi;
+    - run: cd docs && make html
+    strategy:
+      matrix:
+        python:
+        - '3.6'
+        - '3.7'

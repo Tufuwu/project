@@ -1,0 +1,72 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+env:
+  PYTHONWARNINGS: default,ignore::PendingDeprecationWarning,ignore::ResourceWarning
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: "${{ matrix.python }}"
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+#     # This item has no matching transformer
+#     - mysql: '5.5'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install codecov
+    - run: pip install -e git+https://github.com/modoboa/modoboa.git#egg=modoboa
+    - run: pip install -r requirements.txt
+    - run: pip install -r test-requirements.txt
+    - run: python setup.py develop
+    - run: cd test_project
+    - run: coverage run --source ../modoboa_amavis manage.py test modoboa_amavis
+    - run: cd ../modoboa_amavis
+    - run: django-admin compilemessages
+    - run: cd ..
+#     # This item has no matching transformer
+#     - pypi:
+#         provider: pypi
+#         user: tonio
+#         password:
+#           secure: qtRkmcbA9tbqFw0IK/liCuKszeXDrUC9iI7j3Q4x0jxx7OW8bnn0JqGl45IuKaaSIt1M3PIP0T82h3S+DqBoGfE0xuH4Oe2WwvP76p8afjeOHjoRVOhKihTAZZXsBA2jEteNiDibiu7ezpMXQNaO+BnfYqUJ3ATZJD7xIRNigHo=
+#         skip_cleanup: true
+#         distributions: sdist bdist_wheel
+#         'on':
+#           tags: true
+#           python: '3.7'
+#           condition: "$DB = POSTGRESQL"
+#       if: "${{ github.event_name == 'push' && $DB == POSTGRESQL && ${{ github.ref }} }}"
+    - run: codecov
+      if: "${{ success() }}"
+    strategy:
+      matrix:
+        DB:
+        - POSTGRESQL
+        - MYSQL
+        python:
+        - '3.5'
+        - '3.6'
+        - '3.7'
+    services:
+      postgresql:
+        image: postgres:9.6
+#       # This item has no matching transformer
+#       postgres:
+      mysql:
+        image: mysql
+    env:
+      DB: "${{ matrix.DB }}"

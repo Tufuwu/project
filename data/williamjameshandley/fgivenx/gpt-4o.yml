@@ -1,0 +1,44 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [2.7, 3.6, 3.7, 3.8]
+        requirements-file: [minimal_requirements.txt, requirements.txt]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        pip install -r ${{ matrix.requirements-file }}
+        pip install --upgrade pytest
+        pip install pytest-cov codecov
+
+    - name: Set MPLBACKEND
+      run: echo "MPLBACKEND=Agg" >> $GITHUB_ENV
+
+    - name: Test with pytest
+      run: python -m pytest --cov=fgivenx
+
+    - name: Upload coverage to Codecov
+      run: |
+        codecov
+        bash <(curl -s https://codecov.io/bash)
+```

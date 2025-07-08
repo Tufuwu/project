@@ -1,0 +1,53 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      SPHINXINTL_TRANSIFEX_USERNAME: sphinxjp
+      SPHINXINTL_TRANSIFEX_PROJECT_NAME: sphinx-doc
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        pip install -U pip setuptools
+        pip install -r ./requirements.txt
+
+    - name: Run update script
+      run: sh ./locale/update.sh
+
+    - name: Configure Git
+      run: |
+        git config --global user.email "sphinx-auto-update"
+        git config --global user.name "sphinx-auto-update"
+
+    - name: Commit and push changes
+      run: |
+        git add .
+        git commit -m "[skip ci] by GitHub Actions"
+        git remote add github git@github.com:sphinx-doc/sphinx-doc-translations.git
+        git push github master
+      env:
+        GIT_SSH_KEY: ${{ secrets.GIT_SSH_KEY }}
+      if: success()
+```

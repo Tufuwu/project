@@ -1,0 +1,35 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y graphviz xz-utils zlib1g libxml2-dev libxslt1-dev bzip2
+        pip install -r requirements.txt
+
+    - name: Create database
+      run: createdb --encoding=utf-8 scancodeio
+
+    - name: Run tests
+      env:
+        SCANCODEIO_DB_USER: postgres
+        CELERY_TASK_ALWAYS_EAGER: True
+        ACTIVATE: 
+      run: ./manage.py test --settings=scancodeio.settings.base --verbosity=2 --noinput

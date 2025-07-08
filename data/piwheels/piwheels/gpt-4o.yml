@@ -1,0 +1,62 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8, 3.7, 3.5]
+        include:
+          - python-version: 3.8
+            dist: bionic
+            requirements: requirements_bullseye.txt
+            python_apt_ver: 1.6.4
+          - python-version: 3.7
+            dist: xenial
+            requirements: requirements_buster.txt
+            python_apt_ver: 1.1.0~beta1
+          - python-version: 3.5
+            dist: xenial
+            requirements: requirements_stretch.txt
+            python_apt_ver: 1.1.0~beta1
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt build-dep -y python3-apt
+        DEBVER=${{ matrix.python_apt_ver }}
+        pip install git+https://salsa.debian.org/apt-team/python-apt.git@$(echo ${{ matrix.python_apt_ver }} | sed -e 's/~/_/')
+        pip install -r ${{ matrix.requirements }}
+        pip install codecov -e .[master,slave,logger,test]
+
+    - name: Set up PostgreSQL
+      run: |
+        sudo systemctl start postgresql
+        psql -U postgres -c "create user piwheels password 'piwheels'"
+        psql -U postgres -c "create database piwheels_test"
+
+    - name: Run tests
+      run: make test
+
+    - name: Upload coverage to Codecov
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      run: codecov
+```

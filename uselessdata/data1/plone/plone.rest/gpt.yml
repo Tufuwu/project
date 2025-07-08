@@ -1,0 +1,45 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+        plone-version: [4.3.x, 5.1.x, 5.2.x]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Create buildout cache directories
+      run: mkdir -p $HOME/buildout-cache/{eggs,downloads}
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+    - name: Configure buildout
+      run: sed -ie "s#plone-x.x.x.cfg#plone-${{ matrix.plone-version }}.cfg#" travis.cfg
+    - name: Run buildout
+      run: buildout -N -t 3 -c travis.cfg
+    - name: Run black check
+      run: if [ -f "bin/black" ]; then bin/black src/ --check ; fi
+    - name: Run code analysis
+      run: bin/code-analysis
+    - name: Run tests
+      run: bin/test
+    - name: Run test coverage
+      run: bin/test-coverage
+    - name: Publish coverage report
+      if: success()
+      run: |
+        pip install -q coveralls
+        coveralls

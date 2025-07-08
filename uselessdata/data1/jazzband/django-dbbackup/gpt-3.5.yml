@@ -1,0 +1,80 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
+
+    services:
+      - mysql
+      - postgresql
+      - mongodb
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install dependencies
+        run: |
+          TOX_ENV=py${{ matrix.python }}-django${{ env.DJANGO }}
+          pip install virtualenv tox
+          tox -e $TOX_ENV --notest
+
+      - name: Run tests
+        run: |
+          TOX_ENV=py${{ matrix.python }}-django${{ env.DJANGO }}
+          tox -e $TOX_ENV
+
+      - name: After success
+        run: |
+          TOX_ENV=py${{ matrix.python }}-django${{ env.DJANGO }}
+          tox -e $TOX_ENV -- pip install coveralls
+          tox -e $TOX_ENV -- coveralls $COVERALLS_OPTION
+
+      - name: Lint tests
+        if: ${{ matrix.python }} == '3.9'
+        run: |
+          TOX_ENV=lint
+          pip install tox
+          tox -e $TOX_ENV
+
+      - name: Run docs tests
+        if: ${{ matrix.python }} == '3.9'
+        run: |
+          TOX_ENV=docs
+          pip install tox
+          tox -e $TOX_ENV
+
+      - name: Run functional tests
+        if: ${{ matrix.python }} == '3.9'
+        run: |
+          TOX_ENV=functional
+          pip install tox
+          export PYTHON='coverage run -a'
+          mysql -e 'CREATE DATABASE test;'
+          psql -c 'CREATE DATABASE test;' -U postgres
+          tox -e $TOX_ENV
+          DB_ENGINE=django.db.backends.mysql DB_USER=travis DB_HOST=localhost DB_NAME=test tox -e $TOX_ENV
+          DB_ENGINE=django.db.backends.postgresql DB_USER=postgres DB_HOST=localhost DB_NAME=test tox -e $TOX_ENV
+          CONNECTOR=dbbackup.db.postgresql.PgDumpBinaryConnector DB_ENGINE=django.db.backends.postgresql DB_USER=postgres DB_HOST=localhost DB_NAME=test tox -e $TOX_ENV
+
+      - name: Run functional-mongodb tests
+        if: ${{ matrix.python }} == '3.9'
+        run: |
+          TOX_ENV=functional-mongodb
+          pip install tox
+          export PYTHON='coverage run -a'
+          DB_ENGINE=djongo DB_NAME=test tox -e $TOX_ENV
+
+      - name: Finalize
+        if: always()
+        run: echo "All tests completed successfully."

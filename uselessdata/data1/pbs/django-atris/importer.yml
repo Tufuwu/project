@@ -1,0 +1,86 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py36-django21
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: pip install tox
+    - run: psql -U postgres -c "CREATE USER history_user2 CREATEDB PASSWORD 'pass';"
+    - run: tox
+    - uses: rtCamp/action-slack-notify@v2.2.1
+      env:
+        SLACK_WEBHOOK: "${{ secrets.SLACK_WEBHOOK }}"
+    services:
+      postgresql:
+        image: postgres:9.4
+  test_2:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py36-django22
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: pip install tox
+    - run: psql -U postgres -c "CREATE USER history_user2 CREATEDB PASSWORD 'pass';"
+    - run: tox
+    - uses: rtCamp/action-slack-notify@v2.2.1
+      env:
+        SLACK_WEBHOOK: "${{ secrets.SLACK_WEBHOOK }}"
+    services:
+      postgresql:
+        image: postgres:9.4
+  test_3:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py37-django21
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: pip install tox
+    - run: psql -U postgres -c "CREATE USER history_user2 CREATEDB PASSWORD 'pass';"
+    - run: tox
+    - uses: rtCamp/action-slack-notify@v2.2.1
+      env:
+        SLACK_WEBHOOK: "${{ secrets.SLACK_WEBHOOK }}"
+    services:
+      postgresql:
+        image: postgres:9.4
+  test_4:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py37-django22
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: pip install tox
+    - run: psql -U postgres -c "CREATE USER history_user2 CREATEDB PASSWORD 'pass';"
+    - run: tox
+    - uses: rtCamp/action-slack-notify@v2.2.1
+      env:
+        SLACK_WEBHOOK: "${{ secrets.SLACK_WEBHOOK }}"
+    services:
+      postgresql:
+        image: postgres:9.4

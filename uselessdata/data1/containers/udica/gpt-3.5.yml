@@ -1,0 +1,29 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+
+    steps:
+      - name: Pull Docker images
+        run: |
+          docker pull fedora:rawhide
+          docker pull fedora:latest
+          docker pull centos:centos8
+
+      - name: Install dependencies
+        run: sudo apt-get install -y build-essential
+        run: pip3 install pyflakes
+        run: pip3 install black
+
+      - name: Run tests
+        run: make format-check
+        run: make lint
+        run: docker run -v $PWD:/root/build/ fedora:rawhide /bin/sh -c "cd /root/build; python3 -m unittest -v tests/test_unit.py"
+        run: docker run -v $PWD:/root/build/ fedora:latest /bin/sh -c "cd /root/build; python3 -m unittest -v tests/test_unit.py"
+        run: docker run -v $PWD:/root/build/ centos:centos8 /bin/sh -c "yum install python3 -y; cd /root/build; python3 -m unittest -v tests/test_unit.py"

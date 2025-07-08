@@ -1,0 +1,51 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+        som-interp: [AST, BC]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest
+
+    - name: Download and set up PyPy
+      run: |
+        wget https://downloads.python.org/pypy/pypy2.7-v7.3.1-src.tar.bz2
+        tar -xjf pypy2.7-v7.3.1-src.tar.bz2
+        mv pypy2.7-v7.3.1-src .pypy
+
+    - name: Set environment variables
+      run: |
+        echo "SOM_INTERP=${{ matrix.som-interp }}" >> $GITHUB_ENV
+        echo "SOM_BIN=som-${{ matrix.som-interp }}" >> $GITHUB_ENV
+
+    - name: Run tests with pytest
+      run: |
+        PYTHONPATH=$PYTHONPATH:.pypy:src pytest
+
+    - name: Run SOM script
+      run: |
+        PYTHONPATH=$PYTHONPATH:.pypy ./som.sh -cp Smalltalk TestSuite/TestHarness.som
+
+    - name: Compile with RPython
+      run: |
+        PYTHONPATH=$PYTHONPATH:.pypy .pypy/rpython/bin/rpython --batch src/main-rpython.py
+
+    - name: Run compiled SOM
+      run: |
+        ./$SOM_BIN -cp Smalltalk TestSuite/TestHarness.som

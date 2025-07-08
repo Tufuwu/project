@@ -1,0 +1,59 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+        toxenv:
+          - py
+          - cover
+          - black
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        npm install -g elm
+        pip install tox
+
+    - name: Run Tox
+      env:
+        TOXENV: ${{ matrix.toxenv }}
+      run: tox
+
+  coveralls:
+    runs-on: ubuntu-20.04
+    needs: build
+    if: success()
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        pip install coveralls
+
+    - name: Run Coveralls
+      run: coveralls
+```

@@ -1,0 +1,59 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8, 2.7, 3.7, 3.6, 3.5, pypy, pypy3]
+        lua: [luajit-5.1, lua5.3, lua5.2, bundle]
+        include:
+          - python-version: pypy
+            lua: luajit-5.1
+          - python-version: pypy
+            lua: lua5.2
+          - python-version: pypy
+            lua: bundle
+          - python-version: pypy3
+            lua: luajit-5.1
+          - python-version: pypy3
+            lua: lua5.2
+          - python-version: pypy3
+            lua: bundle
+      fail-fast: false
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -U tox-travis virtualenv
+
+    - name: Install Lua dependencies
+      if: ${{ matrix.lua != 'bundle' }}
+      run: sudo apt-get install lib${{ matrix.lua }}-dev
+
+    - name: Set environment variables
+      run: |
+        if [[ "${{ matrix.lua }}" == lua5* ]]; then echo "SETUP_OPTIONS=--no-luajit" >> $GITHUB_ENV; fi
+        if [[ "${{ matrix.lua }}" == "bundle" ]]; then echo "SETUP_OPTIONS=--use-bundle" >> $GITHUB_ENV; fi
+        if [[ "${{ matrix.lua }}" == "bundle" ]]; then echo "CFLAGS=$CFLAGS -flto" >> $GITHUB_ENV; echo "LDFLAGS=$LDFLAGS -flto" >> $GITHUB_ENV; fi
+
+    - name: Run tests
+      run: tox
+```

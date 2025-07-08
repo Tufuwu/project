@@ -1,0 +1,41 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y graphviz
+        pip install .[dev]
+
+    - name: Run tests
+      run: python -m pytest
+
+    - name: Upload coverage to Codecov
+      env:
+        CODECOV_TOKEN: 94150045-9c0d-4b51-8116-e1606ab7a72e
+      run: bash <(curl -s https://codecov.io/bash)
+```

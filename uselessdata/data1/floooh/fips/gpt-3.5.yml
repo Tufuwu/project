@@ -1,0 +1,56 @@
+name: C/C++ CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+        sudo apt-get update -qq
+        sudo apt-get install -qq g++-4.8
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 50
+        sudo apt-get install -qq cmake
+        sudo apt-get install -qq ccache
+
+    - name: Build and test
+      run: |
+        python --version
+        python fips
+        python fips clone https://github.com/floooh/fips-hello-world.git
+        cd ../fips-hello-world
+        python fips help
+        python fips list
+        python fips diag
+        python fips fetch
+        python fips gen
+        python fips build
+        python fips run
+        python fips clean
+        python fips set
+        python fips make
+        python fips update
+        python fips unset
+        python fips init
+        python fips fips-hello-test
+        python fips fips-hello-dep1
+        cd ../fips-hello-dep1
+        python fips gen
+        python fips build
+        python fips clone https://github.com/fungos/fips-tests.git
+        cd ../fips-tests
+        python fips testrunner

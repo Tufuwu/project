@@ -1,0 +1,68 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: [2.7, 3.5, 3.6, 3.7]
+        include:
+          - os: ubuntu-latest
+            python-version: 2.7
+            allow-failure: true
+          - os: macos-latest
+            python-version: 2.7
+            allow-failure: true
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+          wget http://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
+        else
+          wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+        fi
+        bash miniconda.sh -b -p $HOME/miniconda
+        source $HOME/miniconda/bin/activate
+        conda config --set always_yes yes --set changeps1 no --set auto_update_conda no
+        conda create -n testenv python=${{ matrix.python-version }} pytest numpy
+        source activate testenv
+        conda install conda conda-verify conda-build anaconda-client twine
+        conda info -a
+
+    - name: Add MKL shared libraries to path
+      run: |
+        MKL_PARDISO_LIB_DIR=`python -c 'import numpy.distutils.system_info as sysinfo; print(sysinfo.get_info("mkl")["library_dirs"][0])'`
+        if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+          export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${MKL_PARDISO_LIB_DIR}
+        fi
+
+    - name: Install MacOSX SDK
+      if: matrix.os == 'macos-latest'
+      run: |
+        cd /var/tmp; mkdir MacOSX-SDKs; cd MacOSX-SDKs;
+        wget https://github.com/phracker/MacOSX-SDKs/releases/download/10.13/MacOSX10.9.sdk.tar.xz
+        tar -xf ./MacOSX10.9.sdk.tar.xz
+        rm MacOSX10.9.sdk.tar.xz; cd ${{ github.workspace }}
+
+    - name: Build conda package
+      run: conda build conda-recipe --python=${{ matrix.python-version }} --output-folder conda-bld
+```

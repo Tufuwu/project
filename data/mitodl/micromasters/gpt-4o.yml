@@ -1,0 +1,73 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  python:
+    runs-on: ubuntu-18.04
+    services:
+      docker:
+        image: docker:stable
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up environment variables
+        run: |
+          env | grep GITHUB > .env
+          env | grep CI >> .env
+      - name: Run Python tests
+        run: docker-compose -f docker-compose.yml -f docker-compose.travis.yml run web tox
+
+  python-selenium:
+    runs-on: ubuntu-18.04
+    services:
+      docker:
+        image: docker:stable
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up environment variables
+        run: |
+          env | grep GITHUB > .env
+          env | grep CI >> .env
+      - name: Build Docker images
+        run: |
+          docker build -t micromasters_watch -f ./Dockerfile-node .
+          docker build -t travis-watch -f ./travis/Dockerfile-travis-watch .
+      - name: Run travis-watch
+        run: |
+          docker run --name travis-watch-container --env-file .env -e NODE_ENV=production -t travis-watch ./webpack_if_prod.sh
+          docker cp travis-watch-container:/src/webpack-stats.json .
+          docker cp travis-watch-container:/src/static/bundles ./static/bundles
+      - name: Run Selenium tests
+        run: ./scripts/test/run_selenium_tests_travis.sh
+
+  javascript:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 10.15.1
+      - name: Install Yarn
+        run: curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.13.0
+      - name: Add Yarn to PATH
+        run: echo "$HOME/.yarn/bin" >> $GITHUB_PATH
+      - name: Run JavaScript tests
+        run: bash ./travis/js_tests.sh
+        env:
+          NODE_ENV: test
+      - name: Cache Yarn
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+```

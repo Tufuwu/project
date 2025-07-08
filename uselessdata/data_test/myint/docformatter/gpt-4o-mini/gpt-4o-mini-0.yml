@@ -1,0 +1,38 @@
+```yaml
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['2.7', 'pypy', '3.4', '3.5', '3.6', '3.7']
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: python setup.py --quiet install
+
+      - name: Run tests
+        run: |
+          python test_docformatter.py
+          docformatter setup.py
+
+      - name: Coverage
+        if: success()
+        run: |
+          pip install --quiet coverage
+          make coverage
+
+          pip install --quiet coveralls
+          coveralls
+```

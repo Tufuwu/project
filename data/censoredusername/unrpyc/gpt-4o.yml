@@ -1,0 +1,55 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['2.7']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+
+    - name: Run script
+      run: |
+        ./unrpyc.py --clobber testcases/script.rpyc
+        diff -u testcases/script.orig.rpy testcases/script.rpy
+        cd un.rpyc
+        ./compile.py -p 1
+        cd ..
+
+    - name: Before deploy
+      run: ./make-bintray-json.sh
+
+    - name: Deploy to Bintray
+      if: github.ref_type == 'branch'
+      env:
+        BINTRAY_USER: jackmcbarn
+        BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}
+      run: |
+        curl -T bintray.json -u$BINTRAY_USER:$BINTRAY_API_KEY "https://api.bintray.com/content/..."
+
+    - name: Deploy to GitHub Releases
+      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: un.rpyc/un.rpyc
+        token: ${{ secrets.GITHUB_TOKEN }}
+```

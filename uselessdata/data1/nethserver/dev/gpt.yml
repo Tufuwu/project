@@ -1,0 +1,29 @@
+name: Ruby CI with Webhook Notification
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Run every hour
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '2.7'  # Specify the Ruby version
+
+    - name: Run script if scheduled
+      run: |
+        if [[ "${{ github.event_name }}" == "schedule" ]]; then
+          curl -s -X POST \
+            -d "branches=${GITHUB_REF#refs/heads/}" \
+            -d "token=${{ secrets.RTD_TOKEN }}" \
+            https://readthedocs.org/api/v2/webhook/nethserver-devel/49560/
+        fi
+      env:
+        RTD_TOKEN: ${{ secrets.RTD_TOKEN }}

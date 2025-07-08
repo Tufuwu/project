@@ -1,0 +1,84 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:stable
+    strategy:
+      matrix:
+        target:
+          - py2_casacore_v3.2
+          - py3_casacore_v3.2
+          - py2_casacore_master
+          - py3_casacore_master
+          - py2-kern
+          - py3-kern
+          - pep8
+          - mypy
+        allow_failures:
+          target:
+            - py2-kern
+            - py3-kern
+            - pep8
+            - mypy
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Before Install
+      run: .travis/before_install.sh
+
+    - name: Install
+      run: .travis/install.sh
+
+    - name: Run Script
+      run: .travis/script.sh
+
+  deploy:
+    if: github.ref == 'refs/tags/*'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Deploy to PyPI
+      env:
+        TWINE_USERNAME: gijzelaerr
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        python -m pip install --upgrade pip
+        pip install twine
+        twine upload dist/* --skip-existing
+
+  after_success:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Coveralls
+      run: coveralls
+
+  notifications:
+    webhooks:
+      - url: https://webhooks.gitter.im/e/08a570c12a3afa37d8e2
+```

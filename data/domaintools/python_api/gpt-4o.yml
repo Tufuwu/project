@@ -1,0 +1,33 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-16.04
+    strategy:
+      matrix:
+        python-version: [3.8, 3.7, 3.6, 3.5, 2.7]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: ./.travis/install
+    - name: Run tests
+      env:
+        TOXENV: py${{ matrix.python-version }}
+      run: ./.travis/run tox
+    - name: Upload coverage to Coveralls
+      if: success()
+      run: coveralls
+```

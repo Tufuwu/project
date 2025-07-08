@@ -1,0 +1,43 @@
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          pip install flake8 flake8_polyfill kodi-addon-checker git+https://github.com/romanvm/kodi-addon-submitter.git
+
+      - name: Prepare Git
+        run: |
+          git config core.quotepath false
+
+      - name: Run tests
+        run: |
+          flake8 ./ --statistics --show-source --ignore=E501 --exclude=croniter.py
+          kodi-addon-checker --branch=matrix --allow-folder-id-mismatch
+
+      - name: Deploy on tag creation
+        if: github.event_name == 'push' && github.ref_type == 'tag'
+        run: submit-addon -r repo-scripts -b matrix --push-branch service.libraryautoupdate
+```

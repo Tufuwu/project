@@ -1,0 +1,132 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  linting:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip setuptools
+        pip install coveralls==1.9.2 tox==3.14.3
+    - name: Run linting
+      run: tox -e lint
+
+  documentation:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip setuptools
+        pip install coveralls==1.9.2 tox==3.14.3
+    - name: Run documentation tests
+      run: tox -e doctest
+
+  evm-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - name: Install dependencies
+      run: |
+        sudo add-apt-repository -y ppa:ethereum/ethereum
+        sudo add-apt-repository -y ppa:deadsnakes/ppa
+        sudo apt-get update
+        sudo apt-get install -y python3.9-dev npm solc
+        python -m pip install --upgrade pip setuptools
+        pip install coveralls==1.9.2 tox==3.14.3
+    - name: Run EVM tests
+      run: tox -e evmtest
+
+  package-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - name: Install dependencies
+      run: |
+        sudo add-apt-repository -y ppa:ethereum/ethereum
+        sudo add-apt-repository -y ppa:deadsnakes/ppa
+        sudo apt-get update
+        sudo apt-get install -y python3.9-dev npm solc
+        python -m pip install --upgrade pip setuptools
+        pip install coveralls==1.9.2 tox==3.14.3
+    - name: Run package tests
+      run: tox -e pmtest
+
+  plugin-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - name: Install dependencies
+      run: |
+        sudo add-apt-repository -y ppa:ethereum/ethereum
+        sudo add-apt-repository -y ppa:deadsnakes/ppa
+        sudo apt-get update
+        sudo apt-get install -y python3.9-dev npm solc
+        python -m pip install --upgrade pip setuptools
+        pip install coveralls==1.9.2 tox==3.14.3
+    - name: Run plugin tests
+      run: tox -e plugintest
+
+  standard-tests-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        sudo add-apt-repository -y ppa:ethereum/ethereum
+        sudo add-apt-repository -y ppa:deadsnakes/ppa
+        sudo apt-get update
+        sudo apt-get install -y python${{ matrix.python-version }}-dev npm solc
+        python -m pip install --upgrade pip setuptools
+        pip install coveralls==1.9.2 tox==3.14.3
+    - name: Run standard tests
+      run: tox -e py${{ matrix.python-version }}
+
+  standard-tests-windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - name: Install dependencies
+      run: |
+        choco install python --version=3.9.0
+        python -m pip install --upgrade pip setuptools
+        pip install coveralls==1.9.2 tox==3.14.3
+    - name: Run standard tests
+      run: tox -e py39
+
+after_script:
+  - python -m coveralls

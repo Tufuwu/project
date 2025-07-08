@@ -1,0 +1,71 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  release:
+    types:
+      - published
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+        twisted: ['twisted', 'twisted==18.7.0']
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        pip install ${{ matrix.twisted }} -e .[tests]
+        pip freeze
+    - name: Run tests
+      run: pytest
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    - name: Install linting tools
+      run: pip install -U -e .[tests] black pyflakes isort
+    - name: Run pyflakes
+      run: pyflakes daphne tests
+    - name: Run black
+      run: black --check daphne tests
+    - name: Run isort
+      run: isort --check-only --diff --recursive daphne tests
+
+  release:
+    if: github.event_name == 'release' && github.event.action == 'published'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    - name: Install dependencies
+      run: pip install -U -e .[tests]
+    - name: Publish to PyPI
+      run: |
+        pip install twine
+        python setup.py sdist bdist_wheel
+        twine upload dist/*
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+```

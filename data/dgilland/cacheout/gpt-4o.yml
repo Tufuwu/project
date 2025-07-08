@@ -1,0 +1,47 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: ['3.4', '3.5', '3.6', '3.7']
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: pip install tox-travis
+    - name: Run tests
+      run: tox
+
+  coverage:
+    runs-on: ubuntu-20.04
+    needs: build
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.x
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    - name: Install dependencies
+      run: |
+        pip install tox-travis
+        pip install coveralls
+    - name: Run tests and submit coverage
+      run: |
+        tox
+        coveralls
+```

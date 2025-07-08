@@ -1,0 +1,40 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        pip install -r test_requirements.txt
+        pip install .
+        pip install coveralls codeclimate-test-reporter pytest-cov
+
+    - name: Run tests
+      run: |
+        py.test --cov=pycec tests/
+        coverage run --source=pycec setup.py test
+        coverage run --source=pycec $(which py.test)
+
+    - name: Report to Code Climate
+      if: success()
+      run: codeclimate-test-reporter
+
+    - name: Report to Coveralls
+      if: success()
+      run: coveralls
+```

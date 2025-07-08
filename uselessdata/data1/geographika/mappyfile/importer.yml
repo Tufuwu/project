@@ -1,0 +1,36 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: "${{ matrix.python }}"
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install tox-travis coveralls
+    - run: tox
+    - run: python setup.py install
+    - run: mappyfile schema mapfile-schema.json
+    - run: mappyfile schema mapfile-schema-7-6.json --version=7.6
+    - run: mappyfile validate tests/sample_maps/256_overlay_res.map
+    - run: mappyfile format tests/sample_maps/256_overlay_res.map tests/sample_maps/256_overlay_res_formatted.map
+    - run: coveralls
+      if: "${{ success() }}"
+    strategy:
+      matrix:
+        python:
+        - '2.7'
+        - '3.6'
+        - '3.7'
+        - '3.8'
+        - pypy3

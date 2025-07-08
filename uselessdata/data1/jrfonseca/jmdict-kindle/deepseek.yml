@@ -1,0 +1,45 @@
+```yaml
+name: CI
+
+on:
+  push:
+    tags: true
+    branches:
+      - '*'
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -qq
+        sudo apt-get install -qq -y --no-install-recommends python3-cairo python3-pil python3-htmlmin p7zip
+
+    - name: Print Python version
+      run: python3 --version
+
+    - name: Run make
+      run: make
+
+    - name: Create 7z archive
+      run: 7zr a dictionaries-"$GITHUB_REF_NAME".7z jmdict.mobi jmnedict.mobi combined.mobi
+
+    - name: Upload release asset
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: dictionaries-*.7z
+        asset_name: dictionaries-${{ github.ref_name }}.7z
+        asset_content_type: application/x-7z-compressed
+```

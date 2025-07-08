@@ -1,0 +1,39 @@
+name: Python CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python: ['3.9', '3.10']
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install dependencies
+        run: pip install tox
+      - name: Run tests
+        run: tox
+
+      - name: Check style and security
+        run: tox -e checkstyle,security
+
+      - name: Upload coverage report
+        if: matrix.python == '3.10'
+        run: tox -e py38-ci-xdist-cov-codecov
+
+      - name: Notify
+        if: failure()
+        run: echo "Build failed"

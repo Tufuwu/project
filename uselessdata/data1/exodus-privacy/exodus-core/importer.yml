@@ -1,0 +1,49 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: pip install -r requirements.txt
+    - run: pip install flake8==3.8.2
+    - run: export PATH="$PATH:$PWD/exodus_core/dexdump/"
+    - run: flake8
+    - run: python -m unittest discover -v -s exodus_core -p "test_*.py"
+    - run: python setup.py sdist
+    - uses: softprops/action-gh-release@v0.1.15
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        GITHUB_REPOSITORY: "${{ github.repository }}"
+      with:
+        files: dist/*
+      if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+#     # This item has no matching transformer
+#     - pypi:
+#         provider: pypi
+#         user: __token__
+#         password:
+#           secure: pLPye/AMikITU+GfXu1V9qbtxQmWnSavAmi26dsPyi4a84Dk66a3nkkq2ztr9eWOemFLVwI8H2MJGT5XW02zIkljwocPC65GLK3uPtTnPd2TYpU4pdGbvveZBYb//PpuBf5Cjd76QpnxTRU7Ur3n7bk3mZ2yx6LNHNUM1/uijwDyvwTjyojVYYjSjciO6wLQrNeNw+e00Z8IikPRsmyvqfryIiwyGtsCCFlZpGz0uT799qNj1mlrCCREfOWPtJmqJsReyn8sEAqqSenOf3KDNz/sO8ER2uE37MppLHO7ekq5kXJrR8WXp0SiU7LYBnuY5yZGrMbygUHGd+iGNbDdqV9C3FrA4DgvUE0nsd32NL7Cn3XSc1zwlUECB0J+GKFJf5bqrsZj+OQ/oBZxTuQAi50OE62PjmhpQzINBvZvsp5nXfnENiqfzYBqGfFrQmvfi0qPta1nZ/p+f3LknCwnBg7cxpRxe5VcnGzgJHd0VmA22tYyILmGFgGPdqnT6HhmlA5/IofAJzLTy6pJZJvjXetnwpuZEXUUaObuX/dGdDz4TKPc7+K3OP10tDaHbkSkqq5wloBZNjSAVaSMu/PXXaKCBX3uNcq4NUo6/dNUoz8OfVkwiC/spG794N2iObQlzd8+YBi8hLd87oQwfw0oAMex2Q2YoCeINAKE76HPlFE=
+#         file_glob: true
+#         file: dist/*
+#         skip_cleanup: true
+#         'on':
+#           tags: true
+#       if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+#     # This item has no matching transformer
+#     - email:
+#         recipients:
+#         - u039b@exodus-privacy.eu.org
+#         on_success: always
+#         on_failure: always

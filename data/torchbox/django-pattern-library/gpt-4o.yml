@@ -1,0 +1,85 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8, 3.9]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: |
+          pip install poetry tox
+      - name: Run tests
+        run: |
+          tox -e $(tox -l | grep py${{ matrix.python-version }} | xargs echo | sed 's/ /,/g')
+
+  build:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Cache node modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install dependencies
+        run: |
+          pip install poetry tox
+          npm install --no-optional --no-audit --progress=false
+          poetry install
+      - name: Build project
+        run: |
+          npm run build
+          poetry run django-admin runserver --settings=tests.settings.production --pythonpath=. &
+      - name: Run scripts
+        run: |
+          tox -e lint
+          poetry run mkdocs build --strict
+          wget --mirror --page-requisites --no-parent --no-verbose http://localhost:8000/django-pattern-library/demo/pattern-library/
+          mv localhost:8000/django-pattern-library/demo site
+          poetry run django-admin render_patterns --settings=tests.settings.production --pythonpath=. --wrap-fragments --output=site/dpl-rendered-patterns
+          cat pyproject.toml | awk '{sub(/^version = .+/,"version = \"0.0.0.dev\"")}1' > pyproject.toml.tmp && mv pyproject.toml.tmp pyproject.toml
+          poetry build
+          mv dist site
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.PAGES_GITHUB_API_TOKEN }}
+          publish_dir: ./site
+```

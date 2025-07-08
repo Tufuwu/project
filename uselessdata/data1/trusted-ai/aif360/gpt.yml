@@ -1,0 +1,69 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        pip install -e '.[all]'
+        pip install flake8
+        UCI_HTTPS_URL="https://archive.ics.uci.edu/ml/machine-learning-databases"
+        for file in adult.data adult.test adult.names german.data german.doc; do
+          if ! wget ${UCI_HTTPS_URL}/adult/${file} -P aif360/data/raw/adult/ ; then
+            wget ${UCI_HTTPS_URL}/adult/${file} --no-check-certificate -P aif360/data/raw/adult/
+          fi
+        done
+        for file in german.data german.doc; do
+          if ! wget ${UCI_HTTPS_URL}/statlog/german/${file} -P aif360/data/raw/german/ ; then
+            wget ${UCI_HTTPS_URL}/statlog/german/${file} --no-check-certificate -P aif360/data/raw/german/
+          fi
+        done
+        wget https://raw.githubusercontent.com/propublica/compas-analysis/master/compas-scores-two-years.csv -P aif360/data/raw/compas/
+    - name: Lint with flake8
+      run: |
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Run tests
+      run: |
+        flake8 . --count --select=E901,E999,F821,F822,F823 --show-source --statistics
+        pytest tests
+
+  r_build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - name: Install dependencies
+      run: |
+        wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+        bash miniconda.sh -b -p $HOME/miniconda
+        export PATH="$HOME/miniconda/bin:$PATH"
+        hash -r
+        conda config --set always_yes yes --set changeps1 no
+        conda update -q conda
+        conda create -q -n test-env python=3.7
+        source activate test-env
+        R -q -e "install.packages('reticulate')"
+        R -q -e "install.packages('rstudioapi')"
+        R -q -e "install.packages('testthat')"
+        pip install aif360 -q
+        pip install numba -q
+        pip install BlackBoxAuditing -q
+        pip install tensorflow==1.15.0 -q
+        pip install pandas -q
+    - name: Install R package
+      run: R CMD INSTALL .

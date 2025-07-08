@@ -1,0 +1,26 @@
+name: Build and Test
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python: ['3.9', '3.10']
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+
+    - name: Build Docker image
+      run: docker build -t ultisnips:${{ env.TAG }} --build-arg PYTHON_IMAGE=${{ env.PYTHON_IMAGE }} --build-arg VIM_VERSION=${{ env.VIM_VERSION }} .
+
+    - name: Run tests
+      run: docker run -it ultisnips:${{ env.TAG }} docker/run_tests.sh

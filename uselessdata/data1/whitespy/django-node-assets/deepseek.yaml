@@ -1,0 +1,22 @@
+name: Python Lint
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python '3.9'
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - name: Install dependencies
+      run: |
+        pip install flake8 isort black
+    - name: Run flake8
+      run: flake8 django_node_assets
+    - name: Run isort check
+      run: isort django_node_assets --check
+    - name: Run black check
+      run: black django_node_assets --check

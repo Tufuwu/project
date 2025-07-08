@@ -1,0 +1,61 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+        include:
+          - python-version: '3.9'
+            ipython-version: '7'
+            pandas-version: '1'
+          - python-version: '3.10'
+            ipython-version: '7'
+            pandas-version: '1'
+          - python-version: '3.11'
+            ipython-version: '7'
+            pandas-version: '1'
+          - python-version: '3.12'
+            ipython-version: '7'
+            pandas-version: '1'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          pip install IPython==${{ matrix.ipython-version }}
+          pip install pandas==${{ matrix.pandas-version }}
+          pip install .[test]
+      - name: Run tests
+        run: |
+          python -c 'import pytorch_memlab'
+          pytest test/test_mem_reporter.py
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python '3.9'
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: |
+          pip install IPython==7
+          pip install pandas==1
+          pip install .[test]
+      - name: Build and publish
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: yoursky
+          password: ${{ secrets.PYPI_PASSWORD }}
+```

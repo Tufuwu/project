@@ -1,0 +1,28 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        pip install pyflakes pytest pytest-doctestplus
+    - name: Run pyflakes
+      run: pyflakes .
+    - name: Compile all Python files
+      run: python -We:invalid -We::SyntaxWarning -m compileall -f -q removestar/
+    - name: Run pytest
+      run: pytest
+    - name: Install package
+      run: python setup.py install

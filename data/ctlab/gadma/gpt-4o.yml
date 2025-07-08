@@ -1,0 +1,54 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        python-version: [3.6]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install coverage
+        pip install codecov
+        pip install pycodestyle
+        ./install
+        pip install GPy
+        pip install GPyOpt
+        pip install pandas
+
+    - name: Display version
+      run: cat gadma/version.py
+
+    - name: Lint with pycodestyle
+      run: pycodestyle gadma
+
+    - name: Test with nosetests
+      run: |
+        pip install nose
+        nosetests -vs tests --with-coverage --cover-package gadma --cover-branches --cover-erase --cover-xml --cover-inclusive tests
+
+    - name: Upload coverage to Codecov
+      run: |
+        pip install codecov
+        codecov
+```

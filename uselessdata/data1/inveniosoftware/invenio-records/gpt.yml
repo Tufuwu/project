@@ -1,0 +1,111 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+        requirements: [lowest, release, devel]
+        extras: [all]
+        db: [sqlite, mysql, postgresql]
+        include:
+          - python-version: 3.9
+            requirements: lowest
+            extras: all
+            db: sqlite
+            sqlalchemy-uri: "sqlite:///test.db"
+          - python-version: 3.9
+            requirements: lowest
+            extras: all
+            db: mysql
+          - python-version: 3.9
+            requirements: lowest
+            extras: all
+            db: postgresql
+          - python-version: 3.9
+            requirements: release
+            extras: all
+            db: sqlite
+            sqlalchemy-uri: "sqlite:///test.db"
+          - python-version: 3.9
+            requirements: release
+            extras: all
+            db: mysql
+          - python-version: 3.9
+            requirements: release
+            extras: all
+            db: postgresql
+          - python-version: 3.9
+            requirements: devel
+            extras: all
+            db: sqlite
+            sqlalchemy-uri: "sqlite:///test.db"
+          - python-version: 3.9
+            requirements: devel
+            extras: all
+            db: mysql
+          - python-version: 3.9
+            requirements: devel
+            extras: all
+            db: postgresql
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Docker Compose
+      run: |
+        sudo rm /usr/local/bin/docker-compose
+        curl -L https://github.com/docker/compose/releases/download/1.26.2/docker-compose-`uname -s`-`uname -m` > docker-compose
+        chmod +x docker-compose
+        sudo mv docker-compose /usr/local/bin
+
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip setuptools wheel twine coveralls requirements-builder
+        requirements-builder -e ${{ matrix.extras }} --level=${{ matrix.requirements }} setup.py > .travis-${{ matrix.requirements }}-requirements.txt
+
+    - name: Install project dependencies
+      run: pip install -r .travis-${{ matrix.requirements }}-requirements.txt -e .[${{ matrix.extras }}]
+
+    - name: Run tests
+      env:
+        SQLALCHEMY_DATABASE_URI: ${{ matrix.sqlalchemy-uri }}
+        DB: ${{ matrix.db }}
+      run: ./run-tests.sh
+
+    - name: Coveralls
+      if: matrix.requirements != 'devel'
+      run: coveralls
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags') && matrix.requirements == 'release'
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: Install dependencies
+      run: pip install -r .travis-release-requirements.txt -e .[all]
+
+    - name: Deploy to PyPI
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        python setup.py sdist bdist_wheel
+        twine upload --skip-existing dist/*

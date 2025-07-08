@@ -1,0 +1,33 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'  # Change this to your desired Python version
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install coverage
+
+      - name: Run Scrapy commands
+        run: |
+          coverage run -m scrapy list
+          coverage run -m scrapy crawl regional -t csv -o regional.csv
+          coverage run -m scrapy crawl hkoforecast -t csv -o hkoforecast.csv
+          coverage run -m scrapy crawl hko9dayforecast -t csv -o hko9dayforecast.csv
+
+      - name: Upload coverage to Codecov
+        run: bash <(curl -s https://codecov.io/bash)
+```

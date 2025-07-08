@@ -1,0 +1,71 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      memcached:
+        image: memcached:latest
+        ports:
+          - 11211:11211
+
+    strategy:
+      matrix:
+        python-version: ['3.9']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r test-requirements.txt
+        pip install pylint==2.4.4 codecov
+
+    - name: Prepare database
+      run: |
+        psql -c 'drop database if exists test_olo;' -U postgres
+        psql -c 'create database test_olo;' -U postgres
+
+    - name: Lint with pylint
+      run: |
+        pylint --rcfile=.pylintrc olo
+
+    - name: Test with pytest
+      run: |
+        pytest --cov=olo
+
+    - name: Upload coverage to Codecov
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      run: |
+        codecov
+```

@@ -1,0 +1,37 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          if [[ ${{ matrix.python-version }} == '3.9' ]]; then pip install 'setuptools<=60.9.0'; fi
+          python setup.py -q install
+          pip install pylint yapf pytype
+      - name: Run tests
+        run: python setup.py test
+      - name: Lint with pylint
+        run: pylint comment_parser
+      - name: Type check with pytype
+        run: pytype
+      - name: Format check with yapf
+        run: yapf -drp --style=yapf .
+```

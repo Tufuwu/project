@@ -1,0 +1,63 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:stable-dind
+        options: --privileged
+
+    env:
+      secure_1: ${{ secrets.SECURE_1 }}
+      secure_2: ${{ secrets.SECURE_2 }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Confirm Docker version
+      run: docker --version
+
+    - name: Upgrade Docker
+      run: |
+        sudo apt-get -y update
+        sudo apt-get -y install -o Dpkg::Options::="--force-confnew" docker-ce
+        docker --version
+
+    - name: Pull Docker image
+      run: make docker-pull
+
+    - name: Ensure coverage directory exists
+      run: mkdir -p coverage
+
+    - name: Run tests
+      run: |
+        make test.start_elasticsearch
+        make test-docker
+        make quality-docker
+        make coverage-docker
+        sudo make docs
+        make test.stop_elasticsearch
+
+    - name: Upload coverage to Codecov
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      run: |
+        pip install --upgrade codecov
+        codecov
+```

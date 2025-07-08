@@ -1,0 +1,54 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      TEST_FUNCTIONALITY: '1'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7.3
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: if [[ "${{ runner.os }}" == "osx" ]]; then brew update ; fi
+    - run: if [[ "${{ runner.os }}" == "osx" ]]; then brew upgrade python; fi
+    - run: if [[ "${{ runner.os }}" == "osx" ]]; then brew install freetype; fi
+    - run: pip install cython
+    - run: pip install pandas
+    - run: pip install scipy
+    - run: python setup.py install
+    - run: pip install nose
+    - run: pip install pep8
+    - run: pip install pyyaml
+    - run: "./test_umi_tools.sh"
+  test_2:
+    runs-on: ubuntu-latest
+    env:
+      TEST_STYLE: '1'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7.3
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: if [[ "${{ runner.os }}" == "osx" ]]; then brew update ; fi
+    - run: if [[ "${{ runner.os }}" == "osx" ]]; then brew upgrade python; fi
+    - run: if [[ "${{ runner.os }}" == "osx" ]]; then brew install freetype; fi
+    - run: pip install cython
+    - run: pip install pandas
+    - run: pip install scipy
+    - run: python setup.py install
+    - run: pip install nose
+    - run: pip install pep8
+    - run: pip install pyyaml
+    - run: "./test_umi_tools.sh"

@@ -1,0 +1,64 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            env: GROMACS_VERSION=4.6.5 PYTHON_VERSION=2.7 NUMPY_VERSION=1.16
+          - os: ubuntu-latest
+            env: GROMACS_VERSION=2019.1 PYTHON_VERSION=2.7 NUMPY_VERSION=1.16
+          - os: ubuntu-latest
+            env: GROMACS_VERSION=4.6.5 PYTHON_VERSION=3.6
+          - os: ubuntu-latest
+            env: GROMACS_VERSION=2018.6 PYTHON_VERSION=3.6
+          - os: ubuntu-latest
+            env: GROMACS_VERSION=2019.1 PYTHON_VERSION=3.6
+          - os: ubuntu-latest
+            env: GROMACS_VERSION=2019.1 PYTHON_VERSION=3.7
+          - os: ubuntu-latest
+            env: GROMACS_VERSION=2018.6 PYTHON_VERSION=3.6 SETUP_CMD="${SETUP_CMD} --link-gmx-mpi --no-append-suffix"
+          - os: macos-latest
+            env: GROMACS_VERSION=4.6.5 PYTHON_VERSION=3.6
+          - os: macos-latest
+            env: GROMACS_VERSION=2019.1 PYTHON_VERSION=2.7 NUMPY_VERSION=1.16
+          - os: macos-latest
+            env: GROMACS_VERSION=2019.1 PYTHON_VERSION=3.6
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.env.PYTHON_VERSION }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.env.PYTHON_VERSION }}
+
+    - name: Install dependencies
+      run: |
+        git clone --depth 1 git://github.com/astropy/ci-helpers.git
+        source ci-helpers/travis/setup_conda.sh
+        eval $BUILD_CMD
+
+    - name: Run tests
+      run: |
+        cd $GITHUB_WORKSPACE
+        if [[ $RUNNER_OS == 'macOS' ]]; then ulimit -S -n 2048; fi
+        echo $MAIN_CMD $SETUP_CMD
+        eval $MAIN_CMD $SETUP_CMD
+
+    - name: Upload coverage to Codecov
+      if: success() && env.CODECOV == 'true'
+      uses: codecov/codecov-action@v2
+```

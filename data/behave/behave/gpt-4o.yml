@@ -1,0 +1,62 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.8-dev", "3.7", "2.7"]
+        arch: [amd64, ppc64le]
+        exclude:
+          - python-version: "3.8-dev"
+            arch: ppc64le
+          - python-version: "2.7"
+            arch: ppc64le
+      allow_failures:
+        - python-version: "3.8-dev"
+
+    steps:
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture: ${{ matrix.arch }}
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/py.requirements/ci.travis.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        pip install -r py.requirements/ci.travis.txt
+        pip show setuptools
+        python setup.py install
+
+    - name: Run tests
+      run: |
+        python --version
+        pytest tests
+        behave -f progress --junit features/
+        behave -f progress --junit tools/test-features/
+        behave -f progress --junit issue.features/
+
+    - name: After failure
+      if: failure()
+      run: |
+        echo "FAILURE DETAILS (from XML reports):"
+        bin/behave.junit_filter.py --status=failed reports
+```

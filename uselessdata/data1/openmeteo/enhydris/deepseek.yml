@@ -1,0 +1,81 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        python-version: ['3.9']
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Set up Node.js 10
+      uses: actions/setup-node@v2
+      with:
+        node-version: '10'
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gdal-bin libgdal-dev postgresql-10 postgresql-10-postgis-2.4
+        sudo add-apt-repository -y ppa:timescale/timescaledb-ppa
+        sudo apt-get update
+        sudo apt-get install -y timescaledb-postgresql-10
+        sudo bash -c "echo \"shared_preload_libraries = 'timescaledb'\" >>/etc/postgresql/10/main/postgresql.conf"
+        sudo service postgresql restart
+
+    - name: Install Chrome
+      run: |
+        wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+        sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable
+
+    - name: Install Chromedriver
+      run: |
+        CHROME_VERSION=$(google-chrome --version | awk '{ print $3 }' | awk -F. '{ print $1 }')
+        CHROMEDRIVER_VERSION=$(wget -q -O - https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION)
+        wget https://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip
+        sudo unzip chromedriver_linux64.zip -d /usr/local/bin
+
+    - name: Install Python dependencies
+      run: |
+        CPLUS_INCLUDE_PATH=/usr/include/gdal C_INCLUDE_PATH=/usr/include/gdal pip install 'gdal==2.2.3'
+        pip install psycopg2==2.7.4 codecov coverage isort flake8 black
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+
+    - name: Install Node.js dependencies
+      run: |
+        npm install
+
+    - name: Set up PostgreSQL
+      run: |
+        psql -U postgres -c "create extension postgis"
+        psql -U postgres -c "create database openmeteo"
+        cp enhydris_project/settings/travis.py enhydris_project/settings/local.py
+
+    - name: Run tests
+      env:
+        SELENIUM_WEBDRIVER: headless
+      run: |
+        python manage.py makemigrations --check
+        black --check .
+        flake8 --max-line-length=88 .
+        isort --check-only --diff .
+        npm run lint
+        coverage run --include="./*" --omit="*/tests/*","*/tests.py","*/migrations/*","./enhydris_project/*" manage.py test -v2
+        npm run test
+
+    - name: Upload coverage to Codecov
+      run: |
+        codecov
+```

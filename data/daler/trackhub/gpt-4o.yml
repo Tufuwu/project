@@ -1,0 +1,34 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Miniconda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-update-conda: true
+
+    - name: Install dependencies
+      run: ci/travis-setup.sh
+
+    - name: Run script
+      env:
+        ENCRYPTION_LABEL: "8609f8a4dd98"
+        ENCRYPTION_LABEL_DOCS: "5bd4582c5923"
+        COMMIT_AUTHOR_EMAIL: "dalerr@niddk.nih.gov"
+      run: ci/travis-run.sh
+```

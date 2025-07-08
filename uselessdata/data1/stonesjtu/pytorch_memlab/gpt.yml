@@ -1,0 +1,44 @@
+name: Python package CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        pip install IPython==7.9
+        pip install pandas==1
+        pip install .[test]
+    - name: Run tests
+      run: |
+        python -c 'import pytorch_memlab'
+        pytest test/test_mem_reporter.py
+    - name: Deploy to PyPI
+      if: github.ref == 'refs/tags/*' && matrix.python-version == '3.10'
+      run: |
+        echo "${{ secrets.PYPI_PASSWORD }}" > ~/.pypirc
+        python -m pip install --upgrade pip
+        python setup.py sdist bdist_wheel
+        python -m twine upload --repository pypi dist/*
+      env:
+        TWINE_USERNAME: yoursky
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}

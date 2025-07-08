@@ -1,0 +1,47 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    services:
+      docker:
+        image: docker:stable
+    strategy:
+      matrix:
+        python-version: ["3.6"]
+        jobqueue: [sge, none, pbs, slurm, htcondor]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        set -e
+        source ci/${{ matrix.jobqueue }}.sh
+        jobqueue_before_install
+        jobqueue_install
+        set +e
+
+    - name: Run tests
+      run: |
+        set -e
+        jobqueue_script
+        set +e
+
+    - name: After script
+      run: jobqueue_after_script
+```

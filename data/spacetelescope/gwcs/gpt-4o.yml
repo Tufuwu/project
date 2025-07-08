@@ -1,0 +1,62 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8]
+        include:
+          - python-version: 3.7
+            test-command: "pytest --cov-config=gwcs/tests/coveragerc --cov=gwcs"
+            pip-dependencies: ".[test] coveralls pytest-cov"
+          - python-version: 3.8
+            test-command: "make --directory=docs html"
+            pip-dependencies: ".[docs]"
+            addons: "true"
+          - python-version: 3.6
+            numpy-version: "1.17"
+          - python-version: 3.7
+            numpy-version: "1.17"
+          - python-version: 3.8
+            numpy-version: "1.17"
+          - python-version: 3.8
+            test-command: "flake8 gwcs --count"
+            pip-dependencies: flake8
+          - python-version: 3.8
+            pip-dependencies: "-r requirements-dev.txt .[test]"
+          - python-version: 3.8
+            test-command: "bandit -r gwcs -c .bandit.yaml"
+            pip-dependencies: bandit
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        if [ -n "${{ matrix.numpy-version }}" ]; then
+          pip install numpy~=${{ matrix.numpy-version }}
+        fi
+        pip install ${{ matrix.pip-dependencies }}
+    - name: Install additional packages
+      if: ${{ matrix.addons == 'true' }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y graphviz texlive-latex-extra dvipng
+    - name: Run tests
+      run: ${{ matrix.test-command }}
+    - name: Coveralls
+      if: ${{ matrix.test-command == 'pytest --cov-config=gwcs/tests/coveragerc --cov=gwcs' }}
+      run: coveralls --rcfile='gwcs/tests/coveragerc'
+```

@@ -1,0 +1,53 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - stable
+  pull_request:
+    branches:
+      - main
+      - stable
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+        bash miniconda.sh -b -f -p $HOME/miniconda
+        export PATH="$HOME/miniconda/bin:$PATH"
+        conda config --set always_yes yes
+        conda config --add channels conda-forge
+        conda update -q conda
+        sed -i -E 's/(python=)(.*)/\1'${{ matrix.python-version }}'/' ./environment.yml
+        conda env create -f environment.yml
+        source activate mixsea
+        python setup.py install
+
+    - name: Test with pytest
+      run: |
+        source activate mixsea
+        python --version
+        pytest
+
+    - name: Check code style with black
+      run: |
+        source activate mixsea
+        black --check mixsea/
+```

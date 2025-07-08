@@ -1,0 +1,50 @@
+```yaml
+name: Python CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        python-version: ["3.6", "3.7"]
+        fast-finish: true
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        pip install --upgrade black
+        pip install --upgrade flake8
+        pip install --upgrade -r requirements.txt
+
+    - name: Run Flake8
+      run: flake8 --statistics --count
+
+    - name: Run Black
+      run: black --check --diff --target-version py36 .
+
+    - name: Run script
+      run: python random_street_view.py --help
+```

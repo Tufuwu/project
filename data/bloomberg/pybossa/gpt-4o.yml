@@ -1,0 +1,88 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+      postgres:
+        image: postgres:9.5
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Increase RAM size
+      run: sudo mount -o remount,size=50% /var/ramfs
+
+    - name: Remove boto.cfg
+      run: sudo rm -f /etc/boto.cfg
+
+    - name: Update and install dependencies
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y libxml2-dev libxmlsec1-dev
+
+    - name: Redis server version
+      run: redis-server --version
+
+    - name: Start Redis Sentinel
+      run: redis-server contrib/redis/sentinel.conf --sentinel
+
+    - name: Setup Pybossa
+      run: |
+        cd pybossa && ln -s themes/default/translations && cd ..
+        cp settings_test.py.tmpl settings_test.py
+
+    - name: Install Python dependencies
+      run: |
+        pip install -U pip
+        pip install -r requirements.txt
+        pip install otpauth
+
+    - name: Redis CLI commands
+      run: |
+        redis-cli info
+        redis-cli set foo 1
+        redis-cli get foo
+
+    - name: Setup PostgreSQL
+      run: |
+        psql -c "create user rtester with createdb login password 'rtester'" -U postgres
+        psql -c "create database pybossa_test owner rtester encoding 'UTF-8' lc_collate 'en_US.UTF-8' lc_ctype 'en_US.UTF-8' template template0;" -U postgres
+
+    - name: Run tests
+      run: |
+        alembic -c alembictest.ini stamp head
+        alembic -c alembictest.ini upgrade head
+        ./run_tests
+
+    - name: Upload coverage to Coveralls
+      if: success()
+      run: |
+        pip install coveralls
+        coveralls
+```

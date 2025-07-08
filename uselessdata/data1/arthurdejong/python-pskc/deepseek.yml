@@ -1,0 +1,33 @@
+```yaml
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        env:
+          - FLAVOUR=signxml
+          - FLAVOUR=legacy
+          - FLAVOUR=legacy-defusedxml
+          - FLAVOUR=lxml
+          - FLAVOUR=lxml-defusedxml
+        include:
+          - python-version: '3.9'
+            env: TOXENV=flake8
+          - python-version: '3.9'
+            env: TOXENV=docs
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: pip install tox
+      - name: Run tests
+        run: tox -e "${TOXENV:-$(echo py${python-version}-${FLAVOUR} | tr -d . | sed -e 's/pypypy/pypy/')}" --skip-missing-interpreters false
+```

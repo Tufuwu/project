@@ -1,0 +1,66 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.5', '2.7']
+        env:
+          - PACKAGES: "django>=1.11,<1.12"
+          - PACKAGES: "django>=2.0,<2.1"
+      exclude:
+        - python-version: '2.7'
+          env: PACKAGES: "django>=2.0,<2.1"
+      include:
+        - python-version: '3.6'
+          env: PACKAGES: "django>=2.1,<2.2"
+        - python-version: '3.6'
+          env: PACKAGES: "django>=2.2,<2.3"
+        - python-version: '3.6'
+          env: PACKAGES: "django>=3.0,<3.1"
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip wheel setuptools
+        pip install ${{ matrix.env.PACKAGES }} -e .[tests]
+    - name: Run tests
+      run: coverage run --rcfile=.coveragerc runtests.py
+    - name: Upload coverage to Codecov
+      if: success()
+      uses: codecov/codecov-action@v2
+
+  notifications:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Notify IRC
+      if: always()
+      run: |
+        echo "${{ github.repository }}#${{ github.run_number }} (${{ github.sha }}) ${{ github.event.head_commit.message }}  --  ${{ github.event.pull_request.html_url }}"
+        # Add IRC notification command here
+    - name: Notify Email
+      if: failure()
+      run: |
+        echo "Sending failure email to travis@edoburu.nl"
+        # Add email notification command here
+    - name: Notify Slack
+      if: failure()
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      run: |
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"Build failed!"}' $SLACK_WEBHOOK_URL
+```

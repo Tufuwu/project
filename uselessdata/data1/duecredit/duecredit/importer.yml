@@ -1,0 +1,47 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: # this agent type is not supported: [[{"arch"=>"amd64"}]]
+             ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: 99999
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: "${{ matrix.python }}"
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: if [ "$TRAVIS_ARCH" = "ppc64le" ]; then sudo chown -Rvf ${{ github.actor }}:$GROUP ~/.cache/pip/wheels; fi
+    - run: if [[ $TRAVIS_PYTHON_VERSION == pypy ]] ; then dpkg --compare-versions $(pypy --version 2>&1 | awk '/PyPy/{print $2;}') ge 2.5.1 || { d=$PWD; cd /tmp; wget --no-check-certificate https://bitbucket.org/pypy/pypy/downloads/pypy-2.5.1-linux64.tar.bz2; tar -xjvf pypy*bz2; cd pypy-*/bin/; export PATH=$PWD:$PATH; cd $d; } ; fi
+    - run: travis_retry pip install -q coveralls codecov
+    - run: python setup.py --help
+    - run: pip install -e '.[tests]'
+    - run: pip install --upgrade flake8 pytest
+    - run: coverage run --source duecredit -m py.test
+    - run: python setup.py install
+    - run: flake8 duecredit/stub.py
+    - run: coveralls
+      if: "${{ success() }}"
+    - run: codecov
+      if: "${{ success() }}"
+    strategy:
+      matrix:
+        python:
+        - '3.6'
+        - '3.7'
+        - '3.8'

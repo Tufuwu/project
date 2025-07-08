@@ -1,0 +1,70 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04]
+        include:
+          - os: ubuntu-18.04
+            sage_tarball: sage-8.6-Ubuntu_18.04-x86_64.tar.bz2
+            sage_server: http://mirrors.mit.edu/sage/linux/64bit/old
+          - os: ubuntu-18.04
+            sage_tarball: sage-8.7-Ubuntu_18.04-x86_64.tar.bz2
+            sage_server: http://mirrors.mit.edu/sage/linux/64bit/old
+          - os: ubuntu-18.04
+            sage_tarball: sage-8.8-Ubuntu_18.04-x86_64.tar.bz2
+            sage_server: http://mirrors.mit.edu/sage/linux/64bit/old
+          - os: ubuntu-18.04
+            sage_tarball: sage-8.9-Ubuntu_18.04-x86_64.tar.bz2
+            sage_server: http://mirrors.mit.edu/sage/linux/64bit/old
+          - os: ubuntu-18.04
+            sage_tarball: sage-9.0-Ubuntu_18.04-x86_64.tar.bz2
+            sage_server: http://mirrors.mit.edu/sage/linux/64bit/old
+          - os: ubuntu-18.04
+            sage_tarball: sage-9.1-Ubuntu_18.04-x86_64.tar.bz2
+            sage_server: http://mirrors.mit.edu/sage/linux/64bit
+          - os: ubuntu-18.04
+            sage_tarball: sage-9.2-Ubuntu_18.04-x86_64.tar.bz2
+            sage_server: http://mirrors.mit.edu/sage/linux/64bit
+          - os: ubuntu-18.04
+            sage_tarball: sage-9.3-Ubuntu_18.04-x86_64.tar.bz2
+            sage_server: http://mirrors.mit.edu/sage/linux/64bit
+
+    env:
+      SAGE: ${{ github.workspace }}/SageMath/sage
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y aria2 pbzip2 gfortran
+
+    - name: Download and extract Sage
+      run: |
+        aria2c ${{ matrix.sage_server }}/${{ matrix.sage_tarball }} --timeout=300
+        pbzip2 -dc ${{ matrix.sage_tarball }} | tar xf -
+
+    - name: Install Python dependencies
+      run: |
+        ${{ env.SAGE }} -pip install pytest-xdist pytest==4.6.4
+
+    - name: Build
+      run: ${{ env.SAGE }} setup.py build_ext --inplace
+
+    - name: Run tests
+      run: ${{ env.SAGE }} runtests.py -v
+```

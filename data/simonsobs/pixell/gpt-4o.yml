@@ -1,0 +1,65 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ['3.7']
+
+    services:
+      docker:
+        if: matrix.os == 'ubuntu-latest'
+        image: docker:stable
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python3 -m pip install -U pip
+        python3 -m easy_install -U setuptools
+        python3 -m pip install pytest-cov
+        python3 -m pip install cibuildwheel==1.4.2
+
+    - name: Build and test
+      run: |
+        python3 setup.py build_ext -i
+        pip install .
+        py.test --cov=pixell pixell/tests/ -s
+        find . -type f -iname '*.so' -print -delete
+        rm -rf _deps/
+        python3 -m cibuildwheel --output-dir wheelhouse
+        ls wheelhouse
+
+    - name: Upload to PyPI
+      if: startsWith(github.ref, 'refs/tags/')
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+      run: |
+        python3 -m pip install twine
+        python3 -m pip install -U twine
+        python3 -m twine check wheelhouse/*
+        python3 -m twine upload --verbose --skip-existing wheelhouse/*.whl
+
+    - name: Install additional packages on Ubuntu
+      if: matrix.os == 'ubuntu-latest'
+      run: sudo apt-get install -y gfortran
+```

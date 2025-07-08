@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - b2.0
+      - b2.1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r test-requirements.txt
+    - name: Run tests
+      env:
+        PYTEST_EXTRA_ARGS: ${{ matrix.pytest-extra-args }}
+      run: |
+        pytest $PYTEST_EXTRA_ARGS -m "ci"
+        PYTHONPATH=opensvc pylint -E opensvc/*py opensvc/commands opensvc/core opensvc/daemon opensvc/drivers opensvc/utilities
+    - name: Coverage report
+      if: matrix.pytest-extra-args == "--cov"
+      run: |
+        pip install codecov
+        codecov

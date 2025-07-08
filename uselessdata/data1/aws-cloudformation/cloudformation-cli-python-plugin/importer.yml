@@ -1,0 +1,192 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+env:
+  AWS_DEFAULT_REGION: us-east-1
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache/pre-commit"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: 'pip install --upgrade pip mypy ''attrs==19.2.0'' -r https://raw.githubusercontent.com/aws-cloudformation/aws-cloudformation-rpdk/master/requirements.txt
+        '
+    - run: pip install . src/
+    - run: pre-commit run --all-files
+  test_2:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache/pre-commit"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: 'pip install --upgrade pip mypy ''attrs==19.2.0'' -r https://raw.githubusercontent.com/aws-cloudformation/aws-cloudformation-rpdk/master/requirements.txt
+        '
+    - run: pip install . src/
+    - run: pre-commit run --all-files
+  test_3:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache/pre-commit"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: 'pip install --upgrade pip mypy ''attrs==19.2.0'' -r https://raw.githubusercontent.com/aws-cloudformation/aws-cloudformation-rpdk/master/requirements.txt
+        '
+    - run: pip install . src/
+    - run: pre-commit run --all-files
+  integ_python_3_6:
+    needs:
+    - test
+    - test_2
+    - test_3
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache/pre-commit"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: 'pip install --upgrade pip mypy ''attrs==19.2.0'' -r https://raw.githubusercontent.com/aws-cloudformation/aws-cloudformation-rpdk/master/requirements.txt
+        '
+    - run: pip install . src/
+    - run: ls -la
+    - run: DIR=$(mktemp -d)
+    - run: cd "$DIR"
+    - run: ls -la
+    - run: printf "AWS::Foo::Bar\n1\ny" | cfn init -vv
+    - run: ls -la
+    - run: mypy src/aws_foo_bar/ --strict --implicit-reexport
+  integ_python_3_7:
+    needs:
+    - test
+    - test_2
+    - test_3
+    - integ_python_3_6
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache/pre-commit"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: 'pip install --upgrade pip mypy ''attrs==19.2.0'' -r https://raw.githubusercontent.com/aws-cloudformation/aws-cloudformation-rpdk/master/requirements.txt
+        '
+    - run: pip install . src/
+    - run: DIR=$(mktemp -d)
+    - run: cd "$DIR"
+    - run: ls -la
+    - run: printf "AWS::Foo::Bar\n2\ny" | cfn init -vv
+    - run: ls -la
+    - run: mypy src/aws_foo_bar/ --strict --implicit-reexport
+  deploy:
+    needs:
+    - test
+    - test_2
+    - test_3
+    - integ_python_3_6
+    - integ_python_3_7
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "${{ github.workspace }}/.cache/pre-commit"
+        key: "${{ runner.os }}-path"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: 'pip install --upgrade pip mypy ''attrs==19.2.0'' -r https://raw.githubusercontent.com/aws-cloudformation/aws-cloudformation-rpdk/master/requirements.txt
+        '
+    - run: pip install . src/
+    - run: cd $(bash before_deploy.sh)
+#     # This item has no matching transformer
+#     - pypi:
+#         provider: pypi
+#         user: aws-cloudformation-developers
+#         password:
+#           secure: KDSSnOhDMO3sHi4eeOSrsRcs3be5C1cYBdtnmTMOUz6npf39wsssBM6iJfkSdRdpWCr8k1cKodVhE3fcz+Z0vq33oPSWOvakynMrcRQk5Xe7Fzc53kesDEc562smPMiERtFfse0oO+InzIPjsfbsBzLqKlWWQGMqUxrshPmfexsOwKDo+JzT4lVflz6AGQPI0smXa9gHkAu11ne7mIlrmR7f8+mWgqzLTExIJFqYjNECOrT/gDo3zzySO13h5CXf7AM1i0o5p02b9hZ41blkS2OgBeDMSS9qN6QFPT+Erl6Q6y579/vM+knXlPzWBdbqJ2uWaeBfcZZlP7jNp6TkW1WPu4jPL/VnJ/3Eihy4rMkRBuer5zPHj0KBJZoU4jjZx5ctnsYPSZrH7Xo3CHnk1QNckXb+4GZVgz6EWAMGgRmDzJUWTzzu7Dw5EwFQZwESTETqqd+53Ht9yDeJgzA6OneZ4MsWq0OzjUFiiAKMS8BO/uiQrTv3/pJo75JJCLW8wrwTaBTZt6gTuYl+UNeuogITVCdStiH1ECZZ001Bv7tKDhcD4rVB/lJ/I8qIx9QXdWDiRhqqt1+WUl6tlA6sX2vFrTD2wqw9XNwNpIbHF8IoBRI9Cp5wO4m0CreAD6TYbPwEXKMyU5mCEQAv1zSJVag3hf/lhmAR3T7eLUPId2c=
+#         distributions: sdist bdist_wheel
+#         'on':
+#           tags: true
+#       if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"

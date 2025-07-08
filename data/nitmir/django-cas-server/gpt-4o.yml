@@ -1,0 +1,88 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.6, 3.7, 3.8, 3.9, 3.10]
+        tox-env:
+          - flake8
+          - check_rst
+          - coverage
+          - py36-django111
+          - py36-django22
+          - py37-django111
+          - py38-django22
+          - py39-django22
+          - py310-django32
+          - py39-django32
+          - py310-django40
+          - py310-django41
+        include:
+          - python-version: 3.6
+            tox-env: py36-django111
+            os: ubuntu-latest
+          - python-version: 3.6
+            tox-env: py36-django22
+            os: ubuntu-latest
+          - python-version: 3.7
+            tox-env: py37-django111
+            os: ubuntu-latest
+          - python-version: 3.8
+            tox-env: py38-django22
+            os: ubuntu-latest
+          - python-version: 3.9
+            tox-env: py39-django22
+            os: ubuntu-latest
+          - python-version: 3.10
+            tox-env: py310-django32
+            os: ubuntu-latest
+          - python-version: 3.9
+            tox-env: py39-django32
+            os: ubuntu-latest
+          - python-version: 3.10
+            tox-env: py310-django40
+            os: ubuntu-latest
+          - python-version: 3.10
+            tox-env: py310-django41
+            os: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox
+
+    - name: Run Tox
+      run: tox -e ${{ matrix.tox-env }}
+
+    - name: Show Tox logs
+      if: failure()
+      run: cat tox_log/*.log
+```

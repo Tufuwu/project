@@ -1,0 +1,45 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+env:
+  PYLINT: cd ${{ github.workspace }} && ./dev_scripts/pylint wa
+  PEP8: cd ${{ github.workspace }} && ./dev_scripts/pep8 wa
+  NOSETESTS: nose2 -s ${{ github.workspace }}/tests
+  WORKLOAD: cd /tmp && wa run ${{ github.workspace }}/tests/travis/idle_agenda.yaml -v -d idle_workload
+  PROCESS_CMD: "$WORKLOAD && wa process -f -p csv idle_workload"
+  SHOW_CMD: wa show dhrystone && wa show generic_android && wa show trace-cmd && wa show csv
+  LIST_CMD: wa list all
+  CREATE_CMD: wa create agenda dhrystone generic_android csv trace_cmd && wa create package test && wa create workload test
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: pip install nose
+    - run: pip install nose2
+    - run: pip install flake8
+    - run: pip install pylint==2.6.0
+    - run: git clone -v https://github.com/ARM-software/devlib.git /tmp/devlib && cd /tmp/devlib && python setup.py install
+    - run: cd ${{ github.workspace }} && python setup.py install
+    - run: echo $TEST && eval $TEST
+    strategy:
+      matrix:
+        TEST:
+        - "$PYLINT"
+        - "$PEP8"
+        - "$NOSETESTS"
+        - "$WORKLOAD"
+        include:
+        - TEST: "$PROCESS_CMD && $SHOW_CMD && $LIST_CMD && $CREATE_CMD"
+    env:
+      TEST: "${{ matrix.TEST }}"

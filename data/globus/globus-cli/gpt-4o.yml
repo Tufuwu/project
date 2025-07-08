@@ -1,0 +1,63 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.6"]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools
+          pip install tox
+      - name: Run lint
+        env:
+          TOXENV: lint
+        run: tox
+
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: [2.7, 3.5, 3.6, 3.7, 3.8]
+        include:
+          - os: windows-latest
+            python-version: 2.7
+            env: TOXENV=py
+          - os: windows-latest
+            python-version: 3.8
+            env: TOXENV=py
+          - os: macos-latest
+            python-version: 3.7
+            env: TOXENV=py3
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools
+          pip install tox
+      - name: Run tests
+        env:
+          TOXENV: ${{ matrix.env }}
+        run: tox
+```

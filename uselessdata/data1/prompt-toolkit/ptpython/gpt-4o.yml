@@ -1,0 +1,48 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        pip install . pytest isort black mypy readme_renderer
+        pip list
+
+    - name: Run tests
+      run: |
+        echo "${{ matrix.python-version }}"
+        ./tests/run_tests.py
+
+    - name: Check import sorting
+      run: isort -c -rc ptpython tests setup.py examples
+
+    - name: Check code formatting
+      run: black --check ptpython setup.py examples
+
+    - name: Type checking
+      run: mypy ptpython
+
+    - name: Check README rendering
+      run: python -m readme_renderer README.rst > /dev/null
+```

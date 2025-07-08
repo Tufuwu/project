@@ -1,0 +1,46 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  Normal_tests_and_pre_commit_checks:
+    runs-on: ubuntu-latest
+    env:
+      JOB_RUN_CMD: make ci-job
+      DEPLOY_FROM_THIS_JOB: 'true'
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.5'
+    - run: apt-get -y install docker-ce
+    - run: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    - run: sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    - run: sudo apt-get update
+    - run: sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+    - run: |
+        echo '{
+          "experimental": true,
+          "storage-driver": "overlay2",
+          "max-concurrent-downloads": 50,
+          "max-concurrent-uploads": 50
+        }' | sudo tee /etc/docker/daemon.json
+    - run: sudo service docker restart
+    - run: docker pull rlworkgroup/metaworld-ci:latest
+    - run: tag="rlworkgroup/metaworld-ci:${{ github.run_id }}"
+    - run: TAG="${tag}" make build-ci
+    - run: ci_env="$(bash <(curl -s https://codecov.io/env))"
+    - run: ADD_ARGS="${ci_env}" TAG="${tag}" make run-ci RUN_CMD="${JOB_RUN_CMD}"
+    - run: TAG="${tag}" make ci-deploy-docker
+      if: "${{ github.event_name == 'push' && $DEPLOY_FROM_THIS_JOB == true && github.ref == 'refs/heads/master' }}"
+#     # This item has no matching transformer
+#     - email: false
+    services:
+#       # This item has no matching transformer
+#       docker:

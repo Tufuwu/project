@@ -1,0 +1,45 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        django: ['django~=2.2', 'django~=3.0', 'django~=3.1']
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -U -r requirements-test.txt
+          pip install ${{ matrix.django }}
+          pip install -e .[rest]
+      - name: Install jshint
+        run: npm install -g jshint
+      - name: Run QA checks
+        run: ./run-qa-checks
+      - name: Run tests with coverage
+        run: |
+          coverage run --source=openwisp_users runtests.py
+          SAMPLE_APP=1 coverage run --append --source=openwisp_users runtests.py
+      - name: Run basic tests without allauth.socialaccount
+        run: NO_SOCIAL_APP=1 ./tests/manage.py test testapp.tests.test_admin.TestUsersAdmin --parallel
+      - name: Upload coverage to Coveralls
+        run: coveralls
+```

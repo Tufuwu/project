@@ -1,0 +1,81 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    services:
+      xvfb:
+        image: 'xvfb'
+        options: --privileged
+
+    strategy:
+      matrix:
+        python-version: [3.5, 3.6, 3.7, 3.8, 3.9]
+        env:
+          - MATPLOTLIB_VERSION=1.5.*
+          - MATPLOTLIB_VERSION=2.0.*
+          - MATPLOTLIB_VERSION=2.1.*
+          - MATPLOTLIB_VERSION=2.2.*
+          - MATPLOTLIB_VERSION=3.0.* PYQT=PyQt5
+          - MATPLOTLIB_VERSION=3.0.* PYQT=PySide2
+          - MATPLOTLIB_VERSION=3.1.* PYQT=PyQt5
+          - MATPLOTLIB_VERSION=3.1.* PYQT=PySide2
+          - MATPLOTLIB_VERSION=3.2.* PYQT=PyQt5
+          - MATPLOTLIB_VERSION=3.2.* PYQT=PySide2
+          - MATPLOTLIB_VERSION=3.3.* PYQT=PyQt5
+          - MATPLOTLIB_VERSION=3.3.* PYQT=PySide2
+      exclude:
+        - python-version: 3.5
+          env: MATPLOTLIB_VERSION=3.1.* PYQT=PyQt5
+        - python-version: 3.5
+          env: MATPLOTLIB_VERSION=3.1.* PYQT=PySide2
+        - python-version: 3.5
+          env: MATPLOTLIB_VERSION=3.2.* PYQT=PyQt5
+        - python-version: 3.5
+          env: MATPLOTLIB_VERSION=3.2.* PYQT=PySide2
+        - python-version: 3.5
+          env: MATPLOTLIB_VERSION=3.3.* PYQT=PyQt5
+        - python-version: 3.5
+          env: MATPLOTLIB_VERSION=3.3.* PYQT=PySide2
+        - python-version: 3.8
+          env: MATPLOTLIB_VERSION=1.5.*
+        - python-version: 3.8
+          env: MATPLOTLIB_VERSION=2.0.*
+        - python-version: 3.8
+          env: MATPLOTLIB_VERSION=2.1.*
+        - python-version: 3.8
+          env: MATPLOTLIB_VERSION=2.2.*
+        - python-version: 3.9
+          env: MATPLOTLIB_VERSION=1.5.*
+        - python-version: 3.9
+          env: MATPLOTLIB_VERSION=2.0.*
+        - python-version: 3.9
+          env: MATPLOTLIB_VERSION=2.1.*
+        - python-version: 3.9
+          env: MATPLOTLIB_VERSION=2.2.*
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-render0 libxcb-shape0 libxcb-shm0 libxcb-sync1 libxcb-util1 libxcb-xfixes0 libxcb-xinerama0 libxcb-xkb1 libxkbcommon-x11-0
+        pip install mock
+        if [ -n "${{ matrix.env.PYQT }}" ]; then pip install QtPy ${{ matrix.env.PYQT }}; fi
+        pip install matplotlib==${{ matrix.env.MATPLOTLIB_VERSION }}
+    - name: Run tests
+      run: make test_long
+```

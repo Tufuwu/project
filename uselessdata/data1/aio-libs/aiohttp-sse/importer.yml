@@ -1,0 +1,197 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-16.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: pip install tox codecov
+    - run: tox
+#     # This item has no matching transformer
+#     - pypi:
+#         provider: pypi
+#         distributions: sdist bdist_wheel
+#         user: jettify
+#         password:
+#           secure: V/UjH36QQcJyLqIzNb7/R1Y4nLJi1O2nvp/xf3O/myiO722QD6SZQ7u5CoWcicyQBhqodu/oXA2XeJk1LAorhKnk15CkiWhO7wFAWuYc4rQA7qgjApfercGPqcSL1K2RmGeP/UWpLR+La5o4/9zCmfG83Z007rmii9a6dbdJU7c=
+#         'on':
+#           tags: true
+#           repo: aio-libs/aiohttp-sse
+#           all_branches: true
+#           python: 3.5
+#       if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+    - run: codecov
+      if: "${{ success() }}"
+    strategy:
+      matrix: {}
+#       # 'allow_failures' transformations are currently unsupported.
+  test_2:
+    runs-on: ubuntu-16.04
+    env:
+      TOXENV: py35-aiohttp-3
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.5
+    - run: pip install tox codecov
+    - run: tox
+#     # This item has no matching transformer
+#     - pypi:
+#         provider: pypi
+#         distributions: sdist bdist_wheel
+#         user: jettify
+#         password:
+#           secure: V/UjH36QQcJyLqIzNb7/R1Y4nLJi1O2nvp/xf3O/myiO722QD6SZQ7u5CoWcicyQBhqodu/oXA2XeJk1LAorhKnk15CkiWhO7wFAWuYc4rQA7qgjApfercGPqcSL1K2RmGeP/UWpLR+La5o4/9zCmfG83Z007rmii9a6dbdJU7c=
+#         'on':
+#           tags: true
+#           repo: aio-libs/aiohttp-sse
+#           all_branches: true
+#           python: 3.5
+#       if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+    - run: codecov
+      if: "${{ success() }}"
+  test_3:
+    runs-on: ubuntu-16.04
+    env:
+      TOXENV: py35-aiohttp-master
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.5
+    - run: pip install tox codecov
+    - run: tox
+#     # This item has no matching transformer
+#     - pypi:
+#         provider: pypi
+#         distributions: sdist bdist_wheel
+#         user: jettify
+#         password:
+#           secure: V/UjH36QQcJyLqIzNb7/R1Y4nLJi1O2nvp/xf3O/myiO722QD6SZQ7u5CoWcicyQBhqodu/oXA2XeJk1LAorhKnk15CkiWhO7wFAWuYc4rQA7qgjApfercGPqcSL1K2RmGeP/UWpLR+La5o4/9zCmfG83Z007rmii9a6dbdJU7c=
+#         'on':
+#           tags: true
+#           repo: aio-libs/aiohttp-sse
+#           all_branches: true
+#           python: 3.5
+#       if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+    - run: codecov
+      if: "${{ success() }}"
+  test_4:
+    runs-on: ubuntu-16.04
+    env:
+      TOXENV: py36-aiohttp-3
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: pip install tox codecov
+    - run: tox
+#     # This item has no matching transformer
+#     - pypi:
+#         provider: pypi
+#         distributions: sdist bdist_wheel
+#         user: jettify
+#         password:
+#           secure: V/UjH36QQcJyLqIzNb7/R1Y4nLJi1O2nvp/xf3O/myiO722QD6SZQ7u5CoWcicyQBhqodu/oXA2XeJk1LAorhKnk15CkiWhO7wFAWuYc4rQA7qgjApfercGPqcSL1K2RmGeP/UWpLR+La5o4/9zCmfG83Z007rmii9a6dbdJU7c=
+#         'on':
+#           tags: true
+#           repo: aio-libs/aiohttp-sse
+#           all_branches: true
+#           python: 3.5
+#       if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+    - run: codecov
+      if: "${{ success() }}"
+  test_5:
+    runs-on: ubuntu-16.04
+    env:
+      TOXENV: py36-aiohttp-master
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: pip install tox codecov
+    - run: tox
+#     # This item has no matching transformer
+#     - pypi:
+#         provider: pypi
+#         distributions: sdist bdist_wheel
+#         user: jettify
+#         password:
+#           secure: V/UjH36QQcJyLqIzNb7/R1Y4nLJi1O2nvp/xf3O/myiO722QD6SZQ7u5CoWcicyQBhqodu/oXA2XeJk1LAorhKnk15CkiWhO7wFAWuYc4rQA7qgjApfercGPqcSL1K2RmGeP/UWpLR+La5o4/9zCmfG83Z007rmii9a6dbdJU7c=
+#         'on':
+#           tags: true
+#           repo: aio-libs/aiohttp-sse
+#           all_branches: true
+#           python: 3.5
+#       if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+    - run: codecov
+      if: "${{ success() }}"
+  test_6:
+    runs-on: ubuntu-16.04
+    env:
+      TOXENV: py37-aiohttp-3
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: pip install tox codecov
+    - run: tox
+#     # This item has no matching transformer
+#     - pypi:
+#         provider: pypi
+#         distributions: sdist bdist_wheel
+#         user: jettify
+#         password:
+#           secure: V/UjH36QQcJyLqIzNb7/R1Y4nLJi1O2nvp/xf3O/myiO722QD6SZQ7u5CoWcicyQBhqodu/oXA2XeJk1LAorhKnk15CkiWhO7wFAWuYc4rQA7qgjApfercGPqcSL1K2RmGeP/UWpLR+La5o4/9zCmfG83Z007rmii9a6dbdJU7c=
+#         'on':
+#           tags: true
+#           repo: aio-libs/aiohttp-sse
+#           all_branches: true
+#           python: 3.5
+#       if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+    - run: codecov
+      if: "${{ success() }}"
+  test_7:
+    runs-on: ubuntu-16.04
+    env:
+      TOXENV: py37-aiohttp-master
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: pip install tox codecov
+    - run: tox
+#     # This item has no matching transformer
+#     - pypi:
+#         provider: pypi
+#         distributions: sdist bdist_wheel
+#         user: jettify
+#         password:
+#           secure: V/UjH36QQcJyLqIzNb7/R1Y4nLJi1O2nvp/xf3O/myiO722QD6SZQ7u5CoWcicyQBhqodu/oXA2XeJk1LAorhKnk15CkiWhO7wFAWuYc4rQA7qgjApfercGPqcSL1K2RmGeP/UWpLR+La5o4/9zCmfG83Z007rmii9a6dbdJU7c=
+#         'on':
+#           tags: true
+#           repo: aio-libs/aiohttp-sse
+#           all_branches: true
+#           python: 3.5
+#       if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+    - run: codecov
+      if: "${{ success() }}"

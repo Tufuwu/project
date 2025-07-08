@@ -1,0 +1,43 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+        toxenv: [docs, prospector, py39-2.2, py39-3.0, py39-3.1, py39-3.2, py39-main, pypy3-2.2, pypy3-3.0, pypy3-3.1, pypy3-3.2, pypy3-main]
+        include:
+          - python-version: 3.8
+            toxenv: py38-2.2, py38-3.0, py38-3.1, py38-3.2, py38-main
+          - python-version: 3.7
+            toxenv: py37-2.2, py37-3.0, py37-3.1, py37-3.2
+          - python-version: 3.6
+            toxenv: py36-2.2, py36-3.0, py36-3.1, py36-3.2
+          - python-version: pypy3
+            toxenv: pypy3-2.2, pypy3-3.0, pypy3-3.1, pypy3-3.2, pypy3-main
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install wheel codecov virtualenv tox
+        pip wheel -r tests/requirements.txt codecov
+    - name: Run tox
+      run: tox -e ${{ matrix.toxenv }}
+    - name: Upload coverage
+      if: matrix.toxenv != 'docs' && matrix.toxenv != 'prospector'
+      run: codecov
+    - name: Allow failures for main branches
+      if: matrix.toxenv == 'py38-main' || matrix.toxenv == 'py39-main' || matrix.toxenv == 'pypy3-main'
+      uses: actions/github-script@v4
+      with:
+        script: |
+          core.setFailed('Allowing failure for main branch build')

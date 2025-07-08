@@ -1,0 +1,37 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    services:
+      docker:
+        image: docker:stable
+    strategy:
+      matrix:
+        python-version: [3.5, 3.6, 3.7, 3.8, 3.9, 3.10]
+        lldb-version: [7, 9, 10, 11]
+    steps:
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y make
+    - name: Run tests
+      run: make test-py${{ matrix.python-version | replace('.', '') }}
+    - name: Pre-release testing
+      if: matrix.python-version == '3.10' && matrix.lldb-version == '11'
+      run: make test-py310
+
+notifications:
+  email: false
+```

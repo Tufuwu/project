@@ -1,0 +1,72 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python: ['3.9', '3.10']
+
+    env:
+      PACKAGE: PHPUnitKit
+      SUBLIME_TEXT_VERSION: 3
+
+    services:
+      - xvfb
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install dependencies
+        run: |
+          if [ ${{ matrix.os }} == 'ubuntu-latest' ]; then
+            pip install flake8
+            pip install flake8-docstrings
+            pip install pydocstyle
+            pip install coverage==4.5.4
+            pip install codecov==2.0.15
+            pip install python-coveralls
+            pip install mypy
+            flake8 --version
+            mypy --version
+          fi
+          curl -OL https://raw.githubusercontent.com/SublimeText/UnitTesting/master/sbin/travis.sh
+          sh travis.sh bootstrap
+
+      - name: Run tests
+        run: |
+          sh travis.sh run_tests --coverage
+          sh travis.sh run_syntax_compatibility
+          sh travis.sh run_syntax_tests
+          if [ ${{ matrix.os }} == 'ubuntu-latest' ]; then
+            flake8
+            cd "$HOME/.config/sublime-text-3/Packages/$PACKAGE/"
+            find . -type d ! -path "*/\.*" ! -path "./tmp*" ! -path "./htmlcov*" ! -path "./bin*" ! -path "./res*" ! -path "./tests/fixtures*" ! -exec test -f "{}/__init__.pyi" ";" ! -exec test -f "{}/__init__.py" ";" -exec touch "{}/__init__.pyi" ";" -print
+            find . -type f -name __init__.py -print
+            find . -type f -name __init__.pyi -print
+            if [ ${{ matrix.python }} == '3.9' ]; then
+              mypy "../$PACKAGE" || true
+            else
+              mypy --show-error-codes "../$PACKAGE" || true
+            fi
+            cd "$GITHUB_WORKSPACE"
+          fi
+
+      - name: Upload coverage results
+        run: |
+          coveralls
+          codecov
+
+      - name: Disable email notifications
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"

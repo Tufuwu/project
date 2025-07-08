@@ -1,0 +1,150 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py34
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.4
+    - run: pip install tox
+    - run: pip install .
+    - run: tox -v --skip-missing-interpreters
+    - uses: softprops/action-gh-release@v0.1.15
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        GITHUB_REPOSITORY: "${{ github.repository }}"
+      with:
+        files: stacks_py*_linux.pex
+      if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+  test_2:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py35
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.5
+    - run: pip install tox
+    - run: pip install .
+    - run: tox -v --skip-missing-interpreters
+    - uses: softprops/action-gh-release@v0.1.15
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        GITHUB_REPOSITORY: "${{ github.repository }}"
+      with:
+        files: stacks_py*_linux.pex
+      if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+  test_3:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py36
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: pip install tox
+    - run: pip install .
+    - run: tox -v --skip-missing-interpreters
+    - uses: softprops/action-gh-release@v0.1.15
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        GITHUB_REPOSITORY: "${{ github.repository }}"
+      with:
+        files: stacks_py*_linux.pex
+      if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+  test_4:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: docs
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: pip install tox
+    - run: pip install .
+    - run: tox -v --skip-missing-interpreters
+    - uses: softprops/action-gh-release@v0.1.15
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        GITHUB_REPOSITORY: "${{ github.repository }}"
+      with:
+        files: stacks_py*_linux.pex
+      if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+  test_5:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py34-linux-package
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.4
+    - run: pip install tox
+    - run: pip install .
+    - run: tox -v --skip-missing-interpreters
+    - uses: softprops/action-gh-release@v0.1.15
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        GITHUB_REPOSITORY: "${{ github.repository }}"
+      with:
+        files: stacks_py*_linux.pex
+      if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+  test_6:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py35-linux-package
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.5
+    - run: pip install tox
+    - run: pip install .
+    - run: tox -v --skip-missing-interpreters
+    - uses: softprops/action-gh-release@v0.1.15
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        GITHUB_REPOSITORY: "${{ github.repository }}"
+      with:
+        files: stacks_py*_linux.pex
+      if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+  test_7:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: py36-linux-package
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: pip install tox
+    - run: pip install .
+    - run: tox -v --skip-missing-interpreters
+    - uses: softprops/action-gh-release@v0.1.15
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        GITHUB_REPOSITORY: "${{ github.repository }}"
+      with:
+        files: stacks_py*_linux.pex
+      if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"

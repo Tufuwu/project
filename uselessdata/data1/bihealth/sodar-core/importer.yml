@@ -1,0 +1,48 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-16.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: apt-get -y install python3.6 python3.6-dev
+#     # 'chrome' was not transformed because there is no suitable equivalent in GitHub Actions
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: sudo apt-get update -qq
+    - run: sudo apt-get install -qq build-essential zlib1g-dev libtiff5-dev libjpeg8-dev libfreetype6-dev
+    - run: sudo apt-get install -qq liblcms2-dev libwebp-dev libpq-dev graphviz-dev
+    - run: utility/install_python_dependencies.sh
+    - run: psql -c "CREATE DATABASE sodar_core;" -U postgres
+    - run: psql -c "CREATE USER sodar_core WITH PASSWORD 'sodar_core';" -U postgres
+    - run: psql -c "GRANT ALL PRIVILEGES ON DATABASE sodar_core to sodar_core;" -U postgres
+    - run: psql -c "ALTER USER sodar_core CREATEDB;" -U postgres
+    - run: wget -N http://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip -P ~/
+    - run: unzip ~/chromedriver_linux64.zip -d ~/
+    - run: sudo mv -f ~/chromedriver /usr/bin/chromedriver
+    - run: sudo chmod ugo+rx /usr/bin/chromedriver
+    - run: python manage.py collectstatic --noinput
+    - run: coverage run --rcfile=.coveragerc manage.py test -v 2 --settings=config.settings.test
+    - run: coverage xml
+    - run: python-codacy-coverage -r coverage.xml
+    - run: flake8 .
+    - run: make black arg=--check
+    strategy:
+      matrix:
+        CHROME_DRIVER_VERSION:
+        - 87.0.4280.20
+    services:
+      postgresql:
+        image: postgres:9.6
+    env:
+      CHROME_DRIVER_VERSION: "${{ matrix.CHROME_DRIVER_VERSION }}"

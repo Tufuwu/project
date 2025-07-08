@@ -1,0 +1,37 @@
+```yaml
+name: Python CI
+
+on:
+  push:
+    branches:
+      - '**'
+      - '!dependabot/**'
+  pull_request:
+    branches:
+      - '**'
+      - '!dependabot/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-16.04
+    strategy:
+      matrix:
+        python-version: [2.7, 3.5, 3.6, 3.7, 3.8, pypy-2.7, pypy-3.6]
+        include:
+          - python-version: 3.8
+            env: OLD_CRYPTOGRAPHY=2.6.1
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        if [ -n "${{ matrix.env.OLD_CRYPTOGRAPHY }}" ]; then
+          pip install cryptography==${{ matrix.env.OLD_CRYPTOGRAPHY }}
+        fi
+    - name: Run script
+      run: ci/travis.sh
+```

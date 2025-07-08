@@ -1,0 +1,13 @@
+name: Python package
+
+on:
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - run: python setup.py install
+    - run: python setup.py test
+      env:
+        TZ: Europe/Brussels

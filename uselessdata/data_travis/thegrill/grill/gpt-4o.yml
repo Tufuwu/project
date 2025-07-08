@@ -1,0 +1,43 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    strategy:
+      matrix:
+        python-version: ['3.9']
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get install graphviz graphviz-dev
+        pip install -U setuptools
+        pip install ".[full,test]" .
+        pip install pytest codecov pytest-cov
+
+    - name: Set environment variables
+      run: echo "QT_QPA_PLATFORM=offscreen" >> $GITHUB_ENV
+
+    - name: Run tests
+      run: pytest --cov=./
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+```

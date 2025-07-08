@@ -1,0 +1,58 @@
+name: Python CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          pip install codecov
+          pip install -r test-requirements.txt
+          pip install -e git+https://github.com/modoboa/modoboa.git@1.x#egg=modoboa
+
+      - name: Install project dependencies
+        run: |
+          pip install -r requirements.txt
+          python setup.py develop
+
+      - name: Run tests
+        run: |
+          cd test_project
+          coverage run --source ../modoboa_radicale manage.py test modoboa_radicale
+
+      - name: Upload coverage report
+        run: codecov
+
+      - name: Compile messages and build frontend
+        run: |
+          cd ../modoboa_radicale
+          django-admin compilemessages
+          cd ../frontend
+          nvm install --lts
+          npm install
+          npm run build
+
+      - name: Deploy to PyPI
+        if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags') }}
+        run: |
+          echo "${{ secrets.PYPI_PASSWORD }}" | twine upload --skip-existing --repository pypi dist/*

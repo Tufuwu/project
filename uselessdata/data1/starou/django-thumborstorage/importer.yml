@@ -1,0 +1,122 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_VERSION: 1.11.22
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 2.7
+    - run: pip install -q Django==$DJANGO_VERSION
+    - run: pip install coverage coveralls libthumbor mock requests
+    - run: pip install .
+    - run: cd tests
+    - run: make coverage
+    - run: coveralls
+  test_2:
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_VERSION: 1.11.22
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: pip install -q Django==$DJANGO_VERSION
+    - run: pip install coverage coveralls libthumbor mock requests
+    - run: pip install .
+    - run: cd tests
+    - run: make coverage
+    - run: coveralls
+  test_3:
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_VERSION: 2.0.13
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: pip install -q Django==$DJANGO_VERSION
+    - run: pip install coverage coveralls libthumbor mock requests
+    - run: pip install .
+    - run: cd tests
+    - run: make coverage
+    - run: coveralls
+  test_4:
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_VERSION: 2.1.10
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: pip install -q Django==$DJANGO_VERSION
+    - run: pip install coverage coveralls libthumbor mock requests
+    - run: pip install .
+    - run: cd tests
+    - run: make coverage
+    - run: coveralls
+  test_5:
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_VERSION: 2.2.9
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: pip install -q Django==$DJANGO_VERSION
+    - run: pip install coverage coveralls libthumbor mock requests
+    - run: pip install .
+    - run: cd tests
+    - run: make coverage
+    - run: coveralls
+  test_6:
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_VERSION: 2.2.9
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: pip install -q Django==$DJANGO_VERSION
+    - run: pip install coverage coveralls libthumbor mock requests
+    - run: pip install .
+    - run: cd tests
+    - run: make coverage
+    - run: coveralls
+  test_7:
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_VERSION: 2.2.9
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.8
+    - run: pip install -q Django==$DJANGO_VERSION
+    - run: pip install coverage coveralls libthumbor mock requests
+    - run: pip install .
+    - run: cd tests
+    - run: make coverage
+    - run: coveralls

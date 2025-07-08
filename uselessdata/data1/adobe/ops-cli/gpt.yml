@@ -1,0 +1,57 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - master
+      - '/\d+\.\d+/'
+      - '/\d+\.\d+\.\d+/'
+    tags:
+      - '*'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged --name docker --env DOCKER_HOST=unix:///var/run/docker.sock
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Build package
+      run: |
+        bash build_scripts/freeze_requirements.sh
+        bash build_scripts/build_package.sh
+
+    - name: Dry run
+      run: |
+        pip install --no-cache-dir dist/ops*.tar.gz && ops --verbose -h
+
+    - name: Build Docker image
+      run: docker build -f build_scripts/Dockerfile -t ops .
+
+    - name: Deploy to GitHub Releases
+      if: github.event_name == 'push' && github.ref_type == 'tag'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/**
+        token: ${{ secrets.GITHUB_API_KEY }}
+
+    - name: Push Docker image
+      if: github.event_name == 'push' && github.ref_type == 'tag'
+      run: bash build_scripts/docker_push.sh
+      env:
+        GITHUB_API_KEY: ${{ secrets.GITHUB_API_KEY }}

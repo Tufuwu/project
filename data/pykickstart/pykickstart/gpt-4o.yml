@@ -1,0 +1,40 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        python-version: [3.5, 3.6, 3.7, 3.8, nightly]
+        include:
+          - python-version: nightly
+            allow_failures: true
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    - name: Run tests
+      run: |
+        make check coverage docs COVERAGE=coverage SPHINXAPIDOC=sphinx-apidoc
+    - name: Combine coverage and upload to Coveralls
+      if: success() || failure()
+      run: |
+        coverage combine
+        coveralls
+```

@@ -1,0 +1,143 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+        toxenv: [flake8, black, mysql, mssql, postgres, mongodb]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox codecov
+    - name: Run tox
+      run: tox -e ${{ matrix.toxenv }}
+      env:
+        TOXENV: ${{ matrix.toxenv }}
+    - name: Upload coverage to Codecov
+      if: matrix.toxenv != 'mysql' && matrix.toxenv != 'mssql' && matrix.toxenv != 'postgres' && matrix.toxenv != 'mongodb'
+      run: codecov
+
+  mysql:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox codecov
+    - name: Setup MySQL
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y mysql-server
+        mysql -u root -e "DROP DATABASE IF EXISTS app; CREATE DATABASE app DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci"
+        mysql -u root -e "CREATE USER 'mysqluser'@'localhost' IDENTIFIED BY 'mysqluserpassword';"
+        mysql -u root -e "GRANT ALL ON app.* TO 'mysqluser'@'localhost';"
+    - name: Run tox for MySQL
+      run: tox -e mysql
+      env:
+        TOXENV: mysql
+    - name: Upload coverage to Codecov
+      run: codecov
+
+  mssql:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox codecov docker-compose
+    - name: Setup MSSQL
+      run: |
+        docker pull mcr.microsoft.com/mssql/server:2017-CU8-ubuntu
+        docker run --name mssql -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Password_123" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-CU8-ubuntu
+        sleep 60
+    - name: Run tox for MSSQL
+      run: tox -e mssql
+      env:
+        TOXENV: mssql
+    - name: Upload coverage to Codecov
+      run: codecov
+
+  postgres:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox codecov
+    - name: Setup PostgreSQL
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y postgresql
+        psql -U postgres -c "CREATE DATABASE app;"
+        psql -U postgres -c "CREATE USER pguser WITH PASSWORD 'pguserpassword';"
+    - name: Run tox for PostgreSQL
+      run: tox -e postgres
+      env:
+        TOXENV: postgres
+    - name: Upload coverage to Codecov
+      run: codecov
+
+  mongodb:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox codecov
+    - name: Setup MongoDB
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y mongodb
+    - name: Run tox for MongoDB
+      run: tox -e mongodb
+      env:
+        TOXENV: mongodb
+    - name: Upload coverage to Codecov
+      run: codecov

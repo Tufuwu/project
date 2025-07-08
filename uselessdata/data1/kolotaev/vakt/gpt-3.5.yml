@@ -1,0 +1,54 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', 'nightly', 'pypy3']
+
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ''
+          POSTGRES_DB: vakt_db
+        ports:
+          - 5432:5432
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: make deps
+
+    - name: Run tests
+      run: |
+        DATABASE_DSN="mysql+pymysql://root@127.0.0.1/vakt_db" make coverage
+        DATABASE_DSN="sqlite:///:memory:" make test-sql-i
+        DATABASE_DSN="postgresql+psycopg2cffi://postgres:@localhost/vakt_db" make test-sql-i
+        make bench
+
+    - name: Upload coverage to Codecov
+      run: bash <(curl -s https://codecov.io/bash)

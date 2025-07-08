@@ -1,0 +1,36 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: sudo ./.ci/install_dependencies.sh $HOME/tools
+
+    - name: Set PATH
+      run: export PATH=$HOME/tools:$PATH
+
+    - name: Change permissions
+      run: sudo chmod 777 --recursive $HOME/.nextflow
+
+    - name: Run tests
+      run: tox
+
+    - name: Disable email notifications
+      run: |
+        git config --global user.email "actions@github.com"
+        git config --global user.name "GitHub Actions"

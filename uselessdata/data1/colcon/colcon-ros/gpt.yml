@@ -1,0 +1,27 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip setuptools
+        pip install -U git+https://github.com/colcon/colcon-core
+        pip install -U git+https://github.com/colcon/colcon-library-path
+        pip install -U git+https://github.com/colcon/colcon-cmake
+        pip install -U git+https://github.com/colcon/colcon-python-setup-py
+        pip install -U flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-quotes pep8-naming pylint pytest pytest-cov scspell3k
+    - name: Run tests
+      run: python -m pytest --cov=colcon_ros --cov-branch

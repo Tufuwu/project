@@ -1,0 +1,64 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  release:
+    types:
+      - published
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        include:
+          - python-version: '3.9'
+            IPYTHON_VERSION: '7.9'
+            PANDAS_VERSION: '0.24.2'
+          - python-version: '3.10'
+            IPYTHON_VERSION: '7'
+            PANDAS_VERSION: '1'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        pip install IPython==${{ matrix.IPYTHON_VERSION }}
+        pip install pandas==${{ matrix.PANDAS_VERSION }}
+        pip install .[test]
+    - name: Run tests
+      run: |
+        python -c 'import pytorch_memlab'
+        pytest test/test_mem_reporter.py
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'release' && github.event.action == 'published'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
+    - name: Install dependencies
+      run: |
+        pip install IPython==7
+        pip install pandas==1
+        pip install .[test]
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: yoursky
+        password: ${{ secrets.PYPI_PASSWORD }}
+```

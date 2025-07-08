@@ -1,0 +1,97 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+  release:
+    types: [created]
+
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+        db: [mongodb, postgres]
+    services:
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+      postgres:
+        image: postgres:10
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ""
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    env:
+      DATABASE_URL_MONGODB: mongodb://localhost:27017/alerta
+      DATABASE_URL_POSTGRES: postgres://localhost:5432/alerta
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+        pip install .
+    - name: Prepare database
+      run: |
+        if [ "${{ matrix.db }}" == "postgres" ]; then
+          psql -c 'DROP DATABASE IF EXISTS alerta;' -U postgres
+          psql -c 'CREATE DATABASE alerta;' -U postgres
+        fi
+      env:
+        PGHOST: localhost
+        PGUSER: postgres
+    - name: Run tests
+      run: pytest --cov=alerta
+    - name: Upload coverage to Coveralls
+      if: success()
+      run: coveralls
+
+  hooks:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+    - name: Run pre-commit
+      run: pre-commit run -a --show-diff-on-failure
+
+  checks:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+    - name: Lint
+      run: pylint --rcfile pylintrc alerta
+    - name: Type Check
+      run: python -m mypy alerta/
+```

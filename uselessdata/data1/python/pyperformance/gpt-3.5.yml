@@ -1,0 +1,33 @@
+name: Python CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python: ['3.9', 'nightly', 'pypy3']
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install dependencies
+        run: |
+          pip install -U 'setuptools>=18.5' 'pip>=6.0' 'wheel'
+          pip install -e .
+
+      - name: Run tests
+        run: python runtests.py

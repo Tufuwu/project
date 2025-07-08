@@ -1,0 +1,62 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.5", "3.6", "3.7-dev"]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install pipenv
+      run: pip install pipenv
+    - name: Install dependencies
+      run: pipenv install --dev
+    - name: Run flake8
+      run: pipenv run flake8
+    - name: Run tests
+      run: pipenv run py.test
+    - name: Download Code Climate test reporter
+      run: curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+    - name: Make test reporter executable
+      run: chmod +x ./cc-test-reporter
+    - name: Code Climate before-build
+      run: ./cc-test-reporter before-build
+    - name: Code Climate after-build
+      run: ./cc-test-reporter after-build --exit-code ${{ job.status == 'success' && 0 || 1 }}
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/tags/*'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.x
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.x
+    - name: Install pipenv
+      run: pip install pipenv
+    - name: Install dependencies
+      run: pipenv install --dev
+    - name: Deploy to PyPI
+      env:
+        TWINE_USERNAME: amancevice
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        pip install twine
+        python setup.py sdist bdist_wheel
+        twine upload dist/*
+```

@@ -1,0 +1,62 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: "${{ matrix.python }}"
+    - run: pip install tox tox-travis codecov
+    - run: tox
+#     # This item has no matching transformer
+#     - pypi:
+#         provider: pypi
+#         user: lukas-bednar
+#         password:
+#           secure: ks4q6t0YBc4i3hr5uYCepUi05SuBfkA6l2vakuqcQunuwClaCN3ryP5aKCKk3673wdKBh2eeL+VrKrmEnyRTrgo+t02ODSibAMeytwq254m526FiUbATemNrDyPtv7XTO/Yp9yFPwHbpoH8bdTa4MhTUm6qXcRtRdYvfU8zVKUU=
+#         'on':
+#           branch: master
+#           tags: true
+#         skip_upload_docs: true
+#       if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+    - run: codecov
+      if: "${{ success() }}"
+    strategy:
+      matrix:
+        python:
+        - '3.5'
+        - '3.6'
+  test_2:
+    runs-on: ubuntu-16.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: pip install tox tox-travis codecov
+    - run: tox
+#     # This item has no matching transformer
+#     - pypi:
+#         provider: pypi
+#         user: lukas-bednar
+#         password:
+#           secure: ks4q6t0YBc4i3hr5uYCepUi05SuBfkA6l2vakuqcQunuwClaCN3ryP5aKCKk3673wdKBh2eeL+VrKrmEnyRTrgo+t02ODSibAMeytwq254m526FiUbATemNrDyPtv7XTO/Yp9yFPwHbpoH8bdTa4MhTUm6qXcRtRdYvfU8zVKUU=
+#         'on':
+#           branch: master
+#           tags: true
+#         skip_upload_docs: true
+#       if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"
+    - run: codecov
+      if: "${{ success() }}"

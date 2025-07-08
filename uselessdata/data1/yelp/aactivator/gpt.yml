@@ -1,0 +1,25 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+        make-target: [test, itest_xenial, itest_bionic, itest_stretch, itest_buster]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        pip install tox
+        sudo apt-get install -y --no-install-recommends zsh
+        umask 022
+    - name: Run make ${{ matrix.make-target }}
+      run: make ${{ matrix.make-target }}

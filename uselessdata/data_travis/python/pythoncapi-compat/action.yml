@@ -1,0 +1,32 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        # 2020-03-30: use "3.10.0-alpha - 3.10" to get Python 3.10 alpha
+        python: [2.7, 3.5, 3.6, 3.7, 3.8, 3.9, "3.10.0-alpha - 3.10"]
+        include:
+          - os: windows-latest
+            python: 3.6
+          - os: macos-latest
+            python: 3.6
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Display the Python version
+        run: python -VV
+      - name: Run tests
+        run: python runtests.py --current --verbose

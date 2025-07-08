@@ -1,0 +1,54 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: [3.9, 3.10, 3.11]
+
+    env:
+      INSTALL_EDM_VERSION: 1.9.2
+      PYTHONUNBUFFERED: "1"
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache directories
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache
+        key: ${{ runner.os }}-cache-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-cache-
+
+    - name: Install EDM
+      run: |
+        if [[ ${{ runner.os }} == "Linux" ]]; then ./tools/install_edm_linux.sh; export PATH="${HOME}/edm/bin:${PATH}"; fi
+        if [[ ${{ runner.os }} == "macOS" ]]; then ./tools/install_edm_osx.sh; export PATH="${PATH}:/usr/local/bin"; fi
+
+    - name: Create EDM environment
+      run: edm envs create travisci --version ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: edm install -e travisci -y cython numpy
+
+    - name: Install package
+      run: edm run -e travisci -- python setup.py develop
+
+    - name: Run tests
+      run: edm run -e travisci -- python -m unittest discover -v concorde
+
+    - name: Report coverage
+      run: |
+        edm run -- pip install codecov
+        edm run -- codecov

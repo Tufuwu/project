@@ -1,0 +1,42 @@
+```yaml
+name: Python application
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.6', '3.7', '3.8', '3.9-dev']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: make init
+
+    - name: Decrypt config file
+      env:
+        ENCRYPTED_KEY: ${{ secrets.ENCRYPTED_8AB1E779B1D5_KEY }}
+        ENCRYPTED_IV: ${{ secrets.ENCRYPTED_8AB1E779B1D5_IV }}
+      run: |
+        openssl aes-256-cbc -K $ENCRYPTED_KEY -iv $ENCRYPTED_IV -in config.yml.enc -out random_word/config.yml -d
+
+    - name: List files in random_word
+      run: ls random_word
+
+    - name: Run tests
+      run: python random_word/tests/test_word.py
+```

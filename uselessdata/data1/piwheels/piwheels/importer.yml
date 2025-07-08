@@ -1,0 +1,82 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    env:
+      REQUIREMENTS: requirements_bullseye.txt
+      PYTHON_APT_VER: 1.6.4
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.8'
+    - run: sudo apt update
+    - run: sudo apt build-dep -y python3-apt
+    - run: DEBVER=$PYTHON_APT_VER pip install git+https://salsa.debian.org/apt-team/python-apt.git@$(echo $PYTHON_APT_VER | sed -e 's/~/_/')
+    - run: pip install -r $REQUIREMENTS
+    - run: pip install codecov -e .[master,slave,logger,test]
+    - run: psql -U postgres -c "create user piwheels password 'piwheels'"
+    - run: psql -U postgres -c "create database piwheels_test"
+    - run: make test
+    - run: codecov
+      if: "${{ success() }}"
+    services:
+      postgresql:
+        image: postgres:9.6
+  test_2:
+    runs-on: ubuntu-16.04
+    env:
+      REQUIREMENTS: requirements_buster.txt
+      PYTHON_APT_VER: 1.1.0~beta1
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+    - run: sudo apt update
+    - run: sudo apt build-dep -y python3-apt
+    - run: DEBVER=$PYTHON_APT_VER pip install git+https://salsa.debian.org/apt-team/python-apt.git@$(echo $PYTHON_APT_VER | sed -e 's/~/_/')
+    - run: pip install -r $REQUIREMENTS
+    - run: pip install codecov -e .[master,slave,logger,test]
+    - run: psql -U postgres -c "create user piwheels password 'piwheels'"
+    - run: psql -U postgres -c "create database piwheels_test"
+    - run: make test
+    - run: codecov
+      if: "${{ success() }}"
+    services:
+      postgresql:
+        image: postgres:9.6
+  test_3:
+    runs-on: ubuntu-16.04
+    env:
+      REQUIREMENTS: requirements_stretch.txt
+      PYTHON_APT_VER: 1.1.0~beta1
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.5'
+    - run: sudo apt update
+    - run: sudo apt build-dep -y python3-apt
+    - run: DEBVER=$PYTHON_APT_VER pip install git+https://salsa.debian.org/apt-team/python-apt.git@$(echo $PYTHON_APT_VER | sed -e 's/~/_/')
+    - run: pip install -r $REQUIREMENTS
+    - run: pip install codecov -e .[master,slave,logger,test]
+    - run: psql -U postgres -c "create user piwheels password 'piwheels'"
+    - run: psql -U postgres -c "create database piwheels_test"
+    - run: make test
+    - run: codecov
+      if: "${{ success() }}"
+    services:
+      postgresql:
+        image: postgres:9.6

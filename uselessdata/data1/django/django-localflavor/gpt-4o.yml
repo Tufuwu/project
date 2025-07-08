@@ -1,0 +1,46 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+        env:
+          - TOXENV=docs
+          - TOXENV=prospector
+          - TOXENV=py39-3.2
+          - TOXENV=py39-main
+          - TOXENV=py310-main
+          - TOXENV=py311-main
+    allow_failures:
+      - env: TOXENV=py39-main
+      - env: TOXENV=py310-main
+      - env: TOXENV=py311-main
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install virtualenv codecov tox
+        pip wheel -r tests/requirements.txt codecov
+    - name: Run tests with tox
+      env:
+        TOXENV: ${{ matrix.env.TOXENV }}
+      run: tox
+    - name: Upload coverage to Codecov
+      if: success()
+      run: codecov
+```

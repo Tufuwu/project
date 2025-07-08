@@ -1,0 +1,31 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        sudo apt update && sudo apt install -y enchant
+        pip install -U setuptools doc8 pyenchant sphinx-rtd-theme sphinxcontrib-spelling
+    - name: Run spelling check
+      run: |
+        make spelling
+        cat "_build/spelling/output.txt"
+    - name: Build HTML documentation
+      run: make html
+    - name: Check documentation style
+      run: doc8 --max-line-length 999 index.rst developer/ migration/ user/ -v
+    - name: Fail if there are misspelled words
+      run: if [[ -s "_build/spelling/output.txt" ]]; then false; fi

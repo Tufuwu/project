@@ -1,0 +1,39 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        make travis-setup
+
+    - name: Run tests
+      run: make ci
+
+    - name: Test PyPy
+      if: matrix.python-version == '3.9'
+      run: |
+        pip install termcolor==1.1.0 pytest==6.2.4 pytest-xdist==2.3.0 dataclasses==0.8
+        py.test -n auto
+
+    - name: Code coverage
+      if: matrix.python-version == '3.9'
+      run: make coverage
+      after_success:
+        run: bash <(curl -s https://codecov.io/bash)

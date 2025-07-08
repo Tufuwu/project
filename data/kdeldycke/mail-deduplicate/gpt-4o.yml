@@ -1,0 +1,66 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.4", "3.5", "3.6", "3.7-dev", "pypy-5.1", "pypy-5.3", "pypy-5.4"]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Check Python and pip version
+      run: |
+        python --version
+        pip --version
+        pip freeze
+
+    - name: Install dependencies
+      run: |
+        if [[ "${{ matrix.python-version }}" == "pypy-5.1" || "${{ matrix.python-version }}" == "pypy-5.3" ]]; then
+          pip install logilab-common
+        fi
+        pip install codecov
+
+    - name: Install test dependencies
+      run: pip install -e .[tests]
+
+    - name: Run tests
+      run: python -m pytest
+
+    - name: Check coding style
+      run: pip install pycodestyle && pycodestyle
+
+    - name: Test package build
+      run: |
+        pip install -e .[develop]
+        python setup.py sdist bdist_egg bdist_wheel
+
+    - name: Validate package metadata
+      run: python setup.py check -m -r -s
+
+    - name: Upload coverage to Codecov
+      run: codecov
+
+  notifications:
+    email:
+      if: failure()
+      on_success: never
+      on_failure: always
+```

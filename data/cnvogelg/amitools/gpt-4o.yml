@@ -1,0 +1,46 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: [3.6, 3.7, 3.8, 3.9]
+        include:
+          - os: ubuntu-latest
+            python-version: 3.7
+          - os: ubuntu-latest
+            python-version: 3.8
+          - os: macos-latest
+            python-version: 3.7
+            env:
+              TOXENV: py37
+              PIP: pip3
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        ${{ matrix.env.PIP || 'pip' }} install cython
+        ${{ matrix.env.PIP || 'pip' }} install tox
+
+    - name: Run tests
+      run: tox
+```

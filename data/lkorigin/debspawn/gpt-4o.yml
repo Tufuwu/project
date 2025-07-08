@@ -1,0 +1,53 @@
+```yaml
+# GitHub Actions config for Debspawn
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9, nightly]
+        allow_failures:
+          - python-version: nightly
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y xsltproc docbook-xsl docbook-xml zstd systemd-container debootstrap
+        pip install flake8 pytest toml
+
+    - name: Build
+      run: |
+        ./setup.py build
+        ./setup.py install --single-version-externally-managed --root=/tmp
+
+    - name: Test with pytest
+      run: sudo python3 -m pytest
+
+    - name: Clean up build artifacts
+      run: rm -rf build/
+
+    - name: Lint with flake8
+      run: |
+        flake8 ./
+        flake8 debspawn/dsrun
+```

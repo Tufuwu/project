@@ -1,0 +1,424 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+env:
+  ES6_DOWNLOAD_URL: https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.2.0.tar.gz
+  ES7_DOWNLOAD_URL: https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.3.0-linux-x86_64.tar.gz
+  EXTRAS_COMMON: all,postgresql
+jobs:
+  requirements_release_es_7_tests_acquisition:
+    runs-on: ubuntu-latest
+    env:
+      REQUIREMENTS: release
+      EXTRAS: "$EXTRAS_COMMON,elasticsearch7"
+      ES_URL: "$ES7_DOWNLOAD_URL"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: mkdir /tmp/elasticsearch
+    - run: wget -O - $ES_URL | tar xz --directory=/tmp/elasticsearch --strip-components=1
+    - run: "/tmp/elasticsearch/bin/elasticsearch --quiet &"
+    - run: travis_retry pip install --upgrade pip setuptools py
+    - run: travis_retry pip install twine wheel coveralls requirements-builder 'six>=1.12.0'
+    - run: requirements-builder -e $EXTRAS --level=min setup.py > .travis-lowest-requirements.txt
+    - run: requirements-builder -e $EXTRAS --level=pypi setup.py > .travis-release-requirements.txt
+    - run: travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt
+    - run: travis_retry pip install -e .[$EXTRAS]
+    - run: "./run-style-checks.sh"
+    - run: "./run-tests.sh acquisition"
+    - run: coveralls
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email: false
+    services:
+      postgresql:
+        image: postgres:12.4
+      redis:
+        image: redis
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+      rabbitmq:
+        image: rabbitmq
+  requirements_release_es_7_tests_circulation:
+    runs-on: ubuntu-latest
+    env:
+      REQUIREMENTS: release
+      EXTRAS: "$EXTRAS_COMMON,elasticsearch7"
+      ES_URL: "$ES7_DOWNLOAD_URL"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: mkdir /tmp/elasticsearch
+    - run: wget -O - $ES_URL | tar xz --directory=/tmp/elasticsearch --strip-components=1
+    - run: "/tmp/elasticsearch/bin/elasticsearch --quiet &"
+    - run: travis_retry pip install --upgrade pip setuptools py
+    - run: travis_retry pip install twine wheel coveralls requirements-builder 'six>=1.12.0'
+    - run: requirements-builder -e $EXTRAS --level=min setup.py > .travis-lowest-requirements.txt
+    - run: requirements-builder -e $EXTRAS --level=pypi setup.py > .travis-release-requirements.txt
+    - run: travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt
+    - run: travis_retry pip install -e .[$EXTRAS]
+    - run: "./run-style-checks.sh"
+    - run: "./run-tests.sh circulation"
+    - run: coveralls
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email: false
+    services:
+      postgresql:
+        image: postgres:12.4
+      redis:
+        image: redis
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+      rabbitmq:
+        image: rabbitmq
+  requirements_release_es_7_tests_document_requests:
+    runs-on: ubuntu-latest
+    env:
+      REQUIREMENTS: release
+      EXTRAS: "$EXTRAS_COMMON,elasticsearch7"
+      ES_URL: "$ES7_DOWNLOAD_URL"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: mkdir /tmp/elasticsearch
+    - run: wget -O - $ES_URL | tar xz --directory=/tmp/elasticsearch --strip-components=1
+    - run: "/tmp/elasticsearch/bin/elasticsearch --quiet &"
+    - run: travis_retry pip install --upgrade pip setuptools py
+    - run: travis_retry pip install twine wheel coveralls requirements-builder 'six>=1.12.0'
+    - run: requirements-builder -e $EXTRAS --level=min setup.py > .travis-lowest-requirements.txt
+    - run: requirements-builder -e $EXTRAS --level=pypi setup.py > .travis-release-requirements.txt
+    - run: travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt
+    - run: travis_retry pip install -e .[$EXTRAS]
+    - run: "./run-style-checks.sh"
+    - run: "./run-tests.sh document_requests"
+    - run: coveralls
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email: false
+    services:
+      postgresql:
+        image: postgres:12.4
+      redis:
+        image: redis
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+      rabbitmq:
+        image: rabbitmq
+  requirements_release_es_7_tests_ill:
+    runs-on: ubuntu-latest
+    env:
+      REQUIREMENTS: release
+      EXTRAS: "$EXTRAS_COMMON,elasticsearch7"
+      ES_URL: "$ES7_DOWNLOAD_URL"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: mkdir /tmp/elasticsearch
+    - run: wget -O - $ES_URL | tar xz --directory=/tmp/elasticsearch --strip-components=1
+    - run: "/tmp/elasticsearch/bin/elasticsearch --quiet &"
+    - run: travis_retry pip install --upgrade pip setuptools py
+    - run: travis_retry pip install twine wheel coveralls requirements-builder 'six>=1.12.0'
+    - run: requirements-builder -e $EXTRAS --level=min setup.py > .travis-lowest-requirements.txt
+    - run: requirements-builder -e $EXTRAS --level=pypi setup.py > .travis-release-requirements.txt
+    - run: travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt
+    - run: travis_retry pip install -e .[$EXTRAS]
+    - run: "./run-style-checks.sh"
+    - run: "./run-tests.sh ill"
+    - run: coveralls
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email: false
+    services:
+      postgresql:
+        image: postgres:12.4
+      redis:
+        image: redis
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+      rabbitmq:
+        image: rabbitmq
+  requirements_release_es_7_tests_ils:
+    runs-on: ubuntu-latest
+    env:
+      REQUIREMENTS: release
+      EXTRAS: "$EXTRAS_COMMON,elasticsearch7"
+      ES_URL: "$ES7_DOWNLOAD_URL"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: mkdir /tmp/elasticsearch
+    - run: wget -O - $ES_URL | tar xz --directory=/tmp/elasticsearch --strip-components=1
+    - run: "/tmp/elasticsearch/bin/elasticsearch --quiet &"
+    - run: travis_retry pip install --upgrade pip setuptools py
+    - run: travis_retry pip install twine wheel coveralls requirements-builder 'six>=1.12.0'
+    - run: requirements-builder -e $EXTRAS --level=min setup.py > .travis-lowest-requirements.txt
+    - run: requirements-builder -e $EXTRAS --level=pypi setup.py > .travis-release-requirements.txt
+    - run: travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt
+    - run: travis_retry pip install -e .[$EXTRAS]
+    - run: "./run-style-checks.sh"
+    - run: "./run-tests.sh ils"
+    - run: coveralls
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email: false
+    services:
+      postgresql:
+        image: postgres:12.4
+      redis:
+        image: redis
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+      rabbitmq:
+        image: rabbitmq
+  requirements_lowest_es_7_tests_acquisition:
+    runs-on: ubuntu-latest
+    env:
+      REQUIREMENTS: lowest
+      EXTRAS: "$EXTRAS_COMMON,elasticsearch7"
+      ES_URL: "$ES7_DOWNLOAD_URL"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: mkdir /tmp/elasticsearch
+    - run: wget -O - $ES_URL | tar xz --directory=/tmp/elasticsearch --strip-components=1
+    - run: "/tmp/elasticsearch/bin/elasticsearch --quiet &"
+    - run: travis_retry pip install --upgrade pip setuptools py
+    - run: travis_retry pip install twine wheel coveralls requirements-builder 'six>=1.12.0'
+    - run: requirements-builder -e $EXTRAS --level=min setup.py > .travis-lowest-requirements.txt
+    - run: requirements-builder -e $EXTRAS --level=pypi setup.py > .travis-release-requirements.txt
+    - run: travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt
+    - run: travis_retry pip install -e .[$EXTRAS]
+    - run: "./run-style-checks.sh"
+    - run: "./run-tests.sh acquisition"
+    - run: coveralls
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email: false
+    services:
+      postgresql:
+        image: postgres:12.4
+      redis:
+        image: redis
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+      rabbitmq:
+        image: rabbitmq
+  requirements_lowest_es_7_tests_circulation:
+    runs-on: ubuntu-latest
+    env:
+      REQUIREMENTS: lowest
+      EXTRAS: "$EXTRAS_COMMON,elasticsearch7"
+      ES_URL: "$ES7_DOWNLOAD_URL"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: mkdir /tmp/elasticsearch
+    - run: wget -O - $ES_URL | tar xz --directory=/tmp/elasticsearch --strip-components=1
+    - run: "/tmp/elasticsearch/bin/elasticsearch --quiet &"
+    - run: travis_retry pip install --upgrade pip setuptools py
+    - run: travis_retry pip install twine wheel coveralls requirements-builder 'six>=1.12.0'
+    - run: requirements-builder -e $EXTRAS --level=min setup.py > .travis-lowest-requirements.txt
+    - run: requirements-builder -e $EXTRAS --level=pypi setup.py > .travis-release-requirements.txt
+    - run: travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt
+    - run: travis_retry pip install -e .[$EXTRAS]
+    - run: "./run-style-checks.sh"
+    - run: "./run-tests.sh circulation"
+    - run: coveralls
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email: false
+    services:
+      postgresql:
+        image: postgres:12.4
+      redis:
+        image: redis
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+      rabbitmq:
+        image: rabbitmq
+  requirements_lowest_es_7_tests_document_requests:
+    runs-on: ubuntu-latest
+    env:
+      REQUIREMENTS: lowest
+      EXTRAS: "$EXTRAS_COMMON,elasticsearch7"
+      ES_URL: "$ES7_DOWNLOAD_URL"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: mkdir /tmp/elasticsearch
+    - run: wget -O - $ES_URL | tar xz --directory=/tmp/elasticsearch --strip-components=1
+    - run: "/tmp/elasticsearch/bin/elasticsearch --quiet &"
+    - run: travis_retry pip install --upgrade pip setuptools py
+    - run: travis_retry pip install twine wheel coveralls requirements-builder 'six>=1.12.0'
+    - run: requirements-builder -e $EXTRAS --level=min setup.py > .travis-lowest-requirements.txt
+    - run: requirements-builder -e $EXTRAS --level=pypi setup.py > .travis-release-requirements.txt
+    - run: travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt
+    - run: travis_retry pip install -e .[$EXTRAS]
+    - run: "./run-style-checks.sh"
+    - run: "./run-tests.sh document_requests"
+    - run: coveralls
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email: false
+    services:
+      postgresql:
+        image: postgres:12.4
+      redis:
+        image: redis
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+      rabbitmq:
+        image: rabbitmq
+  requirements_lowest_es_7_tests_ill:
+    runs-on: ubuntu-latest
+    env:
+      REQUIREMENTS: lowest
+      EXTRAS: "$EXTRAS_COMMON,elasticsearch7"
+      ES_URL: "$ES7_DOWNLOAD_URL"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: mkdir /tmp/elasticsearch
+    - run: wget -O - $ES_URL | tar xz --directory=/tmp/elasticsearch --strip-components=1
+    - run: "/tmp/elasticsearch/bin/elasticsearch --quiet &"
+    - run: travis_retry pip install --upgrade pip setuptools py
+    - run: travis_retry pip install twine wheel coveralls requirements-builder 'six>=1.12.0'
+    - run: requirements-builder -e $EXTRAS --level=min setup.py > .travis-lowest-requirements.txt
+    - run: requirements-builder -e $EXTRAS --level=pypi setup.py > .travis-release-requirements.txt
+    - run: travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt
+    - run: travis_retry pip install -e .[$EXTRAS]
+    - run: "./run-style-checks.sh"
+    - run: "./run-tests.sh ill"
+    - run: coveralls
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email: false
+    services:
+      postgresql:
+        image: postgres:12.4
+      redis:
+        image: redis
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+      rabbitmq:
+        image: rabbitmq
+  requirements_lowest_es_7_tests_ils:
+    runs-on: ubuntu-latest
+    env:
+      REQUIREMENTS: lowest
+      EXTRAS: "$EXTRAS_COMMON,elasticsearch7"
+      ES_URL: "$ES7_DOWNLOAD_URL"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.6'
+    - run: mkdir /tmp/elasticsearch
+    - run: wget -O - $ES_URL | tar xz --directory=/tmp/elasticsearch --strip-components=1
+    - run: "/tmp/elasticsearch/bin/elasticsearch --quiet &"
+    - run: travis_retry pip install --upgrade pip setuptools py
+    - run: travis_retry pip install twine wheel coveralls requirements-builder 'six>=1.12.0'
+    - run: requirements-builder -e $EXTRAS --level=min setup.py > .travis-lowest-requirements.txt
+    - run: requirements-builder -e $EXTRAS --level=pypi setup.py > .travis-release-requirements.txt
+    - run: travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt
+    - run: travis_retry pip install -e .[$EXTRAS]
+    - run: "./run-style-checks.sh"
+    - run: "./run-tests.sh ils"
+    - run: coveralls
+      if: "${{ success() }}"
+#     # This item has no matching transformer
+#     - email: false
+    services:
+      postgresql:
+        image: postgres:12.4
+      redis:
+        image: redis
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+      rabbitmq:
+        image: rabbitmq

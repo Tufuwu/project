@@ -1,0 +1,61 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+    - "/^[0-9]+\\.[0-9]+.*/"
+    - master
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+env:
+  CIBW_SKIP: "?p27-*"
+  CIBW_BUILD_VERBOSITY: '3'
+  BUILD_OUTPUT_PATH: wheelhouse
+  TWINE_USERNAME: cher-nov
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref || github.event_name == 'repository_dispatch' }}
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: 'pip install twine cibuildwheel
+        '
+    - run: |
+        if [[ -n "$CI_TEST_LAUNCH" ]]; then
+          echo "THIS IS A TEST LAUNCH!"
+          export PYPI_SETUP_VERSION_SUFFIX="dev999${{ github.run_number }}"
+          export TWINE_REPOSITORY_URL="https://test.pypi.org/legacy/"
+          export CIBW_ENVIRONMENT_LINUX="\
+            PYPI_SETUP_VERSION_SUFFIX=\"$PYPI_SETUP_VERSION_SUFFIX\""
+        fi
+    - run: 'cibuildwheel --output-dir $BUILD_OUTPUT_PATH
+        '
+    - run: twine upload --skip-existing "$BUILD_OUTPUT_PATH/*.whl"
+      if: "${{ success() }}"
+    services:
+#       # This item has no matching transformer
+#       docker:
+  test_2:
+    runs-on: macos-latest
+    if: ${{ github.ref || github.event_name == 'repository_dispatch' }}
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: 'pip install twine cibuildwheel
+        '
+    - run: |
+        if [[ -n "$CI_TEST_LAUNCH" ]]; then
+          echo "THIS IS A TEST LAUNCH!"
+          export PYPI_SETUP_VERSION_SUFFIX="dev999${{ github.run_number }}"
+          export TWINE_REPOSITORY_URL="https://test.pypi.org/legacy/"
+          export CIBW_ENVIRONMENT_LINUX="\
+            PYPI_SETUP_VERSION_SUFFIX=\"$PYPI_SETUP_VERSION_SUFFIX\""
+        fi
+    - run: 'cibuildwheel --output-dir $BUILD_OUTPUT_PATH
+        '
+    - run: twine upload --skip-existing "$BUILD_OUTPUT_PATH/*.whl"
+      if: "${{ success() }}"

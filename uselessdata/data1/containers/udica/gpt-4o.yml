@@ -1,0 +1,58 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:stable-dind
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential
+        pip install pyflakes
+        pip install black
+
+    - name: Pull Docker images
+      run: |
+        docker pull fedora:rawhide
+        docker pull fedora:latest
+        docker pull centos:centos8
+
+    - name: Format Check
+      run: make format-check
+
+    - name: Lint
+      run: make lint
+
+    - name: Test on Fedora Rawhide
+      run: |
+        docker run -v ${{ github.workspace }}:/root/build/ fedora:rawhide /bin/sh -c "cd /root/build; python3 -m unittest -v tests/test_unit.py"
+
+    - name: Test on Fedora Latest
+      run: |
+        docker run -v ${{ github.workspace }}:/root/build/ fedora:latest /bin/sh -c "cd /root/build; python3 -m unittest -v tests/test_unit.py"
+
+    - name: Test on CentOS 8
+      run: |
+        docker run -v ${{ github.workspace }}:/root/build/ centos:centos8 /bin/sh -c "yum install python3 -y; cd /root/build; python3 -m unittest -v tests/test_unit.py"
+```

@@ -1,0 +1,47 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        tox_env: [django21, django22, django30, django31, django32, djangomaster]
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y apt-transport-https build-essential python3-dev python3-pip pypy-dev libc-ares-dev libev4 libev-dev sqlite3 curl ca-certificates wget gnupg wait-for-it
+
+    - name: Install Cassandra
+      run: |
+        echo "deb http://www.apache.org/dist/cassandra/debian 40x main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
+        wget -qO - https://www.apache.org/dist/cassandra/KEYS | sudo apt-key add -
+        sudo apt-get update
+        sudo apt-get install -y cassandra
+        sudo service cassandra start
+
+    - name: Install Python dependencies
+      run: |
+        pip install tox-travis lz4
+
+    - name: Run tests
+      env:
+        TOX_ENV: ${{ matrix.tox_env }}
+        CASS_DRIVER_NO_CYTHON: 1
+        CASS_HOST: 127.0.0.1
+      run: |
+        wait-for-it 127.0.0.1:9042 -t 120 -- tox -e $TOX_ENV
+```

@@ -1,0 +1,441 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+env:
+  GECKODRIVER_VERSION: 0.24.0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: flake8
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: wget -O /tmp/geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz
+    - run: mkdir ${{ github.workspace }}/geckodriver && tar xvf /tmp/geckodriver.tar.gz -C ${{ github.workspace }}/geckodriver
+    - run: export PATH=${{ github.workspace }}/geckodriver:$PATH
+    - run: firefox --version
+    - run: geckodriver --version
+    - run: pip install tox-travis
+    - run: tox
+  test_2:
+    runs-on: ubuntu-latest
+    env:
+      TOXENV: docs
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: wget -O /tmp/geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz
+    - run: mkdir ${{ github.workspace }}/geckodriver && tar xvf /tmp/geckodriver.tar.gz -C ${{ github.workspace }}/geckodriver
+    - run: export PATH=${{ github.workspace }}/geckodriver:$PATH
+    - run: firefox --version
+    - run: geckodriver --version
+    - run: pip install tox-travis
+    - run: tox
+  test_3:
+    runs-on: ubuntu-latest
+    env:
+      FIREFOX: nightly
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 2.7
+    - uses: aws-actions/configure-aws-credentials@v4.0.1
+      if: true
+      with:
+        aws-access-key-id: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+        aws-secret-access-key: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        aws-region: us-east-1
+#     # This item has no matching transformer
+#     - firefox: latest-nightly
+    - run: wget -O /tmp/geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz
+    - run: mkdir ${{ github.workspace }}/geckodriver && tar xvf /tmp/geckodriver.tar.gz -C ${{ github.workspace }}/geckodriver
+    - run: export PATH=${{ github.workspace }}/geckodriver:$PATH
+    - run: firefox --version
+    - run: geckodriver --version
+    - run: pip install tox-travis
+    - run: tox
+    - id: upload_artifacts_to_s3_bucket
+      run: aws s3 cp results s3://${{ secrets.AWS_BUCKET }}/${{ github.repository }}/${{ github.workflow }}/${{ github.run_number }} --recursive
+      if: true
+  test_4:
+    runs-on: ubuntu-latest
+    env:
+      FIREFOX: dev
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 2.7
+    - uses: aws-actions/configure-aws-credentials@v4.0.1
+      if: true
+      with:
+        aws-access-key-id: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+        aws-secret-access-key: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        aws-region: us-east-1
+#     # This item has no matching transformer
+#     - firefox: latest-dev
+    - run: wget -O /tmp/geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz
+    - run: mkdir ${{ github.workspace }}/geckodriver && tar xvf /tmp/geckodriver.tar.gz -C ${{ github.workspace }}/geckodriver
+    - run: export PATH=${{ github.workspace }}/geckodriver:$PATH
+    - run: firefox --version
+    - run: geckodriver --version
+    - run: pip install tox-travis
+    - run: tox
+    - id: upload_artifacts_to_s3_bucket
+      run: aws s3 cp results s3://${{ secrets.AWS_BUCKET }}/${{ github.repository }}/${{ github.workflow }}/${{ github.run_number }} --recursive
+      if: true
+  test_5:
+    runs-on: ubuntu-latest
+    env:
+      FIREFOX: beta
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 2.7
+    - uses: aws-actions/configure-aws-credentials@v4.0.1
+      if: true
+      with:
+        aws-access-key-id: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+        aws-secret-access-key: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        aws-region: us-east-1
+#     # This item has no matching transformer
+#     - firefox: latest-beta
+    - run: wget -O /tmp/geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz
+    - run: mkdir ${{ github.workspace }}/geckodriver && tar xvf /tmp/geckodriver.tar.gz -C ${{ github.workspace }}/geckodriver
+    - run: export PATH=${{ github.workspace }}/geckodriver:$PATH
+    - run: firefox --version
+    - run: geckodriver --version
+    - run: pip install tox-travis
+    - run: tox
+    - id: upload_artifacts_to_s3_bucket
+      run: aws s3 cp results s3://${{ secrets.AWS_BUCKET }}/${{ github.repository }}/${{ github.workflow }}/${{ github.run_number }} --recursive
+      if: true
+  test_6:
+    runs-on: ubuntu-latest
+    env:
+      FIREFOX: release
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 2.7
+    - uses: aws-actions/configure-aws-credentials@v4.0.1
+      if: true
+      with:
+        aws-access-key-id: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+        aws-secret-access-key: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        aws-region: us-east-1
+#     # This item has no matching transformer
+#     - firefox: latest
+    - run: wget -O /tmp/geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz
+    - run: mkdir ${{ github.workspace }}/geckodriver && tar xvf /tmp/geckodriver.tar.gz -C ${{ github.workspace }}/geckodriver
+    - run: export PATH=${{ github.workspace }}/geckodriver:$PATH
+    - run: firefox --version
+    - run: geckodriver --version
+    - run: pip install tox-travis
+    - run: tox
+    - id: upload_artifacts_to_s3_bucket
+      run: aws s3 cp results s3://${{ secrets.AWS_BUCKET }}/${{ github.repository }}/${{ github.workflow }}/${{ github.run_number }} --recursive
+      if: true
+  test_7:
+    runs-on: ubuntu-latest
+    env:
+      FIREFOX: esr
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 2.7
+    - run: apt-get -y install jwm
+    - uses: aws-actions/configure-aws-credentials@v4.0.1
+      if: true
+      with:
+        aws-access-key-id: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+        aws-secret-access-key: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        aws-region: us-east-1
+#     # This item has no matching transformer
+#     - firefox: latest-esr
+    - run: wget -O /tmp/geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz
+    - run: mkdir ${{ github.workspace }}/geckodriver && tar xvf /tmp/geckodriver.tar.gz -C ${{ github.workspace }}/geckodriver
+    - run: export PATH=${{ github.workspace }}/geckodriver:$PATH
+    - run: firefox --version
+    - run: geckodriver --version
+    - run: pip install tox-travis
+    - run: tox
+    - id: upload_artifacts_to_s3_bucket
+      run: aws s3 cp results s3://${{ secrets.AWS_BUCKET }}/${{ github.repository }}/${{ github.workflow }}/${{ github.run_number }} --recursive
+      if: true
+  test_8:
+    runs-on: ubuntu-latest
+    env:
+      FIREFOX: nightly
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - uses: aws-actions/configure-aws-credentials@v4.0.1
+      if: true
+      with:
+        aws-access-key-id: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+        aws-secret-access-key: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        aws-region: us-east-1
+#     # This item has no matching transformer
+#     - firefox: latest-nightly
+    - run: wget -O /tmp/geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz
+    - run: mkdir ${{ github.workspace }}/geckodriver && tar xvf /tmp/geckodriver.tar.gz -C ${{ github.workspace }}/geckodriver
+    - run: export PATH=${{ github.workspace }}/geckodriver:$PATH
+    - run: firefox --version
+    - run: geckodriver --version
+    - run: pip install tox-travis
+    - run: tox
+    - id: upload_artifacts_to_s3_bucket
+      run: aws s3 cp results s3://${{ secrets.AWS_BUCKET }}/${{ github.repository }}/${{ github.workflow }}/${{ github.run_number }} --recursive
+      if: true
+  test_9:
+    runs-on: ubuntu-latest
+    env:
+      FIREFOX: dev
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - uses: aws-actions/configure-aws-credentials@v4.0.1
+      if: true
+      with:
+        aws-access-key-id: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+        aws-secret-access-key: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        aws-region: us-east-1
+#     # This item has no matching transformer
+#     - firefox: latest-dev
+    - run: wget -O /tmp/geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz
+    - run: mkdir ${{ github.workspace }}/geckodriver && tar xvf /tmp/geckodriver.tar.gz -C ${{ github.workspace }}/geckodriver
+    - run: export PATH=${{ github.workspace }}/geckodriver:$PATH
+    - run: firefox --version
+    - run: geckodriver --version
+    - run: pip install tox-travis
+    - run: tox
+    - id: upload_artifacts_to_s3_bucket
+      run: aws s3 cp results s3://${{ secrets.AWS_BUCKET }}/${{ github.repository }}/${{ github.workflow }}/${{ github.run_number }} --recursive
+      if: true
+  test_10:
+    runs-on: ubuntu-latest
+    env:
+      FIREFOX: beta
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - uses: aws-actions/configure-aws-credentials@v4.0.1
+      if: true
+      with:
+        aws-access-key-id: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+        aws-secret-access-key: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        aws-region: us-east-1
+#     # This item has no matching transformer
+#     - firefox: latest-beta
+    - run: wget -O /tmp/geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz
+    - run: mkdir ${{ github.workspace }}/geckodriver && tar xvf /tmp/geckodriver.tar.gz -C ${{ github.workspace }}/geckodriver
+    - run: export PATH=${{ github.workspace }}/geckodriver:$PATH
+    - run: firefox --version
+    - run: geckodriver --version
+    - run: pip install tox-travis
+    - run: tox
+    - id: upload_artifacts_to_s3_bucket
+      run: aws s3 cp results s3://${{ secrets.AWS_BUCKET }}/${{ github.repository }}/${{ github.workflow }}/${{ github.run_number }} --recursive
+      if: true
+  test_11:
+    runs-on: ubuntu-latest
+    env:
+      FIREFOX: release
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - uses: aws-actions/configure-aws-credentials@v4.0.1
+      if: true
+      with:
+        aws-access-key-id: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+        aws-secret-access-key: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        aws-region: us-east-1
+#     # This item has no matching transformer
+#     - firefox: latest
+    - run: wget -O /tmp/geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz
+    - run: mkdir ${{ github.workspace }}/geckodriver && tar xvf /tmp/geckodriver.tar.gz -C ${{ github.workspace }}/geckodriver
+    - run: export PATH=${{ github.workspace }}/geckodriver:$PATH
+    - run: firefox --version
+    - run: geckodriver --version
+    - run: pip install tox-travis
+    - run: tox
+    - id: upload_artifacts_to_s3_bucket
+      run: aws s3 cp results s3://${{ secrets.AWS_BUCKET }}/${{ github.repository }}/${{ github.workflow }}/${{ github.run_number }} --recursive
+      if: true
+  test_12:
+    runs-on: ubuntu-latest
+    env:
+      FIREFOX: esr
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: apt-get -y install jwm
+    - uses: aws-actions/configure-aws-credentials@v4.0.1
+      if: true
+      with:
+        aws-access-key-id: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+        aws-secret-access-key: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        aws-region: us-east-1
+#     # This item has no matching transformer
+#     - firefox: latest-esr
+    - run: wget -O /tmp/geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz
+    - run: mkdir ${{ github.workspace }}/geckodriver && tar xvf /tmp/geckodriver.tar.gz -C ${{ github.workspace }}/geckodriver
+    - run: export PATH=${{ github.workspace }}/geckodriver:$PATH
+    - run: firefox --version
+    - run: geckodriver --version
+    - run: pip install tox-travis
+    - run: tox
+    - id: upload_artifacts_to_s3_bucket
+      run: aws s3 cp results s3://${{ secrets.AWS_BUCKET }}/${{ github.repository }}/${{ github.workflow }}/${{ github.run_number }} --recursive
+      if: true
+  deploy:
+    needs:
+    - test
+    - test_2
+    - test_3
+    - test_4
+    - test_5
+    - test_6
+    - test_7
+    - test_8
+    - test_9
+    - test_10
+    - test_11
+    - test_12
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: skip
+    - run: skip
+    - run: skip
+#     # This item has no matching transformer
+#     - pypi:
+#         provider: pypi
+#         user: davehunt
+#         password:
+#           secure: DU7213U/qKunwscaaYbhFkLHHwjlkjZaJimIknAHlpscnH7CxoxVL2oiphpcsE+3nKm+CO4VTi/jaOlNIbOCBccj9Ol+QHhv26vr1XqLxT9IlVmFtpeNK9XilDigLBx7FjpVpEjq/01cjJLW238hAcbUGDf8sx7Fl7ce7qJqe3R8Yszusrt3zWaUnsTvKOnvk/vaiRfQHz38eBGhEWlyMycWoXVfAzdg1UWKdV0qg+xl07kd/byNkP4eREUTVXm/37CyD/7mnGM7yr/sxEyB+OLMthMDt4BBAlThGha1QzJwsHvy9jHzsvUbW6WIs00jwfAcCflHcbolNJcigbk5QTlVIwlBP4jQTnbYXUvfseYZ3yo2SLbfHgXLJcXm290oWSz0XcF95bhOyySFS5GHoy0uo9BAxPqYngiQtWcfAFfmNTHFhc/8dADpGtkCQHQIRdPmn65j+RIwknOWTn1ryrjqJ1ZnCA2D9hoFfpm55/SpJE74gwDX+6uj5x8kPF3pDJauhiPlAPe/nxpgbDNZpVWv98GTIsWYI0Ae0hyj0w7uKySuKEKjiLBhJ/09pVjT6uaz6qTjZmQhXTH7VkcS3VL3i8pTkC7J/PYYw8cyLfhlFFO80MH1I6HGyMtAnACS0D7BaBMK7OENCDJsyXGCcp78w7lbCdpXkwALe2zk+wE=
+#         distributions: sdist bdist_wheel
+#         'on':
+#           tags: true
+#           repo: mozilla/FoxPuppet
+#       if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"

@@ -1,0 +1,91 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
+        env:
+          - ENV: "python=3.5 numpy"
+          - ENV: "python=3.6 numpy"
+          - ENV: "python=3.7 numpy"
+          - ENV: "python=3.8 numpy"
+
+    services:
+      xvfb:
+        image: "xvfb"
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Miniconda
+      shell: bash
+      run: |
+        wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+        bash miniconda.sh -b -p $HOME/miniconda
+        echo "$HOME/miniconda/bin" >> $GITHUB_PATH
+        conda config --set always_yes yes
+        conda update conda
+        conda info -a
+        conda create -n test ${{ matrix.env }} scipy pip pytest flake8 nose networkx matplotlib sphinx numpydoc
+        source activate test
+        conda install pillow
+        pip install coveralls
+
+    - name: Install dependencies
+      run: |
+        tools/header.py "Dependency versions"
+        tools/build_versions.py
+        echo "PYTHONWARNINGS=all" >> $GITHUB_ENV
+        python setup.py build_ext --inplace
+        pip install -e .
+        pip install -r DEPENDS-docs.txt
+
+    - name: Run tests
+      run: |
+        nosetests --exe -v skfuzzy
+        flake8 --exclude=test_* skfuzzy docs/examples
+
+    - name: Coveralls
+      if: success()
+      run: coveralls
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/master' && matrix.env == 'python=3.8 numpy'
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Build docs
+      run: |
+        cd docs && make
+        touch build/html/.nojekyll
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: docs/build/html
+        keep_files: true
+```

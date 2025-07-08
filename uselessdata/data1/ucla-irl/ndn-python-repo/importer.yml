@@ -1,0 +1,108 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  osx:
+    runs-on: macos-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: maxim-lobanov/setup-xcode@v1.6.0
+      with:
+        xcode-version: '10.1'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: echo $LANG
+    - run: echo $LC_ALL
+    - run: if [ "${{ runner.os }}" = "linux" ]; then sudo apt-get install libboost1.65-all-dev ; fi
+    - run: if [ "${{ runner.os }}" = "osx"   ]; then brew reinstall openssl                    ; fi
+    - run: git clone https://github.com/named-data/ndn-cxx.git && cd ndn-cxx
+    - run: git checkout ndn-cxx-0.7.0
+    - run: "./waf configure && ./waf && sudo ./waf install && cd .."
+    - run: git clone https://github.com/named-data/NFD.git && cd NFD
+    - run: git checkout NFD-0.7.0
+    - run: "./waf configure --without-libpcap --without-websocket && ./waf && sudo ./waf install && cd .."
+    - run: if [ "${{ runner.os }}" = "linux" ]; then sudo ldconfig ; fi
+    - run: ndnsec-key-gen test
+    - run: sudo nfd start -c /usr/local/etc/ndn/nfd.conf.sample &
+    - run: pip3 install pytest
+    - run: pip3 install wheel
+    - run: pip3 install .
+    - run: pytest
+  bionic_linux_python3_6:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: apt-get -y install python3.6-dev python3-pip python3-setuptools
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: echo $LANG
+    - run: echo $LC_ALL
+    - run: if [ "${{ runner.os }}" = "linux" ]; then sudo apt-get install libboost1.65-all-dev ; fi
+    - run: if [ "${{ runner.os }}" = "osx"   ]; then brew reinstall openssl                    ; fi
+    - run: git clone https://github.com/named-data/ndn-cxx.git && cd ndn-cxx
+    - run: git checkout ndn-cxx-0.7.0
+    - run: "./waf configure && ./waf && sudo ./waf install && cd .."
+    - run: git clone https://github.com/named-data/NFD.git && cd NFD
+    - run: git checkout NFD-0.7.0
+    - run: "./waf configure --without-libpcap --without-websocket && ./waf && sudo ./waf install && cd .."
+    - run: if [ "${{ runner.os }}" = "linux" ]; then sudo ldconfig ; fi
+    - run: ndnsec-key-gen test
+    - run: sudo nfd start -c /usr/local/etc/ndn/nfd.conf.sample &
+    - run: pip3 install pytest
+    - run: pip3 install wheel
+    - run: pip3 install .
+    - run: pytest
+  bionic_linux_python3_7:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: apt-get -y install python3.7-dev python3-pip python3-setuptools
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: echo $LANG
+    - run: echo $LC_ALL
+    - run: if [ "${{ runner.os }}" = "linux" ]; then sudo apt-get install libboost1.65-all-dev ; fi
+    - run: if [ "${{ runner.os }}" = "osx"   ]; then brew reinstall openssl                    ; fi
+    - run: git clone https://github.com/named-data/ndn-cxx.git && cd ndn-cxx
+    - run: git checkout ndn-cxx-0.7.0
+    - run: "./waf configure && ./waf && sudo ./waf install && cd .."
+    - run: git clone https://github.com/named-data/NFD.git && cd NFD
+    - run: git checkout NFD-0.7.0
+    - run: "./waf configure --without-libpcap --without-websocket && ./waf && sudo ./waf install && cd .."
+    - run: if [ "${{ runner.os }}" = "linux" ]; then sudo ldconfig ; fi
+    - run: ndnsec-key-gen test
+    - run: sudo nfd start -c /usr/local/etc/ndn/nfd.conf.sample &
+    - run: pip3 install pytest
+    - run: pip3 install wheel
+    - run: pip3 install .
+    - run: pytest
+  bionic_linux_python3_8:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: apt-get -y install python3.8-dev python3-pip python3-setuptools
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: echo $LANG
+    - run: echo $LC_ALL
+    - run: if [ "${{ runner.os }}" = "linux" ]; then sudo apt-get install libboost1.65-all-dev ; fi
+    - run: if [ "${{ runner.os }}" = "osx"   ]; then brew reinstall openssl                    ; fi
+    - run: git clone https://github.com/named-data/ndn-cxx.git && cd ndn-cxx
+    - run: git checkout ndn-cxx-0.7.0
+    - run: "./waf configure && ./waf && sudo ./waf install && cd .."
+    - run: git clone https://github.com/named-data/NFD.git && cd NFD
+    - run: git checkout NFD-0.7.0
+    - run: "./waf configure --without-libpcap --without-websocket && ./waf && sudo ./waf install && cd .."
+    - run: if [ "${{ runner.os }}" = "linux" ]; then sudo ldconfig ; fi
+    - run: ndnsec-key-gen test
+    - run: sudo nfd start -c /usr/local/etc/ndn/nfd.conf.sample &
+    - run: pip3 install pytest
+    - run: pip3 install wheel
+    - run: pip3 install .
+    - run: pytest

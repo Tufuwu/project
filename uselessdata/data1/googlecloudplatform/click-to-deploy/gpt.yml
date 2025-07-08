@@ -1,0 +1,40 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target:
+          - python-test
+          - vm-lint
+          - vm-generate-triggers
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python 3.9
+      if: matrix.target == 'python-test'
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies for Python test
+      if: matrix.target == 'python-test'
+      run: pip install jinja2 pyyaml
+
+    - name: Set up Docker for vm-lint
+      if: matrix.target == 'vm-lint'
+      uses: docker/setup-buildx-action@v1
+
+    - name: Install ChefDK for vm-generate-triggers
+      if: matrix.target == 'vm-generate-triggers'
+      run: |
+        wget https://packages.chef.io/files/stable/chefdk/4.2.0/ubuntu/16.04/chefdk_4.2.0-1_amd64.deb
+        sudo dpkg -i chefdk_4.2.0-1_amd64.deb
+
+    - name: Run tests
+      run: make "${{ matrix.target }}"

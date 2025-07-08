@@ -1,0 +1,31 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        distro: [ubuntu1804, ubuntu2004, debian9, debian10]
+
+    steps:
+    - name: Set up Docker
+      uses: docker/setup-buildx-action@v2
+
+    - name: Download test shim
+      run: wget -O ${{ github.workspace }}/tests/test.sh https://gist.githubusercontent.com/nickjj/d12353b5b601e33cd62fda111359957a/raw
+
+    - name: Make test shim executable
+      run: chmod +x ${{ github.workspace }}/tests/test.sh
+
+    - name: Run tests
+      run: ${{ github.workspace }}/tests/test.sh
+```

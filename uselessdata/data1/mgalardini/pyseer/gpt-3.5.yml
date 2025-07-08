@@ -1,0 +1,53 @@
+name: Python CI
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+          bash miniconda.sh -b -p $HOME/miniconda
+          export PATH="$HOME/miniconda/bin:$PATH"
+          hash -r
+          conda config --set always_yes yes --set changeps1 no
+          conda config --add channels defaults
+          conda config --add channels bioconda
+          conda config --add channels conda-forge
+          conda update -q conda
+          conda info -a
+          conda create -q -n test-environment python=${{ matrix.python-version }} pip pytest numpy scipy python-dateutil pandas statsmodels>=0.10.0 scikit-learn pysam dendropy matplotlib pybedtools mash bwa bedtools bedops glmnet_py tqdm
+          source activate test-environment
+          conda list
+          python -m pip install --no-deps --ignore-installed .
+
+      - name: Set up xvfb
+        run: |
+          sudo apt-get install xvfb
+
+      - name: Run tests
+        run: |
+          export DISPLAY=:99.0
+          pytest -v tests
+          cd tests && bash run_test.sh

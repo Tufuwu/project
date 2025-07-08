@@ -1,0 +1,63 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.4, 3.5, 3.6, 3.7, 3.8, 3.9, nightly, pypy3]
+        with-opt-deps: [false, true]
+        include:
+          - python-version: 3.4
+            with-opt-deps: false
+          - python-version: 3.5
+            with-opt-deps: false
+          - python-version: 3.6
+            with-opt-deps: false
+          - python-version: 3.7
+            with-opt-deps: false
+          - python-version: 3.7
+            with-opt-deps: true
+          - python-version: 3.8
+            with-opt-deps: true
+          - python-version: 3.9
+            with-opt-deps: true
+          - python-version: nightly
+            with-opt-deps: true
+          - python-version: pypy3
+            with-opt-deps: false
+      allow_failures:
+        - python-version: pypy3
+          with-opt-deps: true
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        if [ "${{ matrix.with-opt-deps }}" = "true" ]; then
+          pip install -r requirements.txt pytest
+        fi
+        git clone https://github.com/ProgVal/irctest.git
+        echo "y" | pip uninstall limnoria || true
+    - name: Run tests
+      run: |
+        python setup.py install
+        supybot-test test -v --plugins-dir=./plugins/ --no-network
+        if [ "${{ matrix.with-opt-deps }}" = "true" ] && [[ "${{ matrix.python-version }}" =~ ^3\.[4-9] ]]; then
+          cd irctest
+          pytest --controllers irctest.controllers.limnoria
+        fi
+```

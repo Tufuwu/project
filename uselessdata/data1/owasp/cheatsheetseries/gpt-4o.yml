@@ -1,0 +1,50 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x] # Adjust the Node.js version as needed
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install Python 3.9
+      run: sudo apt-get install python3.9 python3-pip python3-setuptools python3-wheel
+
+    - name: Install Python packages
+      run: pip3 install requests feedgen wheel
+
+    - name: Install markdown-link-check
+      run: npm install -g markdown-link-check
+
+    - name: Install gitbook-cli
+      run: npm install -g gitbook-cli
+
+    - name: Make Generate_Site.sh executable
+      run: chmod +x scripts/Generate_Site.sh
+
+    - name: Run Generate_Site.sh
+      run: |
+        cd scripts
+        echo "Try to generate the offline website..."
+        sed -i 's/python/python3.9/g' Generate_Site.sh
+        bash Generate_Site.sh
+        ls -l ../generated/site/
+```

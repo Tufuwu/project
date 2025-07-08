@@ -1,0 +1,28 @@
+```yaml
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12', 'nightly']
+    continue-on-error: ${{ matrix.python-version == 'nightly' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          unset VIRTUAL_ENV
+          python -m pip install --upgrade pip setuptools
+          pip install .
+          pip install doit
+          doit install_test_deps
+      - name: Run tests
+        run: doit test
+```

@@ -1,0 +1,60 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [2.7, 3.5, 3.6, 3.7, 3.8, 3.9, pypy-2.7, pypy-3.7]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache Hypothesis directory
+      uses: actions/cache@v2
+      with:
+        path: ${{ env.HYPOTHESIS_STORAGE_DIRECTORY }}
+        key: ${{ runner.os }}-hypothesis-${{ matrix.python-version }}
+        restore-keys: |
+          ${{ runner.os }}-hypothesis-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade --upgrade-strategy only-if-needed pytest pytest-catchlog
+        pip install .
+
+    - name: Run tests
+      env:
+        HYPOTHESIS_STORAGE_DIRECTORY: ${{ github.workspace }}/.hypothesis
+      run: |
+        pytest
+
+    - name: Notify on success or failure
+      if: always()
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.example.com
+        server_port: 587
+        username: ${{ secrets.SMTP_USERNAME }}
+        password: ${{ secrets.SMTP_PASSWORD }}
+        subject: GitHub Actions - ${{ job.status }}
+        to: your-email@example.com
+        from: github-actions@example.com
+        body: Build ${{ job.status }} for ${{ github.repository }} on ${{ github.ref }}
+```

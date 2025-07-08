@@ -1,0 +1,57 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    services:
+      docker:
+        image: docker:19.03.12
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Upgrade pip, setuptools, and wheel
+      run: |
+        python3 -m pip install --upgrade pip setuptools wheel
+
+    - name: Log in to DockerHub
+      if: env.DOCKERHUB_TOKEN != ''
+      run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u nextstrainbot --password-stdin
+
+    - name: Install Nextstrain CLI
+      run: pip3 install git+https://github.com/nextstrain/cli
+
+    - name: Check Nextstrain version
+      run: nextstrain version
+
+    - name: Check Nextstrain setup
+      run: nextstrain check-setup
+
+    - name: Update Nextstrain
+      run: nextstrain update
+
+    - name: Install additional Python packages
+      run: pip3 install cram nextstrain-augur
+
+    - name: Prepare data
+      run: gunzip data/example_sequences.fasta.gz
+
+    - name: Build with Nextstrain
+      run: nextstrain build . all_regions -j 2 --profile nextstrain_profiles/nextstrain-ci
+
+    - name: Run tests
+      run: cram --shell=/bin/bash tests/sanitize-metadata.t
+```

@@ -1,0 +1,75 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y postgresql-9.6-postgis-2.4 python3-dev autotools-dev libexpat1-dev libfreexl-dev libgeos-dev libproj-dev libreadline-dev libsqlite3-dev libsqlite3-mod-spatialite libxml2-dev zlib1g-dev
+        pip install tox
+
+    - name: Set up PostgreSQL
+      run: |
+        sudo -u postgres psql -c "CREATE ROLE gis PASSWORD 'gis' SUPERUSER CREATEDB CREATEROLE INHERIT LOGIN;"
+        sudo -u postgres psql -c 'CREATE DATABASE gis;'
+        sudo -u postgres psql -d gis -c 'CREATE SCHEMA gis;'
+        sudo -u postgres psql -c 'GRANT CREATE ON DATABASE gis TO "gis";'
+        sudo -u postgres psql -d gis -c 'GRANT USAGE,CREATE ON SCHEMA gis TO "gis";'
+        sudo -u postgres psql -d gis -c 'CREATE EXTENSION postgis;'
+
+    - name: Install project dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run flake8
+      run: flake8 --ignore=W503,W504 geoalchemy2 tests
+
+    - name: Run tox with SQLAlchemy 1.1.2
+      run: tox -e py${{ matrix.python-version }}-sqla11 --sitepackages -- -v --cov geoalchemy2 --cov-report term-missing
+
+    - name: Run tox with latest SQLAlchemy
+      run: tox -e py${{ matrix.python-version }}-sqlalatest --sitepackages -- -v --cov geoalchemy2 --cov-report term-missing
+
+    - name: Report coverage results to coveralls.io
+      run: |
+        pip install coveralls
+        coveralls
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push' && contains(github.ref, 'tags')
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: pip install setuptools wheel twine
+
+    - name: Build and publish
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        python setup.py sdist bdist_wheel
+        twine upload dist/*

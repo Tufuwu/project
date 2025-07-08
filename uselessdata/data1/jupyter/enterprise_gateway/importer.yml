@@ -1,0 +1,71 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+env:
+  ASYNC_TEST_TIMEOUT: '30'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: "${{ matrix.python }}"
+    - name: Set up cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "/home/travis/.sbt/"
+        key: "${{ runner.os }}-path"
+    - run: mkdir -p ${{ github.workspace }}/.sbt/launchers/1.3.12
+    - run: curl -L -o ${{ github.workspace }}/.sbt/launchers/1.3.12/sbt-launch.jar https://repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.3.12/sbt-launch.jar
+    - run: pip install --upgrade setuptools pip websocket-client flake8
+    - run: travis_retry make clean dist enterprise-gateway-demo
+    - run: pip install dist/*.whl coverage
+    - run: pip freeze
+    - run: jupyter enterprisegateway --help
+    - run: flake8 enterprise_gateway
+    - run: travis_retry travis_wait 3 nosetests -x --process-restartworker --with-coverage --cover-package=enterprise_gateway enterprise_gateway.tests
+    - run: echo "Starting integration tests ..."
+    - run: make itest-yarn
+    - run: pip uninstall -y jupyter_enterprise_gateway
+    - run: echo "Travis exited with ${TRAVIS_TEST_RESULT}"
+      if: "${{ success() }}"
+    - run: python --version
+      if: "${{ success() }}"
+    - run: pip --version
+      if: "${{ success() }}"
+    - run: pip list
+      if: "${{ success() }}"
+    - run: docker logs itest-yarn
+      if: "${{ success() }}"
+    - run: pip install codecov
+      if: "${{ success() }}"
+    - run: codecov
+      if: "${{ success() }}"
+    - run: echo "Travis exited with ${TRAVIS_TEST_RESULT}"
+      if: "${{ failure() }}"
+    - run: python --version
+      if: "${{ failure() }}"
+    - run: pip --version
+      if: "${{ failure() }}"
+    - run: pip list
+      if: "${{ failure() }}"
+    - run: docker logs itest-yarn
+      if: "${{ failure() }}"
+    strategy:
+      matrix:
+        python:
+        - 3.5
+        - 3.6
+        - 3.7
+        - 3.8
+    services:
+#       # This item has no matching transformer
+#       docker:

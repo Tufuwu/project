@@ -1,0 +1,61 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7]
+        django-version: [django21, django22]
+    env:
+      TOXENV: py${{ matrix.python-version }}-${{ matrix.django-version }}
+    services:
+      postgres:
+        image: postgres:9.4
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: pip install tox
+    - name: Create database user
+      run: psql -U postgres -c "CREATE USER history_user2 CREATEDB PASSWORD 'pass';"
+      env:
+        PGPASSWORD: postgres
+    - name: Run tests
+      run: tox
+
+  notify:
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+    - name: Send Slack notification
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+```

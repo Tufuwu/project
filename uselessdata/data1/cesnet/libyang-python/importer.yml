@@ -1,0 +1,182 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+    - master
+    - devel
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    env:
+      TOXENV: lint
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: apt-get -y install build-essential cmake libffi-dev libpcre3-dev
+    - run: pip install tox twine
+    - run: pip install -r requirements.txt
+    - run: tox -- $(git ls-files '*.py')
+  test_2:
+    runs-on: ubuntu-18.04
+    env:
+      TOXENV: py35
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.5
+    - run: apt-get -y install build-essential cmake libffi-dev libpcre3-dev
+    - run: pip install tox twine
+    - run: pip install -r requirements.txt
+    - run: tox -- $(git ls-files '*.py')
+  test_3:
+    runs-on: ubuntu-18.04
+    env:
+      TOXENV: pypy3
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: pypy3
+    - run: apt-get -y install build-essential cmake libffi-dev libpcre3-dev
+    - run: pip install tox twine
+    - run: pip install -r requirements.txt
+    - run: tox -- $(git ls-files '*.py')
+  test_4:
+    runs-on: ubuntu-18.04
+    env:
+      TOXENV: py36
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: apt-get -y install build-essential cmake libffi-dev libpcre3-dev
+    - run: pip install tox twine
+    - run: pip install -r requirements.txt
+    - run: tox -- $(git ls-files '*.py')
+  test_5:
+    runs-on: ubuntu-18.04
+    env:
+      TOXENV: py37
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: apt-get -y install build-essential cmake libffi-dev libpcre3-dev
+    - run: pip install tox twine
+    - run: pip install -r requirements.txt
+    - run: tox -- $(git ls-files '*.py')
+  test_6:
+    runs-on: ubuntu-18.04
+    env:
+      TOXENV: py38
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.8
+    - run: apt-get -y install build-essential cmake libffi-dev libpcre3-dev
+    - run: pip install tox twine
+    - run: pip install -r requirements.txt
+    - run: tox -- $(git ls-files '*.py')
+  test_7:
+    runs-on: ubuntu-18.04
+    env:
+      TOXENV: py3-devel
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: apt-get -y install build-essential cmake libffi-dev libpcre3-dev
+    - run: pip install tox twine
+    - run: pip install -r requirements.txt
+    - run: tox -- $(git ls-files '*.py')
+  deploy:
+    needs:
+    - test
+    - test_2
+    - test_3
+    - test_4
+    - test_5
+    - test_6
+    - test_7
+    runs-on: ubuntu-18.04
+    env:
+      TOXENV: py3-master
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: apt-get -y install build-essential cmake libffi-dev libpcre3-dev
+    - run: pip install tox twine
+    - run: pip install -r requirements.txt
+    - run: tox -- $(git ls-files '*.py')
+    - run: twine upload --skip-existing dist/libyang-*.tar.gz
+      if: "${{ github.event_name == 'push' && ${{ github.ref }} }}"

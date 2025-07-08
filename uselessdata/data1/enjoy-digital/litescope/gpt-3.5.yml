@@ -1,0 +1,37 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          cd ~/
+          wget https://raw.githubusercontent.com/enjoy-digital/litex/master/litex_setup.py
+          python3 litex_setup.py init install
+          cd $GITHUB_WORKSPACE
+          python3 setup.py install
+
+      - name: Get RISC-V toolchain
+        run: |
+          wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-20171231-x86_64-linux-centos6.tar.gz
+          tar -xvf riscv64-unknown-elf-gcc-20171231-x86_64-linux-centos6.tar.gz
+          export PATH=$PATH:$PWD/riscv64-unknown-elf-gcc-20171231-x86_64-linux-centos6/bin/
+
+      - name: Test
+        run: |
+          python setup.py test

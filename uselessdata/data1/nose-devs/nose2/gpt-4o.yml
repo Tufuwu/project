@@ -1,0 +1,54 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox-travis
+        pip install coveralls
+        pip install coverage
+    - name: Run tests with tox
+      run: tox
+    - name: Run coveralls
+      if: success()
+      run: coveralls
+
+  sdist-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python '3.9'
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox-travis
+    - name: Build and test sdist
+      run: |
+        python setup.py sdist
+        version="$(cat nose2/_version.py | grep '^__version__' |  cut -d "'" -f2)"
+        (cd dist; tar -xzf "nose2-${version}.tar.gz")
+        (cd "dist/nose2-${version}"; tox)
+```

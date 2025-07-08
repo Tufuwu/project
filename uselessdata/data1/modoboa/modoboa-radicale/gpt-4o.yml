@@ -1,0 +1,116 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+        db: [postgresql, mysql]
+
+    services:
+      postgres:
+        image: postgres:9.6
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: test
+          POSTGRES_PASSWORD: postgres
+      mysql:
+        image: mysql:5.5
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping --silent"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        env:
+          MYSQL_ROOT_PASSWORD: mysql
+          MYSQL_DATABASE: test
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        pip install codecov
+        pip install -r test-requirements.txt
+        pip install -e git+https://github.com/modoboa/modoboa.git@1.x#egg=modoboa
+        pip install -r requirements.txt
+        python setup.py develop
+
+    - name: Run tests
+      env:
+        PYTHONWARNINGS: "default,ignore::PendingDeprecationWarning,ignore::ResourceWarning"
+      run: |
+        cd test_project
+        coverage run --source ../modoboa_radicale manage.py test modoboa_radicale
+
+    - name: Upload coverage to Codecov
+      run: codecov
+
+  deploy:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.7'
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        python setup.py develop
+
+    - name: Prepare for deployment
+      run: |
+        cd modoboa_radicale
+        django-admin compilemessages
+        cd ../frontend
+        nvm install --lts
+        npm install
+        npm run build
+        cd ..
+
+    - name: Deploy to PyPI
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        pip install twine
+        python setup.py sdist bdist_wheel
+        twine upload dist/*
+```

@@ -1,0 +1,46 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+    - master
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: Set up pip cache
+      uses: actions/cache@v3.3.2
+      with:
+        path: "~/.cache/pip"
+        key: "${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}"
+        restore-keys: "${{ runner.os }}-pip-"
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '2.7'
+#     # 'sudo' was not transformed because there is no suitable equivalent in GitHub Actions
+    - run: docker --version
+    - run: sudo apt-get -y update
+    - run: sudo apt-get -y install -o Dpkg::Options::="--force-confnew" docker-ce
+    - run: docker --version
+    - run: make docker-pull
+    - run: mkdir -p coverage
+    - run: true
+    - run: make test.start_elasticsearch
+    - run: make test-docker
+    - run: make quality-docker
+    - run: make coverage-docker
+    - run: sudo make docs
+    - run: make test.stop_elasticsearch
+    - run: pip install --upgrade codecov
+      if: "${{ success() }}"
+    - run: codecov
+      if: "${{ success() }}"
+    services:
+#       # This item has no matching transformer
+#       docker:

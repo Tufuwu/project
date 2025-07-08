@@ -1,0 +1,72 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-python-3.7:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Docker
+        run: docker pull python:3.7-slim
+      - name: Run Docker container
+        run: docker run -it -d --name app python:3.7-slim
+      - name: Copy files to container
+        run: docker cp . app:/root/template
+      - name: Install dependencies
+        run: docker exec app pip install --upgrade pipenv
+      - name: Install dev packages
+        run: docker exec -i app bash -c "cd /root/template && pipenv install --dev --python 3.7"
+      - name: Run tests
+        run: docker exec -i app bash -c "cd /root/template && pipenv run pytest test/"
+      - name: Clean up
+        run: docker rm -f app
+
+  test-python-3.8:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Docker
+        run: docker pull python:3.8-slim
+      - name: Run Docker container
+        run: docker run -it -d --name app python:3.8-slim
+      - name: Copy files to container
+        run: docker cp . app:/root/template
+      - name: Install dependencies
+        run: docker exec app pip install --upgrade pipenv
+      - name: Install dev packages
+        run: docker exec -i app bash -c "cd /root/template && pipenv install --dev --python 3.8"
+      - name: Run tests
+        run: docker exec -i app bash -c "cd /root/template && pipenv run pytest test/"
+      - name: Clean up
+        run: docker rm -f app
+
+  run-autotest-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Debugging
+        run: |
+          echo Current path
+          pwd
+          echo Project dir contents
+          ls
+      - name: Build Docker image
+        run: docker build -t test_image -f test/Dockerfile_3.7 .
+      - name: Run Docker container
+        run: docker run -it -d --name app test_image
+      - name: Run autotest bot
+        run: |
+          docker exec -i app bash -c "python test/travis_test_script.py test/autotest_bot.py"
+          docker exec -i app bash -c "python test/travis_test_script.py test/upgradestest_bot.py"
+          docker exec -i app bash -c "python test/travis_test_script.py test/damagetest_bot.py"
+      - name: Clean up
+        run: docker rm -f app
+```

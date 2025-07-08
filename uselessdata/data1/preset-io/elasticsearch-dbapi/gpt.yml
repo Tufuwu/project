@@ -1,0 +1,36 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+        toxenv: [flake8, black, elasticsearch]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox codecov
+    - name: Run tox for ${{ matrix.toxenv }}
+      run: tox -e ${{ matrix.toxenv }}
+      env:
+        TOXENV: ${{ matrix.toxenv }}
+    - name: Run Elasticsearch tests
+      if: matrix.toxenv == 'elasticsearch'
+      run: |
+        docker pull elasticsearch:7.3.2
+        docker run --name elasticsearch -e "discovery.type=single-node" -p 9200:9200 -d elasticsearch:7.3.2
+        docker ps
+        sleep 60
+    - name: Upload coverage report
+      if: matrix.toxenv != 'elasticsearch'
+      run: codecov

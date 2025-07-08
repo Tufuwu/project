@@ -1,0 +1,43 @@
+name: Python CI
+
+on:
+  push:
+    branches:
+      - '*'
+    tags:
+      - 'blurb-v*.*.*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python: ['3.9', '3.10']
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install flit
+
+      - name: Install project dependencies
+        run: |
+          pushd "blurb"
+          flit install
+          popd
+
+      - name: Run tests
+        run: |
+          blurb test
+
+      - name: Notify
+        if: github.event_name == 'push' && github.ref_type == 'tag'
+        run: echo 'Notification logic goes here'

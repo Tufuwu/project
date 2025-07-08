@@ -1,0 +1,40 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '12'
+
+    - name: Install MJML
+      run: |
+        npm install -g mjml-http-server@0.0.3
+        npm install mjml@4.6.3
+
+    - name: Display MJML version
+      run: node_modules/.bin/mjml --version
+
+    - name: Install Django and requests
+      run: |
+        pip install "Django<3.1"
+        pip install "requests>=2.20.0,<=2.24.0"
+
+    - name: Run tests
+      run: python tools.py test

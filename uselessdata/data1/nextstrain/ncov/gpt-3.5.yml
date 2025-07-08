@@ -1,0 +1,42 @@
+name: Nextstrain CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        if [[ -n "${DOCKERHUB_TOKEN:-}" ]]; then docker login -u nextstrainbot --password-stdin <<<"$DOCKERHUB_TOKEN"; fi
+        pip install git+https://github.com/nextstrain/cli
+        nextstrain version
+        nextstrain check-setup
+        nextstrain update
+        pip install cram nextstrain-augur
+
+    - name: Run tests
+      run: |
+        gunzip data/example_sequences.fasta.gz
+        nextstrain build . all_regions -j 2 --profile nextstrain_profiles/nextstrain-ci
+        cram --shell=/bin/bash tests/sanitize-metadata.t

@@ -1,0 +1,154 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8, nightly]
+        django: [2.2, 3.0, master]
+        exclude:
+          - python-version: pypy
+            django: 2.2
+          - python-version: pypy
+            django: 3.0
+          - python-version: pypy
+            django: master
+      allow_failures:
+        - python-version: nightly
+        - django: master
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test
+        options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=3
+        ports:
+          - 3306:3306
+      postgres:
+        image: postgres:11
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: test
+        options: --health-cmd="pg_isready -U postgres" --health-interval=10s --health-timeout=5s --health-retries=3
+        ports:
+          - 5432:5432
+      mongodb:
+        image: mongo:4.2
+        ports:
+          - 27017:27017
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          TOX_ENV=py${{ matrix.python-version }}-django${{ matrix.django }}
+          pip install virtualenv tox
+          tox -e $TOX_ENV --notest
+      - name: Run tests
+        run: tox -e $TOX_ENV
+      - name: After success
+        if: success()
+        run: |
+          tox -e $TOX_ENV -- pip install coveralls
+          tox -e $TOX_ENV -- coveralls $COVERALLS_OPTION
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install dependencies
+        run: pip install tox
+      - name: Run lint
+        run: tox -e lint
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install dependencies
+        run: pip install tox
+      - name: Build docs
+        run: tox -e docs
+
+  functional:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test
+        options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=3
+        ports:
+          - 3306:3306
+      postgres:
+        image: postgres:11
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: test
+        options: --health-cmd="pg_isready -U postgres" --health-interval=10s --health-timeout=5s --health-retries=3
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install dependencies
+        run: |
+          pip install tox
+          export PYTHON='coverage run -a'
+      - name: Before install
+        run: |
+          mysql -e 'CREATE DATABASE test;'
+          psql -c 'CREATE DATABASE test;' -U postgres
+      - name: Run functional tests
+        run: |
+          tox -e functional
+          DB_ENGINE=django.db.backends.mysql DB_USER=travis DB_HOST=localhost DB_NAME=test tox -e functional
+          DB_ENGINE=django.db.backends.postgresql DB_USER=postgres DB_HOST=localhost DB_NAME=test tox -e functional
+          CONNECTOR=dbbackup.db.postgresql.PgDumpBinaryConnector DB_ENGINE=django.db.backends.postgresql DB_USER=postgres DB_HOST=localhost DB_NAME=test tox -e functional
+
+  functional-mongodb:
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:4.2
+        ports:
+          - 27017:27017
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install dependencies
+        run: |
+          pip install tox
+          export PYTHON='coverage run -a'
+      - name: Run functional tests for MongoDB
+        run: DB_ENGINE=djongo DB_NAME=test tox -e functional-mongodb
+```

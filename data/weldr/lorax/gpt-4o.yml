@@ -1,0 +1,60 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:latest
+        options: --privileged
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: pip install coverage coveralls
+
+    - name: Run tests in Docker
+      run: make test-in-docker
+
+    - name: Copy coverage results
+      run: cp .test-results/.coverage ./.coverage.docker
+
+    - name: Combine coverage
+      run: coverage combine
+
+    - name: Upload coverage to Coveralls
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+      run: coveralls
+
+  notification:
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+    - name: Send email notification
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.example.com
+        server_port: 587
+        username: ${{ secrets.SMTP_USERNAME }}
+        password: ${{ secrets.SMTP_PASSWORD }}
+        subject: GitHub Actions Failure Notification
+        to: your-email@example.com
+        from: github-actions@example.com
+        body: Build or tests failed in GitHub Actions.
+```

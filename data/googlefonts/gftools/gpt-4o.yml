@@ -1,0 +1,44 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    strategy:
+      matrix:
+        python-version: ['3.7', '3.8']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Upgrade pip
+      run: pip install --upgrade pip
+
+    - name: Install dependencies
+      run: |
+        pip install pytest
+        pip install mypy
+        pip install .
+
+    - name: Run tests
+      run: |
+        pytest ./Lib/gftools/tests/test_usage.py
+        pytest ./Lib/gftools/tests/test_fix.py
+
+    - name: Run mypy
+      run: mypy ./Lib/gftools/packager.py
+```

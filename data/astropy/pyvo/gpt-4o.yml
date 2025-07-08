@@ -1,0 +1,111 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: '0 0 * * 0' # Weekly cron job
+
+jobs:
+  initial_tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7]
+        include:
+          - python-version: 3.6
+            setup-cmd: 'egg_info'
+            main-cmd: 'python setup.py'
+          - python-version: 3.7
+            setup-cmd: 'test --coverage'
+            main-cmd: 'python setup.py'
+          - python-version: 3.7
+            setup-cmd: ''
+            main-cmd: 'flake8'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest-astropy requests mimeparse requests_mock
+          if [ "${{ matrix.setup-cmd }}" == "build_docs -w" ]; then
+            pip install sphinx_astropy
+          fi
+      - name: Run tests
+        run: ${{ matrix.main-cmd }} ${{ matrix.setup-cmd }}
+      - name: Upload coverage to Codecov
+        if: matrix.setup-cmd == 'test --coverage'
+        uses: codecov/codecov-action@v2
+
+  comprehensive_tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.5, 3.6, 3.7]
+        numpy-version: [1.14, 1.15, stable]
+        astropy-version: [2.0.16, 3.2, stable, development]
+        include:
+          - python-version: 3.5
+            numpy-version: 1.14
+            astropy-version: 2.0.16
+          - python-version: 3.6
+            numpy-version: 1.15
+            astropy-version: 3.2
+            pip-dependencies: 'requests mimeparse requests_mock contextlib2'
+          - python-version: 3.7
+            numpy-version: stable
+            astropy-version: stable
+            pip-dependencies: 'pytest-astropy requests mimeparse requests_mock'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ${{ matrix.pip-dependencies }}
+      - name: Run tests
+        run: python setup.py test
+
+  windows_test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest-astropy requests mimeparse requests_mock
+      - name: Run tests
+        run: python setup.py test
+
+  cron_tests:
+    runs-on: macos-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest-astropy requests mimeparse requests_mock
+      - name: Run tests
+        run: python setup.py test
+```

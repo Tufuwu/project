@@ -1,0 +1,65 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11]
+        db:
+          - sqlite
+          - postgres
+
+    env:
+      DIRECTOR_HOME: ${{ github.workspace }}/tests/workflows/
+      DIRECTOR_DATABASE_URI: ${{ matrix.db == 'sqlite' && 'sqlite:////tmp/tests.db' || 'postgresql://localhost:5432/tests' }}
+
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: tests
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          pip install black==20.8b1 pytest==5.3.5 mkdocs==1.0.4 mkdocs-material==4.6.3
+
+      - name: Install package
+        run: python setup.py install
+
+      - name: Check code formatting
+        run: black --check director
+
+      - name: Build documentation
+        run: (cd docs && mkdocs build)
+
+      - name: Prepare database
+        if: matrix.db == 'postgres'
+        run: |
+          psql -c 'DROP DATABASE IF EXISTS tests;' -U postgres
+          psql -c 'CREATE DATABASE tests;' -U postgres
+
+      - name: Run tests
+        run: |
+          director celery worker -P solo > /dev/null 2>&1 &
+          sleep 5
+          pytest tests/ -v

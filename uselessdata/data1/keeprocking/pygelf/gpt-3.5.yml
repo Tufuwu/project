@@ -1,0 +1,43 @@
+name: Python package CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        pip install -e .
+        pip install requests pytest-cov coveralls
+
+    - name: Start Docker containers
+      run: docker-compose -f tests/config/docker-compose.yml up -d
+
+    - name: Wait for Docker containers to start
+      run: sleep 120
+
+    - name: Bootstrap
+      run: ./tests/config/bootstrap
+
+    - name: Run tests
+      run: py.test -v --cov=pygelf
+
+    - name: Stop Docker containers
+      run: docker-compose -f tests/config/docker-compose.yml down
+
+    - name: Upload coverage to coveralls
+      run: coveralls

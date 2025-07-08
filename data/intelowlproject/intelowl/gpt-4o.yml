@@ -1,0 +1,58 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    services:
+      docker:
+        image: docker:19.03.12
+        options: --privileged
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.7'
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        unzip -P infected tests/test_files.zip -d .
+
+    - name: Build Docker containers
+      run: |
+        sudo docker-compose -f docker-compose-for-travis.yml build
+        sudo docker-compose -f docker-compose-for-travis.yml up -d
+
+    - name: Run Black
+      run: sudo docker exec -ti intel_owl_uwsgi black . --check
+
+    - name: Run Flake8
+      run: sudo docker exec -ti intel_owl_uwsgi flake8 . --count
+
+    - name: Run Tests
+      run: sudo docker exec -ti intel_owl_uwsgi python manage.py test tests
+```

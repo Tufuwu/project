@@ -1,0 +1,42 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Miniconda
+      shell: bash
+      run: |
+        wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+        bash miniconda.sh -b -p $HOME/miniconda
+        source "$HOME/miniconda/etc/profile.d/conda.sh"
+        hash -r
+        conda config --set always_yes yes --set changeps1 no
+        conda update -q conda
+        conda info -a
+        conda create -q -n test-environment python=${{ matrix.python-version }} numpy scipy matplotlib pyqt
+        conda activate test-environment
+        pip install -e .
+
+    - name: Run tests
+      shell: bash
+      run: bash test/run_test.sh
+```

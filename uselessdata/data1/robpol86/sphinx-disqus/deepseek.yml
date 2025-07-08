@@ -1,0 +1,73 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install appveyor-artifacts coveralls tox
+    - name: Run tests
+      run: tox -e lint,py35,py34,py33,pypy,py27,docs
+    - name: Combine coverage
+      run: |
+        mv .coverage .coverage.travis
+        appveyor-artifacts -mi download
+        coverage combine
+    - name: Upload coverage to Coveralls
+      run: coveralls
+    - name: Set up SSH
+      run: |
+        eval "$(ssh-agent -s)"
+        touch docs/key
+        chmod 0600 docs/key
+        openssl aes-256-cbc -d -K "${{ secrets.ENCRYPTED_1B7C54115A3F_KEY }}" -iv "${{ secrets.ENCRYPTED_1B7C54115A3F_IV }}" < docs/key.enc > docs/key
+        ssh-add docs/key
+    - name: Configure Git
+      run: |
+        git config --global user.email "builds@travis-ci.com"
+        git config --global user.name "Travis CI"
+        git remote set-url origin "git@github.com:${{ github.repository }}"
+    - name: Build documentation
+      run: tox -e docsV
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install twine
+    - name: Build and publish
+      env:
+        TWINE_USERNAME: Robpol86
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        python setup.py sdist bdist_wheel
+        twine upload dist/*
+```

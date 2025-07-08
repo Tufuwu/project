@@ -1,0 +1,41 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        testfolder: [tdl, guest, ozutil, factory]
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install system dependencies
+      run: |
+        sudo add-apt-repository -y ppa:pdffs/precise-virt
+        sudo apt-get update
+        sudo apt-get install -qq genisoimage libvirt-dev mtools openssh-client python-dev python-guestfs swig libssl1.0.0 python-m2crypto python-libvirt
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        python setup.py install
+        pip install coverage coveralls
+
+    - name: Run tests
+      run: |
+        coverage run -p --source=oz runtests.py --verbose --tb=short tests/${{ matrix.testfolder }}
+
+    - name: Upload coverage to Coveralls
+      run: |
+        coveralls
+```

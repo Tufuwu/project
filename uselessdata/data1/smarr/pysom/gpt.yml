@@ -1,0 +1,65 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        interp: [AST, BC]
+        python-version: [3.9, 3.10]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Set environment variables for ${{ matrix.interp }} VM
+      run: |
+        echo "SOM_INTERP=${{ matrix.interp }}" >> $GITHUB_ENV
+        echo "SOM_BIN=som-${{ matrix.interp }}-interp" >> $GITHUB_ENV
+
+    - name: Run tests with pytest
+      run: |
+        pytest
+
+    - name: Run SOM with ${{ matrix.interp }} VM
+      run: |
+        ./som.sh -cp Smalltalk TestSuite/TestHarness.som
+
+  pypy-build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Pypy
+      run: |
+        wget https://downloads.python.org/pypy/pypy2.7-v7.3.1-src.tar.bz2
+        tar -xjf pypy2.7-v7.3.1-src.tar.bz2
+        mv pypy2.7-v7.3.1-src .pypy
+
+    - name: Set up environment for Pypy
+      run: |
+        echo "PYTHONPATH=$PYTHONPATH:.pypy:src" >> $GITHUB_ENV
+
+    - name: Run tests with Pypy
+      run: |
+        pytest
+
+    - name: Run SOM with Pypy
+      run: |
+        ./som.sh -cp Smalltalk TestSuite/TestHarness.som
+
+    - name: Compile with RPython
+      run: |
+        .pypy/rpython/bin/rpython --batch src/main-rpython.py

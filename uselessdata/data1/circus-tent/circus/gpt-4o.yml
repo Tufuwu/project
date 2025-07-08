@@ -1,0 +1,46 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libev-dev libevent-dev
+        pip install tox
+
+    - name: Run before_script
+      if: runner.os == 'Linux'
+      run: sudo sh -c 'echo 0 > /proc/sys/net/ipv6/conf/all/disable_ipv6'
+
+    - name: Run Tox
+      env:
+        TOX_ENV: py${{ matrix.python-version }}
+      run: tox -v -e $TOX_ENV
+
+    - name: Run Coveralls
+      if: success()
+      run: pip install coveralls && coveralls
+```

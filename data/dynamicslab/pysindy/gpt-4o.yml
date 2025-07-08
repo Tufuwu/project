@@ -1,0 +1,45 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements-dev.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: pip install --upgrade -r requirements-dev.txt
+
+    - name: Test with pytest
+      run: py.test test --cov=sindy --flake8
+
+    - name: Upload coverage to Codecov
+      env:
+        CODECOV_TOKEN: 9d40a0bb-0bfb-44d5-a01b-9f32fff65e56
+      run: bash <(curl -s https://codecov.io/bash)
+```

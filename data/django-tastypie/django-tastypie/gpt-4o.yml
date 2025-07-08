@@ -1,0 +1,81 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.6", "3.7", "3.8"]
+        env:
+          - MODE: flake8
+          - MODE: flake8-strict
+          - MODE: docs
+          - DJANGO_VERSION: dj22
+          - DJANGO_VERSION: dj30
+          - DJANGO_VERSION: dj31
+          - DJANGO_VERSION: dj32
+          - DJANGO_VERSION: djdev
+      exclude:
+        - python-version: "3.6"
+          env: MODE: flake8
+        - python-version: "3.6"
+          env: MODE: flake8-strict
+        - python-version: "3.6"
+          env: MODE: docs
+        - python-version: "3.6"
+          env: DJANGO_VERSION: dj30
+        - python-version: "3.6"
+          env: DJANGO_VERSION: dj31
+        - python-version: "3.6"
+          env: DJANGO_VERSION: dj32
+        - python-version: "3.6"
+          env: DJANGO_VERSION: djdev
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 762E3157
+        sudo apt-get update
+        sudo apt-get install -y binutils libproj-dev gdal-bin libsqlite3-mod-spatialite
+        pip install -U pip
+        pip install -U wheel virtualenv
+        pip install tox coveralls
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Run tests
+      env:
+        MODE: ${{ matrix.env.MODE }}
+        DJANGO_VERSION: ${{ matrix.env.DJANGO_VERSION }}
+      run: |
+        apt list --installed
+        coverage erase
+        tox -e py${{ matrix.python-version }}-${{ matrix.env.DJANGO_VERSION }}${{ matrix.env.MODE }}
+
+    - name: Coveralls
+      if: success()
+      run: coveralls
+```

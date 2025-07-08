@@ -1,0 +1,32 @@
+name: Node.js CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: ['node']
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Install dependencies
+      run: |
+        sudo apt-get install python3.9 python3-pip python3-setuptools python3-wheel
+        pip3 install requests feedgen wheel
+        npm install -g markdown-link-check
+        npm install -g gitbook-cli
+        chmod +x scripts/Generate_Site.sh
+    - name: Build and test
+      run: |
+        cd scripts
+        echo "Try to generate the offline website..."
+        sed -i 's/python/python3\.9/g' Generate_Site.sh
+        bash Generate_Site.sh
+        ls -l ../generated/site/

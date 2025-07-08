@@ -1,0 +1,124 @@
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  macos-python-38-mne-data-tests:
+    runs-on: macos-latest
+    env:
+      CONDA_PYTHON: '3.8'
+      CONDA_OS: MacOSX
+      KMP_DUPLICATE_LIB_OK: TRUE
+      CC: g++
+      CXX: g++
+      DOWNLOAD_MNE_DATA: TRUE
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: ${{ env.CONDA_PYTHON }}
+          activate-environment: condaenv
+          auto-update-conda: true
+          auto-activate-base: false
+      - name: Install dependencies
+        run: |
+          mamba info -a
+          mamba create -y -q -n condaenv python=$CONDA_PYTHON
+          mamba env update -q -n condaenv --file env-dev.yml --prune
+          conda activate condaenv
+          if [ "${DOWNLOAD_MNE_DATA}" == "TRUE" ]; then
+            python -c "import mne; mne.datasets.testing.data_path()";
+          fi;
+          python --version
+      - name: Install package
+        run: python -m pip install -e .
+      - name: Run tests
+        run: make testw
+
+  macos-python-39:
+    runs-on: macos-latest
+    env:
+      CONDA_PYTHON: '3.9'
+      CONDA_OS: MacOSX
+      KMP_DUPLICATE_LIB_OK: TRUE
+      CC: g++
+      CXX: g++
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: ${{ env.CONDA_PYTHON }}
+          activate-environment: condaenv
+          auto-update-conda: true
+          auto-activate-base: false
+      - name: Install dependencies
+        run: |
+          mamba info -a
+          mamba create -y -q -n condaenv python=$CONDA_PYTHON
+          mamba env update -q -n condaenv --file env-dev.yml --prune
+          conda activate condaenv
+          python --version
+      - name: Install package
+        run: python -m pip install -e .
+      - name: Run tests
+        run: make testw
+
+  linux-python-38:
+    runs-on: ubuntu-latest
+    env:
+      CONDA_PYTHON: '3.8'
+      CONDA_OS: Linux
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: ${{ env.CONDA_PYTHON }}
+          activate-environment: condaenv
+          auto-update-conda: true
+          auto-activate-base: false
+      - name: Install system dependencies
+        run: sudo apt-get install -y libwebkitgtk-dev
+      - name: Install dependencies
+        run: |
+          mamba info -a
+          mamba create -y -q -n condaenv python=$CONDA_PYTHON
+          mamba env update -q -n condaenv --file env-dev.yml --prune
+          conda activate condaenv
+          python --version
+      - name: Install package
+        run: python -m pip install -e .
+      - name: Run tests
+        run: make test
+
+  linux-python-39:
+    runs-on: ubuntu-latest
+    env:
+      CONDA_PYTHON: '3.9'
+      CONDA_OS: Linux
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: ${{ env.CONDA_PYTHON }}
+          activate-environment: condaenv
+          auto-update-conda: true
+          auto-activate-base: false
+      - name: Install system dependencies
+        run: sudo apt-get install -y libwebkitgtk-dev
+      - name: Install dependencies
+        run: |
+          mamba info -a
+          mamba create -y -q -n condaenv python=$CONDA_PYTHON
+          mamba env update -q -n condaenv --file env-dev.yml --prune
+          conda activate condaenv
+          python --version
+      - name: Install package
+        run: python -m pip install -e .
+      - name: Run tests
+        run: make test
+```

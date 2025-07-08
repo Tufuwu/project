@@ -1,0 +1,210 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  lint:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - run: pip install codecov
+    - run: pip install $OSCAR $DJANGO
+    - run: make install
+    - run: pip freeze
+    - run: codecov
+      if: "${{ success() }}"
+    strategy:
+      matrix: {}
+#       # 'allow_failures' transformations are currently unsupported.
+  lint_2:
+    runs-on: ubuntu-18.04
+    env:
+      DJANGO: "'Django>=2.2,<3'"
+      OSCAR: "'django-oscar>=2.1,<2.2'"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: pip install codecov
+    - run: pip install $OSCAR $DJANGO
+    - run: make install
+    - run: pip freeze
+    - run: make lint
+    - run: codecov
+      if: "${{ success() }}"
+  test:
+    needs:
+    - lint
+    - lint_2
+    runs-on: ubuntu-18.04
+    env:
+      DJANGO: "'Django>=2.2,<3'"
+      OSCAR: "'django-oscar>=2.1,<2.2'"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: pip install codecov
+    - run: pip install $OSCAR $DJANGO
+    - run: make install
+    - run: pip freeze
+    - run: make coverage
+    - run: codecov
+      if: "${{ success() }}"
+  test_2:
+    needs:
+    - lint
+    - lint_2
+    runs-on: ubuntu-18.04
+    env:
+      DJANGO: "'Django>=2.2,<3'"
+      OSCAR: "'django-oscar>=2.1,<2.2'"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: pip install codecov
+    - run: pip install $OSCAR $DJANGO
+    - run: make install
+    - run: pip freeze
+    - run: make coverage
+    - run: codecov
+      if: "${{ success() }}"
+  test_3:
+    needs:
+    - lint
+    - lint_2
+    runs-on: ubuntu-18.04
+    env:
+      DJANGO: "'Django>=2.2,<3'"
+      OSCAR: "'django-oscar>=2.1,<2.2'"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.8
+    - run: pip install codecov
+    - run: pip install $OSCAR $DJANGO
+    - run: make install
+    - run: pip freeze
+    - run: make coverage
+    - run: codecov
+      if: "${{ success() }}"
+  test_4:
+    needs:
+    - lint
+    - lint_2
+    runs-on: ubuntu-18.04
+    env:
+      DJANGO: "'Django>=3,<3.1'"
+      OSCAR: "'django-oscar>=2.1,<2.2'"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.6
+    - run: pip install codecov
+    - run: pip install $OSCAR $DJANGO
+    - run: make install
+    - run: pip freeze
+    - run: make coverage
+    - run: codecov
+      if: "${{ success() }}"
+  test_5:
+    needs:
+    - lint
+    - lint_2
+    runs-on: ubuntu-18.04
+    env:
+      DJANGO: "'Django>=3,<3.1'"
+      OSCAR: "'django-oscar>=2.1,<2.2'"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.7
+    - run: pip install codecov
+    - run: pip install $OSCAR $DJANGO
+    - run: make install
+    - run: pip freeze
+    - run: make coverage
+    - run: codecov
+      if: "${{ success() }}"
+  test_6:
+    needs:
+    - lint
+    - lint_2
+    runs-on: ubuntu-18.04
+    env:
+      DJANGO: "'Django>=3,<3.1'"
+      OSCAR: "'django-oscar>=2.1,<2.2'"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.8
+    - run: pip install codecov
+    - run: pip install $OSCAR $DJANGO
+    - run: make install
+    - run: pip freeze
+    - run: make coverage
+    - run: codecov
+      if: "${{ success() }}"
+  test_7:
+    needs:
+    - lint
+    - lint_2
+    runs-on: ubuntu-18.04
+    env:
+      DJANGO: "'Django>=3,<3.1'"
+      OSCAR: "'https://github.com/django-oscar/django-oscar/archive/master.tar.gz'"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.8
+    - run: pip install codecov
+    - run: pip install $OSCAR $DJANGO
+    - run: make install
+    - run: pip freeze
+    - run: make coverage
+    - run: codecov
+      if: "${{ success() }}"
+  test_8:
+    needs:
+    - lint
+    - lint_2
+    runs-on: ubuntu-18.04
+    env:
+      DJANGO: "'Django>=3.1,<3.2'"
+      OSCAR: "'https://github.com/django-oscar/django-oscar/archive/master.tar.gz'"
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: 3.8
+    - run: pip install codecov
+    - run: pip install $OSCAR $DJANGO
+    - run: make install
+    - run: pip freeze
+    - run: make coverage
+    - run: codecov
+      if: "${{ success() }}"

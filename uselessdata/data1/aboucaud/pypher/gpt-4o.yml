@@ -1,0 +1,58 @@
+```yaml
+name: Python package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        astropy-version: [stable, development]
+        numpy-version: [stable, '1.10', '1.9', '1.8', '1.7']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-cov
+        if [ "${{ matrix.astropy-version }}" = "development" ]; then
+          pip install git+https://github.com/astropy/astropy.git
+        else
+          pip install astropy==${{ matrix.astropy-version }}
+        fi
+        if [ "${{ matrix.numpy-version }}" != "stable" ]; then
+          pip install numpy==${{ matrix.numpy-version }}
+        else
+          pip install numpy
+        fi
+
+    - name: Test with pytest
+      run: |
+        py.test
+
+    - name: Code Climate
+      env:
+        CC_TEST_REPORTER_ID: 3b872f454e56a7bae149bd9ec6b24c83e6d5856ce08035a8c2e739e67c410d70
+      run: |
+        curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+        chmod +x ./cc-test-reporter
+        ./cc-test-reporter before-build
+        py.test --cov=.
+        ./cc-test-reporter after-build --exit-code $?
+```

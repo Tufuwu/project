@@ -1,0 +1,53 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10]
+        plone-version: [5.2.x]
+        solr-version: [7.7.2, 8.2.0]
+        extra-eggs: [""]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install zest.pocompile
+        pocompile src
+    - name: Configure buildout
+      run: |
+        sed -ie "s#plone-.\..\.x\.cfg#plone-${{ matrix.plone-version }}.cfg#" buildout.cfg
+        sed -ie "s#eggs +=#eggs += ${{ matrix.extra-eggs }}#" buildout.cfg
+        sed -ie "s#solr/.\..\..#solr/${{ matrix.solr-version }}" base.cfg
+        sed -ie "s#solr-.\..\..#solr-${{ matrix.solr-version }}" base.cfg
+    - name: Buildout
+      run: bin/buildout -N -t 20
+    - name: Run code analysis
+      run: bin/code-analysis
+    - name: Run black check
+      run: bin/black src/ --check
+    - name: Run tests
+      run: bin/coverage run bin/test
+    - name: Run Robot Framework
+      run: export ROBOTSUITE_PREFIX=ONLYROBOT && bin/test -t ONLYROBOT --all
+    - name: Coveralls
+      if: success()
+      run: |
+        pip install -q coveralls python-coveralls==2.5.0
+        coveralls

@@ -1,0 +1,46 @@
+name: Python CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python: ['3.9', '3.10', '3.11']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv E0C56BD4
+        sudo apt-get update
+        sudo apt-get install clickhouse-client clickhouse-server clickhouse-common-static dirmngr apt-transport-https postgresql-contrib-9.6 postgresql-10 postgresql-contrib-10 postgresql-client-10 postgresql-11 postgresql-contrib-11 postgresql-client-11 postgresql-12 postgresql-contrib-12 postgresql-client-12 unzip rabbitmq-server
+        pip install -r requirements-test.txt
+        pip install -q Django==${{ matrix.DJANGO }}.*
+
+    - name: Configure PostgreSQL
+      run: |
+        sudo sed -i 's/port = 5433/port = 5432/' /etc/postgresql/11/main/postgresql.conf
+        sudo cp /etc/postgresql/{10,11}/main/pg_hba.conf
+        sudo sed -i 's/port = 5434/port = 5432/' /etc/postgresql/12/main/postgresql.conf
+        sudo cp /etc/postgresql/{10,12}/main/pg_hba.conf
+        sudo systemctl stop postgresql
+        sudo systemctl start postgresql@${{ matrix.PG }}-main
+        psql -tc 'SHOW server_version' -U postgres
+        psql -c 'CREATE ROLE test;' -U postgres
+        psql -c 'ALTER ROLE test WITH SUPERUSER;' -U postgres
+        psql -c 'ALTER ROLE test WITH LOGIN;' -U postgres
+        psql -c "ALTER ROLE test PASSWORD 'test';" -U postgres
+        psql -c 'CREATE DATABASE test OWNER test;' -U postgres
+        psql -c 'CREATE DATABASE test2 OWNER test;' -U postgres
+
+    - name: Run tests
+      run: python runtests.py

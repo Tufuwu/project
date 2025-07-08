@@ -1,0 +1,54 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:9.6
+        env:
+          POSTGRES_USER: pygame_test
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: pygame_test
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y yui-compressor node optipng
+        pip install --upgrade pip
+        pip install -r requirements.dev.txt
+        pip install --upgrade pytest
+        pip install coveralls
+        pip install -e .
+    - name: Prepare environment
+      run: cp example.env .env
+    - name: Create database
+      run: psql -c 'create database pygame_test;' -U postgres
+    - name: Create user and grant privileges
+      run: |
+        psql pygame_test -c "CREATE USER pygame_test WITH PASSWORD 'password';" -U postgres
+        psql pygame_test -c "GRANT ALL PRIVILEGES ON DATABASE pygame_test to pygame_test;" -U postgres
+    - name: Run tests
+      env:
+        APP_SECRET_KEY: a
+      run: pytest
+    - name: Coveralls
+      if: success()
+      run: coveralls
+    - name: Pre-deploy checks
+      run: |
+        pwd
+        ls -la
+        git checkout $GITHUB_REF
+        pygameweb_release_version_correct

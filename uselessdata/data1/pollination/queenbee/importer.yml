@@ -1,0 +1,61 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/master' && (contains(fromJson('["pull_request"]'), github.event_name)) }}
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+    - run: nvm install lts/* --latest-npm
+    - run: pip install -r requirements.txt
+    - run: pip install -r dev-requirements.txt
+    - run: npm install @semantic-release/exec
+    - run: git config --global user.email "releases@ladybug.tools"
+    - run: git config --global user.name "ladybugbot"
+    - run: npx semantic-release
+    - run: coverage report
+      if: "${{ success() }}"
+    - run: coveralls
+      if: "${{ success() }}"
+  docs:
+    needs:
+    - deploy
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/master' && (contains(fromJson('["pull_request"]'), github.event_name)) }}
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: '3.7'
+    - run: pip install -r dev-requirements.txt
+    - run: pip install -r requirements.txt
+    - run: pip install -U .
+    - run: pip install -r dev-requirements.txt
+    - run: sphinx-apidoc -f -e -d 4 -o ./docs/modules ./queenbee
+    - run: sphinx-build -b html ./docs ./docs/_build
+#     # This item has no matching transformer
+#     - pages:
+#         provider: pages
+#         skip_cleanup: true
+#         github-token: "$GH_TOKEN"
+#         keep_history: false
+#         local_dir: docs/_build/
+#         'on':
+#           branch: master
+#       if: "${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}"
+    - run: coverage report
+      if: "${{ success() }}"
+    - run: coveralls
+      if: "${{ success() }}"

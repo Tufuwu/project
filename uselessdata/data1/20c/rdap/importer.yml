@@ -1,0 +1,33 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+    - "!gh-pages"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: "${{ matrix.python }}"
+    - run: sudo apt-get -qq update
+    - run: python -m pip install -U pip
+    - run: pip install -U setuptools poetry
+    - run: pip install -U tox-travis codecov
+    - run: tox
+    - run: codecov
+      if: "${{ success() }}"
+    strategy:
+      matrix:
+        python:
+        - 3.6
+        - 3.7
+        - 3.8
+        - 3.9

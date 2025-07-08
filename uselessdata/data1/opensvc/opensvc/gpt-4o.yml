@@ -1,0 +1,58 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - b2.0
+      - b2.1
+  pull_request:
+    branches:
+      - master
+      - b2.0
+      - b2.1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        include:
+          - python-version: '3.9'
+            env: PYTEST_EXTRA_ARGS=""
+          - python-version: '3.10'
+            env: PYTEST_EXTRA_ARGS="--cov"
+
+    steps:
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get -y install procps
+        pip install -r test-requirements.txt
+
+    - name: Run tests
+      run: |
+        sudo $(which pytest) $PYTEST_EXTRA_ARGS -m "ci"
+        PYTHONPATH=opensvc pylint -E opensvc/*py opensvc/commands opensvc/core opensvc/daemon opensvc/drivers opensvc/utilities
+
+    - name: Upload coverage to Codecov
+      if: matrix.python-version == '3.10'
+      run: |
+        pip install codecov
+        codecov
+```

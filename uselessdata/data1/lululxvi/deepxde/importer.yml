@@ -1,0 +1,37 @@
+name: Tufuwu/test2
+on:
+  push:
+    branches:
+    - "**/*"
+  pull_request:
+concurrency:
+#   # This item has no matching transformer
+#   maximum_number_of_builds: 0
+jobs:
+  test:
+    runs-on: # this agent type is not supported: [[{"dist"=>"jammy"}]]
+             ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - uses: actions/setup-python@v5.0.0
+      with:
+        python-version: "${{ matrix.python }}"
+    - run: wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+    - run: bash miniconda.sh -b -p ${{ github.workspace }}/miniconda
+    - run: source "${{ github.workspace }}/miniconda/etc/profile.d/conda.sh"
+    - run: hash -r
+    - run: conda config --set always_yes yes --set changeps1 no
+    - run: conda update -q conda
+    - run: conda info -a
+    - run: conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
+    - run: conda activate test-environment
+    - run: conda install matplotlib numpy scikit-learn scipy
+    - run: conda install -c conda-forge scikit-optimize
+    - run: python -c "print('Hello World')"
+    strategy:
+      matrix:
+        python:
+        - '3.7'
+        - '3.8'
+        - '3.9'

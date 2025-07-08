@@ -1,0 +1,46 @@
+name: Python 3.9 on Xenial Linux
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.9', '3.10']
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get build-dep python-scipy
+          pip install -r tests/requirements.txt
+          pip install -r requirements.txt
+          pip install coveralls
+      - name: Set up Miniconda
+        if: ${{ matrix.python == '3.9' }}
+        run: |
+          wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+          bash miniconda.sh -b -p $HOME/miniconda
+          export PATH="$HOME/miniconda/bin:$PATH"
+          hash -r
+          conda config --set always_yes yes --set changeps1 no
+          export BASE_PYTHON=`python -c 'import sys; version=sys.version_info[:3]; print("{0}.{1}.{2}".format(*version))'`
+          echo "Base Anaconda Python is $BASE_PYTHON"
+          echo "Creating Anaconda Python 3.9 conda environment"
+          conda update -n base conda --yes
+          conda config --add channels conda-forge
+          conda env create -f tests/requirements.txt -n yellowbrick python=3.9
+          source activate yellowbrick
+          conda install coveralls
+      - name: Download NLTK data
+        run: python -m nltk.downloader popular
+      - name: Run tests
+        run: make test
+      - name: Upload coverage
+        run: coveralls

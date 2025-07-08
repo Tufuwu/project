@@ -1,0 +1,44 @@
+```yaml
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:stable-dind
+
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10']
+        make-target: ['test', 'itest_xenial', 'itest_bionic', 'itest_stretch', 'itest_buster']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends zsh
+
+    - name: Set umask
+      run: umask 022
+
+    - name: Run Make
+      run: make ${{ matrix.make-target }}
+```

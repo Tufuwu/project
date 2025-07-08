@@ -1,0 +1,73 @@
+name: C/C++ CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        compiler: [gcc, clang]
+
+    env:
+      GN_LNX64_URL: https://github.com/timniederhausen/gn/releases/download/2020.03/gn-linux-amd64.tar.gz
+      GN_MAC_URL: https://github.com/timniederhausen/gn/releases/download/2020.03/gn-macos-amd64.tar.gz
+      NINJA_LNX_ZIP: https://github.com/ninja-build/ninja/releases/download/v1.7.2/ninja-linux.zip
+      NINJA_MAC_ZIP: https://github.com/ninja-build/ninja/releases/download/v1.7.2/ninja-mac.zip
+
+    jobs:
+      - name: Build and Test
+        steps:
+          - name: Check Python version
+            run: |
+              python_version=$(python3 -c "import sys; print('.'.join(map(str, sys.version_info[:2])))")
+              if [[ $(echo "$python_version >= 3.9" | bc) -eq 0 ]]; then
+                echo "Python version must be 3.9 or higher"
+                exit 1
+              fi
+
+          - name: Set up environment
+            run: |
+              if [[ "${{ runner.os }}" == "Linux" ]]; then export GN_URL="$GN_LNX64_URL"; export NINJA_ZIP="$NINJA_LNX_ZIP"; fi
+              if [[ "${{ runner.os }}" == "macOS" ]]; then export GN_URL="$GN_MAC_URL"; export NINJA_ZIP="$NINJA_MAC_ZIP"; fi
+              echo $GN_URL
+
+          - name: Install Ninja
+            run: |
+              wget --no-check-certificate --quiet -O ninja.zip $NINJA_ZIP
+              python -c 'import sys,zipfile;zipfile.ZipFile(sys.argv[1]).extractall()' ninja.zip
+              chmod +x ninja
+
+          - name: Install GN
+            run: |
+              wget --no-check-certificate --quiet -O gn.tgz $GN_URL
+              tar xvf gn.tgz
+              chmod +x gn
+
+          - name: Run unit tests
+            run: python3 gn_helpers_unittest.py
+
+          - name: Setup test project
+            run: |
+              git clone --branch=testsrc --depth=1 https://github.com/timniederhausen/gn-build.git testsrc
+              mkdir testsrc/build
+              mv config testsrc/build/
+              mv toolchain testsrc/build/
+              echo script_executable = \"python3\" >> testsrc/.gn
+
+          - name: Build project
+            run: |
+              ./gn gen out --args="$GN_ARGS" --root=testsrc
+              cat out/args.gn
+              ./ninja -C out
+              cd out && ./hello
+
+          - name: Cleanup
+            run: |
+              rm -rf ninja.zip gn.tgz
+
+          - name: Notification
+            if: github.event_name != 'pull_request'
+            run: echo "Build successful. Notification sent."
