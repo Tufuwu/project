@@ -1,0 +1,7 @@
+full_name,commits,releases,forks,stargazers,size,createdAt,pushedAt,updatedAt,lastCommit,travisredate
+okfn-brasil/querido-diario,2020-11-21T21:44:54Z,test.yml,47cf7d1db4378e9e7fa23c57aa5abf6b4f3030c2,47cf7d1db4378e9e7fa23c57aa5abf6b4f3030c2,3
+yaph/geonamescache,2021-11-02T21:56:14Z,pythonpackage.yml,c23e74608cfb109d638d1fc3e4ccc5c275698209,089fb1dfbb9165118751d7ca3193baa4f0b24767,2
+trynthink/scout,2021-09-22T22:51:47Z,tests.yml,0272dc7beacd1a77602a5de7028701c5abfe8f82,ece30eedcc7492a2484fd052a249ae6fa6130e1f,2
+liormizr/s3path,2021-06-28T05:58:15Z,test.yml,0519b96e97e859f37a261efd743affdf0044c6a3,0519b96e97e859f37a261efd743affdf0044c6a3,2
+codemeta/codemeta,2023-04-26T10:35:05Z,check.yml,49e99b02dc8601ca5bcd9a5a7591200edefa08d3,49e99b02dc8601ca5bcd9a5a7591200edefa08d3,1
+uc-cdis/fence,2023-09-27T23:09:45Z,ci.yaml,1892efc7247ababec68f76fb682f169474897bbf,1892efc7247ababec68f76fb682f169474897bbf,1

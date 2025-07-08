@@ -20,6 +20,8 @@ script:
     && (echo "File count before compiling test: pass" && exit 0)
     || (echo "File count before compiling test: fail" && exit 1)
 
+    
+
   - >
     flask digest compile
     && ls -laR example/static/ | wc -l
